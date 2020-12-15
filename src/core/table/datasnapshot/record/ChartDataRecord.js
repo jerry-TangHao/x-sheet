@@ -1,0 +1,3 @@
+class ChartDataRecord {}
+
+export { ChartDataRecord };
