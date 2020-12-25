@@ -927,7 +927,7 @@ class XTableContentUI extends XTableUI {
               builder.setCol(col);
               builder.setOverFlow(overflow);
               const font = builder.build();
-              const result = font.draw();
+              const result = font.drawingFont();
               cell.setContentWidth(result.width);
               cell.setLeftSdistWidth(result.leftSdist);
               cell.setRightSdistWidth(result.rightSdist);
@@ -980,7 +980,7 @@ class XTableContentUI extends XTableUI {
               builder.setCol(col);
               builder.setOverFlow(overflow);
               const font = builder.build();
-              const result = font.draw();
+              const result = font.drawingFont();
               cell.setContentWidth(result.width);
               cell.setLeftSdistWidth(result.leftSdist);
               cell.setRightSdistWidth(result.rightSdist);
@@ -1244,7 +1244,7 @@ class XTableContentUI extends XTableUI {
         builder.setCol(col);
         builder.setOverFlow(overflow);
         const font = builder.build();
-        const result = font.draw();
+        const result = font.drawingFont();
         cell.setContentWidth(result.width);
         cell.setLeftSdistWidth(result.leftSdist);
         cell.setRightSdistWidth(result.rightSdist);
@@ -1258,7 +1258,7 @@ class XTableContentUI extends XTableUI {
         builder.setCol(col);
         builder.setOverFlow(rect);
         const font = builder.build();
-        const result = font.draw();
+        const result = font.drawingFont();
         cell.setContentWidth(result.width);
         cell.setLeftSdistWidth(result.leftSdist);
         cell.setRightSdistWidth(result.rightSdist);

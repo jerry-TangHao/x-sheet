@@ -16,20 +16,20 @@ class Angle {
 
   constructor({
     angle,
-    dw,
+    draw,
     origin = ANGLE_ORIGIN.MIDDLE_CENTER,
     rect = new Rect({ x: 0, y: 0, width: 0, height: 0 }),
   }) {
-    this.dw = dw;
+    this.draw = draw;
     this.origin = origin;
     this.rect = rect;
     this.angle = angle;
   }
 
   rotate() {
-    const { origin, dw, rect, angle } = this;
+    const { origin, draw, rect, angle } = this;
     const { x, y, width, height } = rect;
-    dw.save();
+    draw.save();
     let tx = 0;
     let ty = 0;
     switch (origin) {
@@ -71,17 +71,17 @@ class Angle {
         break;
       default: break;
     }
-    const offsetX = dw.getOffsetX();
-    const offsetY = dw.getOffsetY();
-    dw.translate(tx + offsetX, ty + offsetY)
+    const offsetX = draw.getOffsetX();
+    const offsetY = draw.getOffsetY();
+    draw.translate(tx + offsetX, ty + offsetY)
       .rotate(angle)
       .translate(-(tx + offsetX), -(ty + offsetY));
     return this;
   }
 
   revert() {
-    const { dw } = this;
-    dw.restore();
+    const { draw } = this;
+    draw.restore();
     return this;
   }
 

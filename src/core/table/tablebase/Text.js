@@ -1,8 +1,8 @@
 import { ScaleAdapter } from './Scale';
 import { XDraw } from '../../../canvas/XDraw';
-import { XFontBuilder } from '../../../canvas/font/XFontBuilder';
 import { BaseFont } from '../../../canvas/font/BaseFont';
 import XTableFormat from '../XTableFormat';
+import { DrawFontBuilder } from '../../../canvas/font/build/DrawFontBuilder';
 
 class TextBuilder {
 
@@ -11,7 +11,7 @@ class TextBuilder {
   }) {
     this.scaleAdapter = scaleAdapter;
     this.rect = null;
-    this.dw = null;
+    this.draw = null;
     this.cell = null;
     this.row = -1;
     this.col = -1;
@@ -23,8 +23,8 @@ class TextBuilder {
     this.rect = rect;
   }
 
-  setDraw(dw) {
-    this.dw = dw;
+  setDraw(draw) {
+    this.draw = draw;
   }
 
   setCell(cell) {
@@ -44,19 +44,23 @@ class TextBuilder {
   }
 
   build() {
-    const { rect, overflow, row, col, cell, dw, scaleAdapter, table } = this;
-    const { format, text, fontAttr } = cell;
+    const { rect, overflow, row, col, cell, draw, scaleAdapter, table } = this;
+    const { format, text, fontAttr, ruler } = cell;
     const size = XDraw.srcTransformStylePx(scaleAdapter.goto(fontAttr.size));
     const padding = XDraw.srcTransformStylePx(scaleAdapter.goto(fontAttr.padding));
-    const builder = new XFontBuilder({
-      text: XTableFormat(format, text), dw, overflow, rect, attr: fontAttr,
+    const builder = new DrawFontBuilder({
+      text: XTableFormat(format, text), draw, overflow, rect, attr: fontAttr,
     });
     builder.setSize(size);
     builder.setPadding(padding);
     if (table.isAngleBarCell(row, col)) {
       builder.setDirection(BaseFont.TEXT_DIRECTION.ANGLE_BAR);
     }
-    return builder.build();
+    const buildRuler = builder.buildRuler();
+    const buildFont = builder.buildFont();
+    buildFont.setRuler(buildRuler.equals(ruler) ? ruler : buildRuler);
+    cell.setRuler(buildFont.ruler);
+    return buildFont;
   }
 
 }
@@ -80,6 +84,4 @@ class Text {
 
 }
 
-export {
-  Text,
-};
+export { Text };

@@ -1,49 +1,15 @@
 class BaseFont {
 
   constructor({
-    text, dw, attr, rect,
+    draw, ruler, attr,
   }) {
-    this.text = text;
-    this.dw = dw;
+    this.draw = draw;
+    this.ruler = ruler;
     this.attr = attr;
-    this.rect = rect;
   }
 
-  truncateFont() {
-    throw new TypeError('child impl');
-  }
-
-  overflowFont() {
-    throw new TypeError('child impl');
-  }
-
-  wrapTextFont() {
-    throw new TypeError('child impl');
-  }
-
-  draw() {
-    throw new TypeError('child impl');
-  }
-
-  /**
-   * 文字宽度测量(性能杀手,考虑缓存优化)
-   * @param text
-   * @returns {number}
-   */
-  textWidth(text) {
-    return this.dw.measureText(text).width;
-  }
-
-  textBreak(text) {
-    return text.split(/\n/);
-  }
-
-  hasBreak(text) {
-    return text.indexOf('\n') > -1;
-  }
-
-  isBlank(text) {
-    return text === null || text === undefined || text.toString().trim() === '';
+  setRuler(ruler) {
+    this.ruler = ruler;
   }
 
   getAlignPadding() {
@@ -51,6 +17,14 @@ class BaseFont {
       return 0;
     }
     return this.attr.padding;
+  }
+
+  isBlank(text) {
+    return text === null || text === undefined || text.toString().trim() === '';
+  }
+
+  hasBreak(text) {
+    return text.indexOf('\n') > -1;
   }
 
   getVerticalAlignPadding() {
@@ -80,7 +54,7 @@ BaseFont.TEXT_DIRECTION = {
   HORIZONTAL: 'horizontal',
   VERTICAL: 'vertical',
   ANGLE: 'angle',
-  ANGLE_BAR: 'anglebar',
+  ANGLE_BAR: 'bar',
 };
 export {
   BaseFont,

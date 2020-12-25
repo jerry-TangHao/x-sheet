@@ -187,10 +187,7 @@ class XTableEdit extends Widget {
       this.hide();
       if (cell.text !== text) {
         tableDataSnapshot.begin();
-        cell.text = text;
-        cell.setContentWidth(0);
-        cell.setLeftSdistWidth(0);
-        cell.setRightSdistWidth(0);
+        cell.setText(text);
         cellDataProxy.setCell(select.sri, select.sci, cell);
         tableDataSnapshot.end();
         table.render();

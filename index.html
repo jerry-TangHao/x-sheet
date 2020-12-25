@@ -20,7 +20,11 @@
   const xSheet = new XSheet(dome, {
     workConfig: {
       body: {
-        sheets: [{}],
+        sheets: [{
+          tableConfig: {
+            data: []
+          }
+        }],
       },
     },
   });

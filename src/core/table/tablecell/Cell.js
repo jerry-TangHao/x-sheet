@@ -32,8 +32,9 @@ class Cell {
     leftSdistWidth = 0,
     rightSdistWidth = 0,
   }) {
-    this.background = background;
     this.text = text;
+    this.ruler = null;
+    this.background = background;
     this.format = format;
     this.icons = XIcon.newInstances(icons);
     this.borderAttr = new CellBorder(borderAttr);
@@ -59,6 +60,17 @@ class Cell {
     this.icons = icons;
   }
 
+  setText(text) {
+    this.text = text;
+    this.setContentWidth(0);
+    this.setLeftSdistWidth(0);
+    this.setRightSdistWidth(0);
+  }
+
+  setRuler(ruler) {
+    this.ruler = ruler;
+  }
+
   setLeftSdistWidth(leftSdistWidth) {
     this.leftSdistWidth = leftSdistWidth;
   }
@@ -68,18 +80,14 @@ class Cell {
   }
 
   clone() {
-    const {
-      background, format, text, fontAttr, borderAttr, contentWidth, icons,
-    } = this;
+    const { background, format, text, fontAttr, borderAttr, contentWidth, icons } = this;
     return new Cell({
       background, format, text, fontAttr, borderAttr, contentWidth, icons,
     });
   }
 
   toJSON() {
-    const {
-      background, format, text, fontAttr, borderAttr, contentWidth, icons,
-    } = this;
+    const { background, format, text, fontAttr, borderAttr, contentWidth, icons } = this;
     return {
       background, format, text, fontAttr, borderAttr, contentWidth, icons,
     };
