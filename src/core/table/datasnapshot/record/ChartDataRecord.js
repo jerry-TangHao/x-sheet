@@ -1,3 +1,0 @@
-class ChartDataRecord {}
-
-export { ChartDataRecord };
