@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>x-sheet</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        html, body {
+            height: 100%;
+            display: block;
+        }
+    </style>
+<link rel="shortcut icon" href="logo.ico"><link href="XSheet.css" rel="stylesheet"></head>
+<body id="dome"><script type="text/javascript" src="XSheet.js"></script></body>
+<script>
+  const dome = document.getElementById('dome');
+  const xSheet = new XSheet(dome, {
+    workConfig: {
+      body: {
+        sheets: [{
+          tableConfig: {
+            data: []
+          }
+        }],
+      },
+    },
+  });
+</script>
+</html>
