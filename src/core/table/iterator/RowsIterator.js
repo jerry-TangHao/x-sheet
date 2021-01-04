@@ -14,12 +14,13 @@ class RowsIterator extends BaseIterator {
 
   constructor() {
     super();
+    this.skipCallback = () => {};
     this.useFold = true;
   }
 
   execute() {
     const {
-      loopCallback, nextCallback,
+      loopCallback, nextCallback, skipCallback,
     } = this;
     const {
       begin, end, useFold,
@@ -29,6 +30,7 @@ class RowsIterator extends BaseIterator {
       i = begin;
       for (; i >= end; i -= 1, nextCallback(i)) {
         if (useFold && fold[i]) {
+          skipCallback(i);
           continue;
         }
         const res = loopCallback(i);
@@ -40,6 +42,7 @@ class RowsIterator extends BaseIterator {
       i = begin;
       for (; i <= end; i += 1, nextCallback(i)) {
         if (useFold && fold[i]) {
+          skipCallback(i);
           continue;
         }
         const res = loopCallback(i);
@@ -49,6 +52,11 @@ class RowsIterator extends BaseIterator {
       }
     }
     this.finishCallback(i);
+    return this;
+  }
+
+  setSkip(callback) {
+    this.skipCallback = callback;
     return this;
   }
 

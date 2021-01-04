@@ -239,6 +239,14 @@ class ValueFilter extends ELContextMenuItem {
   }
 
   /**
+   * 是否符合筛选条件
+   * @param items
+   */
+  qualified(items) {
+
+  }
+
+  /**
    * 销毁组件
    */
   destroy() {

@@ -1,8 +1,10 @@
-import { RowsIterator } from '../iterator/RowsIterator';
-
 class XLineOptimizeJoin {
 
-  static htJoin(line) {
+  constructor(xIteratorBuilder) {
+    this.xIteratorBuilder = xIteratorBuilder;
+  }
+
+  htJoin(line) {
     for (let i = 1; i < line.length;) {
       const item = line[i];
       const last = line[i - 1];
@@ -20,7 +22,7 @@ class XLineOptimizeJoin {
     return line;
   }
 
-  static hbJoin(line) {
+  hbJoin(line) {
     for (let i = 1; i < line.length;) {
       const item = line[i];
       const last = line[i - 1];
@@ -38,11 +40,12 @@ class XLineOptimizeJoin {
     return line;
   }
 
-  static vlJoin(line) {
+  vlJoin(line) {
+    const { xIteratorBuilder } = this;
     for (let i = 1; i < line.length;) {
       const item = line[i];
       const last = line[i - 1];
-      const nextRow = RowsIterator.getInstance()
+      const nextRow = xIteratorBuilder.getRowIterator()
         .setBegin(last.row)
         .setEnd(item.row)
         .nextRow();
@@ -60,11 +63,12 @@ class XLineOptimizeJoin {
     return line;
   }
 
-  static vrJoin(line) {
+  vrJoin(line) {
+    const { xIteratorBuilder } = this;
     for (let i = 1; i < line.length;) {
       const item = line[i];
       const last = line[i - 1];
-      const nextRow = RowsIterator.getInstance()
+      const nextRow = xIteratorBuilder.getRowIterator()
         .setBegin(last.row)
         .setEnd(item.row)
         .nextRow();

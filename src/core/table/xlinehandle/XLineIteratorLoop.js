@@ -1,5 +1,3 @@
-import { RowsIterator } from '../iterator/RowsIterator';
-import { ColsIterator } from '../iterator/ColsIterator';
 import { XLineIteratorFilter } from './XLineIteratorFilter';
 import { RectRange } from '../tablebase/RectRange';
 
@@ -25,14 +23,14 @@ class XLineIteratorLoop {
 
   run() {
     const { view, table } = this;
-    const { rows, cols } = table;
+    const { rows, cols, xIteratorBuilder } = table;
     const { filter, foldOnOff } = this;
     const { bx, by } = this;
     const { sri, eri, sci, eci } = view;
     let y = by;
     let firstRow = true;
     let lastRow = false;
-    RowsIterator.getInstance()
+    xIteratorBuilder.getRowIterator()
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((row) => {
@@ -43,7 +41,7 @@ class XLineIteratorLoop {
             this.runNewRow(row, y);
             lastRow = row === eri;
             let x = bx;
-            ColsIterator.getInstance()
+            xIteratorBuilder.getColIterator()
               .setBegin(sci)
               .setEnd(eci)
               .setLoop((col) => {

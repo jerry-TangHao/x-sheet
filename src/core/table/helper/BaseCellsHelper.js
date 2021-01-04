@@ -2,7 +2,6 @@ import { PlainUtils } from '../../../utils/PlainUtils';
 import { Rect } from '../../../canvas/Rect';
 import { RTCosKit, RTSinKit } from '../../../canvas/RTFunction';
 import { BaseFont } from '../../../canvas/font/BaseFont';
-import { ColsIterator } from '../iterator/ColsIterator';
 
 class BaseCellsHelper {
 
@@ -15,7 +14,7 @@ class BaseCellsHelper {
   }
 
   getStyleTable() {
-
+    throw new TypeError('child impl');
   }
 
   getCols() {
@@ -27,6 +26,10 @@ class BaseCellsHelper {
   }
 
   getCells() {
+    throw new TypeError('child impl');
+  }
+
+  getXIteratorBuilder() {
     throw new TypeError('child impl');
   }
 
@@ -59,13 +62,14 @@ class BaseCellsHelper {
     const cells = this.getCells();
     const { fontAttr } = cell;
     const { align } = fontAttr;
+    const xIteratorBuilder = this.getXIteratorBuilder();
     let width = 0;
     let offset = 0;
     switch (align) {
       case BaseFont.ALIGN.left: {
         // 计算当前单元格右边
         // 空白的单元格的总宽度
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci)
           .setEnd(cols.len)
           .setLoop((i) => {
@@ -89,7 +93,7 @@ class BaseCellsHelper {
         let rightWidth = 0;
         let leftWidth = 0;
         // 右边
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci + 1)
           .setEnd(cols.len)
           .setLoop((i) => {
@@ -104,7 +108,7 @@ class BaseCellsHelper {
           })
           .execute();
         // 左边
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci - 1)
           .setEnd(0)
           .setLoop((i) => {
@@ -127,7 +131,7 @@ class BaseCellsHelper {
       case BaseFont.ALIGN.right: {
         // 计算当前单元格左边
         // 空白的单元格的总宽度
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci)
           .setEnd(0)
           .setLoop((i) => {
@@ -161,6 +165,7 @@ class BaseCellsHelper {
     if (merge) {
       return merge;
     }
+    const xIteratorBuilder = this.getXIteratorBuilder();
     const { fontAttr } = cell;
     const { angle, align, padding } = fontAttr;
     const rowHeight = rows.getHeight(ri);
@@ -174,7 +179,7 @@ class BaseCellsHelper {
     switch (align) {
       case BaseFont.ALIGN.left: {
         haveWidth += padding;
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci)
           .setEnd(cols.len)
           .setLoop((i) => {
@@ -189,7 +194,7 @@ class BaseCellsHelper {
         const target = haveWidth - rect.width;
         const half = target / 2;
         let leftWidth = 0;
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci)
           .setEnd(cols.len)
           .setLoop((i) => {
@@ -199,7 +204,7 @@ class BaseCellsHelper {
           })
           .execute();
         let rightWidth = 0;
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci)
           .setEnd(0)
           .setLoop((i) => {
@@ -214,7 +219,7 @@ class BaseCellsHelper {
       }
       case BaseFont.ALIGN.right: {
         haveWidth += padding;
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(ci)
           .setEnd(0)
           .setLoop((i) => {

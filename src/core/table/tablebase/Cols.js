@@ -1,7 +1,6 @@
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { ScaleAdapter } from './Scale';
 import { RectRange } from './RectRange';
-import { ColsIterator } from '../iterator/ColsIterator';
 import { Col } from './Col';
 
 class Cols {
@@ -11,11 +10,13 @@ class Cols {
     len = 10,
     data = [],
     width = 110,
+    xIteratorBuilder,
   }) {
     this.scaleAdapter = scaleAdapter;
     this.len = len;
     this.data = data;
     this.min = 5;
+    this.xIteratorBuilder = xIteratorBuilder;
     this.width = PlainUtils.minIf(width, this.min);
   }
 
@@ -24,7 +25,7 @@ class Cols {
     if (sci > eci) {
       return total;
     }
-    ColsIterator.getInstance()
+    this.xIteratorBuilder.getColIterator()
       .setBegin(sci)
       .setEnd(eci)
       .setLoop((i) => {
@@ -75,7 +76,7 @@ class Cols {
 
   eachWidth(ci, ei, cb, sx = 0) {
     let x = sx;
-    ColsIterator.getInstance()
+    this.xIteratorBuilder.getColIterator()
       .setBegin(ci)
       .setEnd(ei)
       .setLoop((i) => {

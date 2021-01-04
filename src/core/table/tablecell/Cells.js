@@ -11,15 +11,17 @@ class Cells {
     onChange = () => {},
     table,
     xTableData,
+    xIteratorBuilder,
   }) {
     this.table = table;
     this.xTableData = xTableData;
     this.onChange = onChange;
+    this.xIteratorBuilder = xIteratorBuilder;
   }
 
   emptyRectRange(rectRange) {
     let empty = true;
-    rectRange.each((ri, ci) => {
+    rectRange.each(this.xIteratorBuilder, (ri, ci) => {
       const cell = this.getCell(ri, ci);
       if (PlainUtils.isNotEmptyObject(cell) && !PlainUtils.isBlank(cell.text)) {
         empty = false;

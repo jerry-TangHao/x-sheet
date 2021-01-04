@@ -1,7 +1,6 @@
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { ScaleAdapter } from './Scale';
 import { RectRange } from './RectRange';
-import { RowsIterator } from '../iterator/RowsIterator';
 import { Row } from './Row';
 
 class Rows {
@@ -9,13 +8,15 @@ class Rows {
   constructor({
     scaleAdapter = new ScaleAdapter(),
     len = 10,
-    data = [],
     height = 30,
+    xIteratorBuilder,
+    data = [],
   }) {
     this.scaleAdapter = scaleAdapter;
     this.len = len;
     this.data = data;
     this.min = 5;
+    this.xIteratorBuilder = xIteratorBuilder;
     this.height = PlainUtils.minIf(height, this.min);
   }
 
@@ -24,7 +25,7 @@ class Rows {
     if (sri > eri) {
       return total;
     }
-    RowsIterator.getInstance()
+    this.xIteratorBuilder.getRowIterator()
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((i) => {
@@ -75,7 +76,7 @@ class Rows {
 
   eachHeight(ri, ei, cb, sy = 0) {
     let y = sy;
-    RowsIterator.getInstance()
+    this.xIteratorBuilder.getRowIterator()
       .setBegin(ri)
       .setEnd(ei)
       .setLoop((i) => {

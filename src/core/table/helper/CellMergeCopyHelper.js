@@ -1,5 +1,3 @@
-import { RowsIterator } from '../iterator/RowsIterator';
-import { ColsIterator } from '../iterator/ColsIterator';
 import { RectRange } from '../tablebase/RectRange';
 import { BaseCellsHelper } from './BaseCellsHelper';
 import { PlainUtils } from '../../../utils/PlainUtils';
@@ -12,12 +10,14 @@ class CopyMerge {
     merge = () => {},
     master = () => {},
     onCopy = () => {},
+    xIteratorBuilder,
   }) {
     this.targetViewRange = targetViewRange;
     this.originViewRange = originViewRange;
     this.master = master;
     this.merge = merge;
     this.onCopy = onCopy;
+    this.xIteratorBuilder = xIteratorBuilder;
   }
 
   copyStartRow() {
@@ -78,12 +78,12 @@ class CopyMerge {
 
   executeCopy() {
     let ori = this.copyStartRow();
-    RowsIterator.getInstance()
+    this.xIteratorBuilder.getRowIterator()
       .setBegin(this.pasteStartRow())
       .setEnd(this.pasteEndRow())
       .setLoop((tri) => {
         let oci = this.copyStartCol();
-        ColsIterator.getInstance()
+        this.xIteratorBuilder.getColIterator()
           .setBegin(this.pasteStartCol())
           .setEnd(this.pasteEndCol())
           .setLoop((tci) => {
@@ -112,16 +112,18 @@ class CopyCellIN {
     targetViewRange,
     originViewRange,
     onCopy = () => {},
+    xIteratorBuilder,
   }) {
     this.targetViewRange = targetViewRange;
     this.originViewRange = originViewRange;
     this.onCopy = onCopy;
+    this.xIteratorBuilder = xIteratorBuilder;
   }
 
   copyStartRow() {
     const { originViewRange } = this;
     const { sri, eri } = originViewRange;
-    return RowsIterator.getInstance()
+    return this.xIteratorBuilder.getRowIterator()
       .setBegin(sri - 1)
       .setEnd(eri)
       .nextRow();
@@ -130,7 +132,7 @@ class CopyCellIN {
   copyEndRow() {
     const { originViewRange } = this;
     const { sri, eri } = originViewRange;
-    return RowsIterator.getInstance()
+    return this.xIteratorBuilder.getRowIterator()
       .setBegin(eri + 1)
       .setEnd(sri)
       .nextRow();
@@ -141,7 +143,7 @@ class CopyCellIN {
     if (row >= endRow) {
       return this.copyStartRow();
     }
-    return RowsIterator.getInstance()
+    return this.xIteratorBuilder.getRowIterator()
       .setBegin(row)
       .setEnd(endRow)
       .nextRow();
@@ -187,12 +189,12 @@ class CopyCellIN {
 
   executeCopy() {
     let ori = this.copyStartRow();
-    RowsIterator.getInstance()
+    this.xIteratorBuilder.getRowIterator()
       .setBegin(this.pasteStartRow())
       .setEnd(this.pasteEndRow())
       .setLoop((tri) => {
         let oci = this.copyStartCol();
-        ColsIterator.getInstance()
+        this.xIteratorBuilder.getColIterator()
           .setBegin(this.pasteStartCol())
           .setEnd(this.pasteEndCol())
           .setLoop((tci) => {
@@ -218,23 +220,25 @@ class Serialize {
     direction,
     getStartIndex,
     onSerialize,
+    xIteratorBuilder,
   }) {
     this.originViewRange = originViewRange;
     this.direction = direction;
     this.getStartIndex = getStartIndex;
     this.onSerialize = onSerialize;
+    this.xIteratorBuilder = xIteratorBuilder;
   }
 
   serializeRight() {
     const { originViewRange, onSerialize, getStartIndex } = this;
     const { sri, sci, eri, eci } = originViewRange;
     let ret = true;
-    RowsIterator.getInstance()
+    this.xIteratorBuilder.getRowIterator()
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((ri) => {
         let start = PlainUtils.Nul;
-        ColsIterator.getInstance()
+        this.xIteratorBuilder.getColIterator()
           .setBegin(sci)
           .setEnd(eci)
           .setLoop((ci) => {
@@ -261,12 +265,12 @@ class Serialize {
     const { originViewRange, onSerialize, getStartIndex } = this;
     const { sri, sci, eri, eci } = originViewRange;
     let ret = true;
-    ColsIterator.getInstance()
+    this.xIteratorBuilder.getColIterator()
       .setBegin(sci)
       .setEnd(eci)
       .setLoop((ci) => {
         let start = PlainUtils.Nul;
-        RowsIterator.getInstance()
+        this.xIteratorBuilder.getRowIterator()
           .setBegin(sri)
           .setEnd(eri)
           .setLoop((ri) => {
@@ -293,12 +297,12 @@ class Serialize {
     const { originViewRange, onSerialize, getStartIndex } = this;
     const { sri, sci, eri, eci } = originViewRange;
     let ret = true;
-    ColsIterator.getInstance()
+    this.xIteratorBuilder.getColIterator()
       .setBegin(sci)
       .setEnd(eci)
       .setLoop((ci) => {
         let start = PlainUtils.Nul;
-        RowsIterator.getInstance()
+        this.xIteratorBuilder.getRowIterator()
           .setBegin(eri)
           .setEnd(sri)
           .setLoop((ri) => {
@@ -325,12 +329,12 @@ class Serialize {
     const { originViewRange, onSerialize, getStartIndex } = this;
     const { sri, sci, eri, eci } = originViewRange;
     let ret = true;
-    RowsIterator.getInstance()
+    this.xIteratorBuilder.getRowIterator()
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((ri) => {
         let start = PlainUtils.Nul;
-        ColsIterator.getInstance()
+        this.xIteratorBuilder.getColIterator()
           .setBegin(eci)
           .setEnd(sci)
           .setLoop((ci) => {
@@ -413,15 +417,22 @@ class CellMergeCopyHelper extends BaseCellsHelper {
     return this.table.getTableMerges();
   }
 
+  getXIteratorBuilder() {
+    return this.table.xIteratorBuilder;
+  }
+
   copyCellINContent({
     originViewRange, targetViewRange,
   }) {
+    const { table } = this;
+    const { xIteratorBuilder } = table;
     const tableDataSnapshot = this.getTableDataSnapshot();
     const cells = this.getCells();
     const { cellDataProxy } = tableDataSnapshot;
     const copy = new CopyCellIN({
       originViewRange,
       targetViewRange,
+      xIteratorBuilder,
       onCopy: (tri, tci, ori, oci) => {
         const src = cells.getCell(ori, oci);
         if (src) {
@@ -436,12 +447,15 @@ class CellMergeCopyHelper extends BaseCellsHelper {
   copyMergeContent({
     originViewRange, targetViewRange,
   }) {
+    const { table } = this;
+    const { xIteratorBuilder } = table;
     const tableDataSnapshot = this.getTableDataSnapshot();
     const merges = this.getMerges();
     const { mergeDataProxy } = tableDataSnapshot;
     const copy = new CopyMerge({
       originViewRange,
       targetViewRange,
+      xIteratorBuilder,
       merge: (ri, ci) => merges.getFirstIncludes(ri, ci),
       master: (ri, ci, m) => m.sri === ri && m.sci === ci,
       onCopy: (ri, ci, m) => {
@@ -449,14 +463,14 @@ class CellMergeCopyHelper extends BaseCellsHelper {
         cSize -= 1;
         rSize -= 1;
         const newMerge = new RectRange(ri, ci, ri + rSize, ci + cSize);
-        const hasFold = RowsIterator.getInstance()
+        const hasFold = xIteratorBuilder.getRowIterator()
           .setBegin(newMerge.sri)
           .setEnd(newMerge.eri)
           .hasFold();
         if (hasFold) {
           return;
         }
-        newMerge.each((ri, ci) => {
+        newMerge.each(xIteratorBuilder, (ri, ci) => {
           const merge = merges.getFirstIncludes(ri, ci);
           if (merge) {
             mergeDataProxy.deleteMerge(merge);
@@ -471,12 +485,15 @@ class CellMergeCopyHelper extends BaseCellsHelper {
   copyStylesContent({
     originViewRange, targetViewRange,
   }) {
+    const { table } = this;
+    const { xIteratorBuilder } = table;
     const tableDataSnapshot = this.getTableDataSnapshot();
     const cells = this.getCells();
     const { cellDataProxy } = tableDataSnapshot;
     const copy = new CopyCellIN({
       originViewRange,
       targetViewRange,
+      xIteratorBuilder,
       onCopy: (tri, tci, ori, oci) => {
         const src = cells.getCell(ori, oci);
         if (src) {
@@ -493,12 +510,15 @@ class CellMergeCopyHelper extends BaseCellsHelper {
   serializeContent({
     originViewRange, direction,
   }) {
+    const { table } = this;
+    const { xIteratorBuilder } = table;
     const tableDataSnapshot = this.getTableDataSnapshot();
     const cells = this.getCells();
     const { cellDataProxy } = tableDataSnapshot;
     const serialize = new Serialize({
       originViewRange,
       direction,
+      xIteratorBuilder,
       getStartIndex: (ri, ci) => {
         const cell = cells.getCell(ri, ci);
         if (cell) {

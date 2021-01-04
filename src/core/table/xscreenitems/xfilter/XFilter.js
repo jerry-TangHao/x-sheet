@@ -4,8 +4,6 @@ import { RectRange } from '../../tablebase/RectRange';
 import { Widget } from '../../../../lib/Widget';
 import { Constant, cssPrefix } from '../../../../const/Constant';
 import { XEvent } from '../../../../lib/XEvent';
-import { ColsIterator } from '../../iterator/ColsIterator';
-import { RowsIterator } from '../../iterator/RowsIterator';
 import { Alert } from '../../../../component/alert/Alert';
 import { XScreenCssBorderItem } from '../../xscreen/item/viewborder/XScreenCssBorderItem';
 import darkFilter from '../../../../../assets/svg/filter-dark.svg';
@@ -28,10 +26,10 @@ class XFilter extends XScreenCssBorderItem {
    */
   constructor(table) {
     super({ table });
+    this.display = false;
+    this.icons = [];
     this.selectRange = null;
     this.activeIcon = null;
-    this.icons = [];
-    this.display = false;
     this.mask = new Mask().setRoot(table);
     this.filter = new FilterData({
       el: this.mask,
@@ -100,14 +98,16 @@ class XFilter extends XScreenCssBorderItem {
    * 创建过滤小图标
    */
   createFilterIcon() {
-    const { table, selectRange, icons } = this;
+    const { selectRange } = this;
+    const { table } = this;
+    const { icons } = this;
     if (selectRange) {
       const { top } = selectRange.brink();
-      const { xIconBuilder } = table;
+      const { xIconBuilder, xIteratorBuilder } = table;
       const style = table.getXTableStyle();
       const { fixedCellIcon } = style;
       const { mousePointer } = table;
-      top.each((ri, ci) => {
+      top.each(xIteratorBuilder, (ri, ci) => {
         const icon = xIconBuilder.build({
           image: darkFilter,
           offset: {
@@ -119,12 +119,6 @@ class XFilter extends XScreenCssBorderItem {
           vertical: XIcon.ICON_VERTICAL.BOTTOM,
         });
         const item = { ri, ci, icon };
-        icon.setOnDown((event) => {
-          const { native } = event;
-          this.activeIcon = item;
-          this.filterOpen();
-          native.stopPropagation();
-        });
         icon.setOnEnter((event) => {
           const { position } = event;
           const cssHeight = XDraw.styleTransformCssPx(position.height);
@@ -136,6 +130,12 @@ class XFilter extends XScreenCssBorderItem {
             .setWidth(cssWidth)
             .setHeight(cssHeight)
             .open();
+        });
+        icon.setOnDown((event) => {
+          const { native } = event;
+          this.activeIcon = item;
+          this.filterOpen();
+          native.stopPropagation();
         });
         icon.setOnMove(() => {
           mousePointer.set(XTableMousePointer.KEYS.pointer, XFilter);
@@ -200,7 +200,7 @@ class XFilter extends XScreenCssBorderItem {
   xFilterHandle() {
     const { table } = this;
     const {
-      xScreen, cols, rows,
+      xScreen, cols, rows, xIteratorBuilder,
     } = table;
 
     const xSelect = xScreen.findType(XSelectItem);
@@ -220,7 +220,7 @@ class XFilter extends XScreenCssBorderItem {
         return;
       }
       // 向右走
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(eci + 1)
         .setEnd(colLen)
         .setLoop((i) => {
@@ -233,7 +233,7 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向左走
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(sci - 1)
         .setEnd(0)
         .setLoop((i) => {
@@ -246,7 +246,7 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向下走
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(eri + 1)
         .setEnd(rowLen)
         .setLoop((i) => {
@@ -259,7 +259,7 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向上走
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(sri - 1)
         .setEnd(0)
         .setLoop((i) => {
@@ -272,13 +272,13 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向右扫描
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(targetRange.eci + 1)
         .setEnd(colLen)
         .setLoop((i) => {
           const { sri, eri } = targetRange;
           let emptyCol = true;
-          RowsIterator.getInstance()
+          xIteratorBuilder.getRowIterator()
             .setBegin(sri)
             .setEnd(eri)
             .setLoop((j) => {
@@ -293,13 +293,13 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向左扫描
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(targetRange.sci - 1)
         .setEnd(0)
         .setLoop((i) => {
           const { sri, eri } = targetRange;
           let emptyCol = true;
-          RowsIterator.getInstance()
+          xIteratorBuilder.getRowIterator()
             .setBegin(sri)
             .setEnd(eri)
             .setLoop((j) => {
@@ -314,13 +314,13 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向下扫描
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(targetRange.eri + 1)
         .setEnd(rowLen)
         .setLoop((i) => {
           const { sci, eci } = targetRange;
           let emptyRow = true;
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(sci)
             .setEnd(eci)
             .setLoop((j) => {
@@ -335,13 +335,13 @@ class XFilter extends XScreenCssBorderItem {
         })
         .execute();
       // 向上扫描
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(targetRange.sri - 1)
         .setEnd(0)
         .setLoop((i) => {
           const { sci, eci } = targetRange;
           let emptyRow = true;
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(sci)
             .setEnd(eci)
             .setLoop((j) => {
@@ -377,6 +377,7 @@ class XFilter extends XScreenCssBorderItem {
   filterOpen() {
     const { selectRange, table, filter, activeIcon } = this;
     const { valueFilter, ifFilter } = filter;
+    const { xIteratorBuilder } = table;
     const cells = table.getTableCells();
     // 筛选条件
     const { valueFilterValue, ifFilterType, ifFilterValue, valueFilterItems } = activeIcon;
@@ -386,7 +387,7 @@ class XFilter extends XScreenCssBorderItem {
     const eci = sci;
     // 筛选数据
     const items = new Set();
-    new RectRange(sri, sci, eri, eci).each((ri, ci) => {
+    new RectRange(sri, sci, eri, eci).each(xIteratorBuilder, (ri, ci) => {
       const cell = cells.getCellOrMergeCell(ri, ci);
       if (cell && !PlainUtils.isBlank(cell.text)) {
         items.add(cell.text.trim());
@@ -428,7 +429,38 @@ class XFilter extends XScreenCssBorderItem {
   /**
    * 过滤折叠行
    */
-  filterFoldRow() {}
+  filterFoldRow() {
+    const { selectRange } = this;
+    const { table } = this;
+    const { icons } = this;
+    const { sri, sci, eri, eci } = selectRange;
+    const cells = table.getTableCells();
+    for (let ri = sri; ri <= eri; ri++) {
+      for (let ci = sci; ci <= eci; ci++) {
+        const cell = cells.getCell(ri, ci);
+        if (PlainUtils.isEmptyObject(cell)) {
+          continue;
+        }
+        const { text } = cell;
+        if (PlainUtils.isBlank(text)) {
+          continue;
+        }
+        const icon = icons[ci];
+        // 数值筛选
+        const { valueFilterItems } = icon;
+        const { valueFilterValue } = icon;
+        if (valueFilterItems) {
+
+        }
+        // 条件筛选
+        const { ifFilterType } = icon;
+        const { ifFilterValue } = icon;
+        if (ifFilterType) {
+
+        }
+      }
+    }
+  }
 
   /**
    * 隐藏过滤器

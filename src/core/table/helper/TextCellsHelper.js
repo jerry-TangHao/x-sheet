@@ -2,8 +2,6 @@ import { BaseCellsHelper } from './BaseCellsHelper';
 import { Rect } from '../../../canvas/Rect';
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { RectRange } from '../tablebase/RectRange';
-import { ColsIterator } from '../iterator/ColsIterator';
-import { RowsIterator } from '../iterator/RowsIterator';
 
 const TEXT_BREAK_LOOP = {
   CONTINUE: 3,
@@ -42,6 +40,10 @@ class TextCellsHelper extends BaseCellsHelper {
     return this.table.cells;
   }
 
+  getXIteratorBuilder() {
+    return this.table.xIteratorBuilder;
+  }
+
   getCellByViewRange({
     reverseRows = false,
     reverseCols = false,
@@ -57,11 +59,13 @@ class TextCellsHelper extends BaseCellsHelper {
     const cols = this.getCols();
     const cells = this.getCells();
     const merges = this.getMerges();
+    const { table } = this;
+    const { xIteratorBuilder } = table;
     const { sri, eri, sci, eci } = view;
     const filter = [];
     if (reverseRows && reverseCols) {
       let y = startY;
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(eri)
         .setEnd(sri)
         .setLoop((row) => {
@@ -70,7 +74,7 @@ class TextCellsHelper extends BaseCellsHelper {
           let x = startX;
           y -= height;
           newRow(row);
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(eci)
             .setEnd(sci)
             .setLoop((col) => {
@@ -115,7 +119,7 @@ class TextCellsHelper extends BaseCellsHelper {
         .execute();
     } else if (reverseRows) {
       let y = startY;
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(eri)
         .setEnd(sri)
         .setLoop((row) => {
@@ -124,7 +128,7 @@ class TextCellsHelper extends BaseCellsHelper {
           let x = startX;
           newRow(row);
           y -= height;
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(sci)
             .setEnd(eci)
             .setLoop((col) => {
@@ -169,7 +173,7 @@ class TextCellsHelper extends BaseCellsHelper {
         .execute();
     } else if (reverseCols) {
       let y = startY;
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(sri)
         .setEnd(eri)
         .setLoop((row) => {
@@ -177,7 +181,7 @@ class TextCellsHelper extends BaseCellsHelper {
           let result = null;
           let x = startX;
           newRow(row);
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(eci)
             .setEnd(sci)
             .setLoop((col) => {
@@ -223,7 +227,7 @@ class TextCellsHelper extends BaseCellsHelper {
         .execute();
     } else {
       let y = startY;
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(sri)
         .setEnd(eri)
         .setLoop((row) => {
@@ -231,7 +235,7 @@ class TextCellsHelper extends BaseCellsHelper {
           let result = null;
           let x = startX;
           newRow(row);
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(sci)
             .setEnd(eci)
             .setLoop((col) => {

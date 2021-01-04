@@ -7,8 +7,6 @@ import { RectRange } from '../../tablebase/RectRange';
 import { PlainUtils } from '../../../../utils/PlainUtils';
 import { XEvent } from '../../../../lib/XEvent';
 import { XTableMousePointer } from '../../XTableMousePointer';
-import { RowsIterator } from '../../iterator/RowsIterator';
-import { ColsIterator } from '../../iterator/ColsIterator';
 import { AutoFillType } from '../../../../component/autofilltype/AutoFillType';
 import { Serialize } from '../../helper/CellMergeCopyHelper';
 import { AutoFillTypeMenu } from '../../../../component/autofilltype/AutoFillTypeMenu';
@@ -134,7 +132,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
 
   rangeHandle(x, y) {
     const { table } = this;
-    const { xScreen } = table;
+    const { xIteratorBuilder, xScreen } = table;
     const xSelect = xScreen.findType(XSelectItem);
     const merges = table.getTableMerges();
     const { selectRange, selectLocal } = xSelect;
@@ -173,7 +171,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
         if (hasFull) {
           let minRi = sri;
           let number = 0;
-          RowsIterator.getInstance()
+          xIteratorBuilder.getRowIterator()
             .setBegin(sri - 1)
             .setEnd(0)
             .setLoop((i) => {
@@ -195,7 +193,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
             autoFillRange = new RectRange(minRi, sci, sri - 1, eci);
           }
         } else {
-          const nextRow = RowsIterator.getInstance()
+          const nextRow = xIteratorBuilder.getRowIterator()
             .setBegin(sri)
             .setEnd(0)
             .nextRow();
@@ -207,7 +205,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
         if (hasFull) {
           let maxRi = eri;
           let number = 0;
-          RowsIterator.getInstance()
+          xIteratorBuilder.getRowIterator()
             .setBegin(eri + 1)
             .setEnd(rows.len - 1)
             .setLoop((i) => {
@@ -229,7 +227,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
             autoFillRange = new RectRange(eri + 1, sci, maxRi, eci);
           }
         } else {
-          const nextRow = RowsIterator.getInstance()
+          const nextRow = xIteratorBuilder.getRowIterator()
             .setBegin(eri)
             .setEnd(rows.len - 1)
             .nextRow();
@@ -243,7 +241,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
         if (hasFull) {
           let minCi = sci;
           let number = 0;
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(sci - 1)
             .setEnd(0)
             .setLoop((i) => {
@@ -264,7 +262,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
             autoFillRange = new RectRange(sri, minCi, eri, sci - 1);
           }
         } else {
-          const nextCol = ColsIterator.getInstance()
+          const nextCol = xIteratorBuilder.getColIterator()
             .setBegin(sci)
             .setEnd(0)
             .nextRow();
@@ -276,7 +274,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
         if (hasFull) {
           let maxCi = eci;
           let number = 0;
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(eci + 1)
             .setEnd(cols.len - 1)
             .setLoop((i) => {
@@ -297,7 +295,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
             autoFillRange = new RectRange(sri, eci + 1, eri, maxCi);
           }
         } else {
-          const nextCol = ColsIterator.getInstance()
+          const nextCol = xIteratorBuilder.getColIterator()
             .setBegin(eci)
             .setEnd(cols.len - 1)
             .nextRow();

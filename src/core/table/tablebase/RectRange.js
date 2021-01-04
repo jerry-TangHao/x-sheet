@@ -1,6 +1,4 @@
 import { PlainUtils } from '../../../utils/PlainUtils';
-import { RowsIterator } from '../iterator/RowsIterator';
-import { ColsIterator } from '../iterator/ColsIterator';
 
 class RectRange {
 
@@ -20,6 +18,36 @@ class RectRange {
     this.eci = eci;
     this.w = w;
     this.h = h;
+  }
+
+  /**
+   * 循环过滤指定的行列
+   * @param {XIteratorBuilder} iteratorBuilder 迭代器
+   * @param {Function} cb 回调函数
+   * @param {Function} rowFilter 过滤使用的回调函数
+   */
+  each(iteratorBuilder, cb, rowFilter = () => true) {
+    const {
+      sri, sci, eri, eci,
+    } = this;
+    let ret = false;
+    iteratorBuilder.getRowIterator()
+      .setBegin(sri)
+      .setEnd(eri)
+      .setLoop((i) => {
+        if (rowFilter(i)) {
+          iteratorBuilder.getColIterator()
+            .setBegin(sci)
+            .setEnd(eci)
+            .setLoop((j) => {
+              ret = cb(i, j);
+              return ret;
+            })
+            .execute();
+        }
+        return ret;
+      })
+      .execute();
   }
 
   /**
@@ -61,35 +89,6 @@ class RectRange {
       sri, sci, eri, eci,
     } = this;
     return sri <= ri && ri <= eri && sci <= ci && ci <= eci;
-  }
-
-  /**
-   * 循环过滤指定的行列
-   * @param {Function} cb 回调函数
-   * @param {Function} rowFilter 过滤使用的回调函数
-   */
-  each(cb, rowFilter = () => true) {
-    const {
-      sri, sci, eri, eci,
-    } = this;
-    let ret = false;
-    RowsIterator.getInstance()
-      .setBegin(sri)
-      .setEnd(eri)
-      .setLoop((i) => {
-        if (rowFilter(i)) {
-          ColsIterator.getInstance()
-            .setBegin(sci)
-            .setEnd(eci)
-            .setLoop((j) => {
-              ret = cb(i, j);
-              return ret;
-            })
-            .execute();
-        }
-        return ret;
-      })
-      .execute();
   }
 
   /**

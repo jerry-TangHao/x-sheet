@@ -2,7 +2,6 @@ import { CellOutRange } from './CellOutRange';
 import { XLineIteratorFilter } from '../../XLineIteratorFilter';
 import { PlainUtils } from '../../../../../utils/PlainUtils';
 import { BaseFont } from '../../../../../canvas/font/BaseFont';
-import { ColsIterator } from '../../../iterator/ColsIterator';
 
 class RCellOutRange extends CellOutRange {
 
@@ -67,7 +66,7 @@ class RCellOutRange extends CellOutRange {
     row, col,
   }) {
     const { table } = this;
-    const { cells, cols, merges } = table;
+    const { cells, cols, merges, xIteratorBuilder } = table;
     const next = cells.getCell(row, col + 1);
     const master = cells.getCell(row, col);
     let find = true;
@@ -75,7 +74,7 @@ class RCellOutRange extends CellOutRange {
 
     // 左方向越界检查
     if (table.hasAngleCell(row)) {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col - 1)
         .setEnd(0)
         .setLoop((i) => {
@@ -148,7 +147,7 @@ class RCellOutRange extends CellOutRange {
         })
         .execute();
     } else {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col - 1)
         .setEnd(0)
         .setLoop((i) => {
@@ -206,7 +205,7 @@ class RCellOutRange extends CellOutRange {
     row, col,
   }) {
     const { table } = this;
-    const { cells, cols, merges } = table;
+    const { cells, cols, merges, xIteratorBuilder } = table;
     const { len } = cols;
     const master = cells.getCell(row, col);
     let find = true;
@@ -214,7 +213,7 @@ class RCellOutRange extends CellOutRange {
 
     // 右方向越界检查
     if (table.hasAngleCell(row)) {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col + 1)
         .setEnd(len)
         .setLoop((j) => {
@@ -284,7 +283,7 @@ class RCellOutRange extends CellOutRange {
         })
         .execute();
     } else {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col + 1)
         .setEnd(len)
         .setLoop((j) => {

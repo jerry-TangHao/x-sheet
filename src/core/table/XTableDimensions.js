@@ -31,14 +31,14 @@ import { DropColFixed } from './tablefixed/drop/DropColFixed';
 import { XFixedMeasure } from './tablebase/XFixedMeasure';
 import { XFixedView } from './tablebase/XFixedView';
 import { XFilter } from './xscreenitems/xfilter/XFilter';
-import { ColsIterator } from './iterator/ColsIterator';
-import { RowsIterator } from './iterator/RowsIterator';
 import { TableDataSnapshot } from './datasnapshot/TableDataSnapshot';
 import { CellMergeCopyHelper } from './helper/CellMergeCopyHelper';
 import { Clipboard } from '../../lib/Clipboard';
 import { XIcon } from './xicon/XIcon';
 import { XIconBuilder } from './xicon/XIconBuilder';
 import { BaseFont } from '../../canvas/font/BaseFont';
+import { RowHeightIndex } from './tablebase/RowHeightIndex';
+import { XIteratorBuilder } from './iterator/XIteratorBuilder';
 
 class Dimensions {
 
@@ -535,70 +535,6 @@ class KeyBoardTabCode {
 class XTableDimensions extends Widget {
 
   /**
-   * 滚动行区间
-   * @param min
-   * @param max
-   * @param initS
-   * @param initV
-   * @param ifv
-   * @param getV
-   * @return {(*|number)[]}
-   */
-  static rowsReduceIf(min, max, initS, initV, ifv, getV) {
-    let s = initS;
-    let v = initV;
-    let ri = min;
-    RowsIterator.getInstance()
-      .setBegin(ri)
-      .setEnd(max - 1)
-      .setLoop((i) => {
-        if (s >= ifv) {
-          return false;
-        }
-        v = getV(i);
-        s += v;
-        return true;
-      })
-      .setFinish((i) => {
-        ri = i;
-      })
-      .execute();
-    return [ri, s - v, v];
-  }
-
-  /**
-   * 滚动列区间
-   * @param min
-   * @param max
-   * @param initS
-   * @param initV
-   * @param ifv
-   * @param getV
-   * @return {(*|number)[]}
-   */
-  static colsReduceIf(min, max, initS, initV, ifv, getV) {
-    let s = initS;
-    let v = initV;
-    let ri = min;
-    ColsIterator.getInstance()
-      .setBegin(ri)
-      .setEnd(max - 1)
-      .setLoop((i) => {
-        if (s >= ifv) {
-          return false;
-        }
-        v = getV(i);
-        s += v;
-        return true;
-      })
-      .setFinish((i) => {
-        ri = i;
-      })
-      .execute();
-    return [ri, s - v, v];
-  }
-
-  /**
    * XTable
    * @param settings
    */
@@ -648,6 +584,10 @@ class XTableDimensions extends Widget {
     // 视口区域大小
     this.visualHeightCache = null;
     this.visualWidthCache = null;
+    // 图标创建器
+    this.xIconBuilder = new XIconBuilder();
+    // 行列迭代器
+    this.xIteratorBuilder = new XIteratorBuilder();
     // 表格数据配置
     this.scale = new Scale();
     this.index = new Code({
@@ -660,12 +600,14 @@ class XTableDimensions extends Widget {
       scaleAdapter: new ScaleAdapter({
         goto: v => XDraw.srcTransformCssPx(this.scale.goto(v)),
       }),
+      xIteratorBuilder: this.xIteratorBuilder,
       ...this.settings.rows,
     });
     this.cols = new Cols({
       scaleAdapter: new ScaleAdapter({
         goto: v => XDraw.srcTransformCssPx(this.scale.goto(v)),
       }),
+      xIteratorBuilder: this.xIteratorBuilder,
       ...this.settings.cols,
     });
     // 冻结视图坐标
@@ -684,6 +626,7 @@ class XTableDimensions extends Widget {
       scroll: this.scroll,
       rows: this.rows,
       cols: this.cols,
+      xIteratorBuilder: this.xIteratorBuilder,
       getHeight: () => this.xContent.getHeight(),
       getWidth: () => this.xContent.getWidth(),
     });
@@ -698,6 +641,7 @@ class XTableDimensions extends Widget {
     this.xTableStyle = new XTableStyle({
       xTableScrollView: this.xTableScrollView,
       scroll: this.scroll,
+      xIteratorBuilder: this.xIteratorBuilder,
       settings: this.settings,
       xFixedView: this.xFixedView,
     });
@@ -716,8 +660,6 @@ class XTableDimensions extends Widget {
     this.xLeft = new XTableLeft(this);
     this.xTop = new XTableTop(this);
     this.xContent = new XTableContent(this);
-    // 图标创建器
-    this.xIconBuilder = new XIconBuilder();
     // table组件
     this.focus = new XTableFocus(this);
     this.mousePointer = new XTableMousePointer(this);
@@ -744,6 +686,77 @@ class XTableDimensions extends Widget {
       },
       paste: () => {},
     });
+    // 表格行高索引
+    this.rowHeightIndex = new RowHeightIndex({
+      rows: this.rows,
+      xFixedView: this.xFixedView,
+      xIteratorBuilder: this.xIteratorBuilder,
+    });
+    this.rowHeightIndex.computeIndex();
+  }
+
+  /**
+   * 滚动行区间
+   * @param min
+   * @param max
+   * @param initS
+   * @param initV
+   * @param ifv
+   * @param getV
+   * @return {(*|number)[]}
+   */
+  rowsReduceIf(min, max, initS, initV, ifv, getV) {
+    let s = initS;
+    let v = initV;
+    let ri = min;
+    this.xIteratorBuilder.getRowIterator()
+      .setBegin(ri)
+      .setEnd(max - 1)
+      .setLoop((i) => {
+        if (s >= ifv) {
+          return false;
+        }
+        v = getV(i);
+        s += v;
+        return true;
+      })
+      .setFinish((i) => {
+        ri = i;
+      })
+      .execute();
+    return [ri, s - v, v];
+  }
+
+  /**
+   * 滚动列区间
+   * @param min
+   * @param max
+   * @param initS
+   * @param initV
+   * @param ifv
+   * @param getV
+   * @return {(*|number)[]}
+   */
+  colsReduceIf(min, max, initS, initV, ifv, getV) {
+    let s = initS;
+    let v = initV;
+    let ri = min;
+    this.xIteratorBuilder.getColIterator()
+      .setBegin(ri)
+      .setEnd(max - 1)
+      .setLoop((i) => {
+        if (s >= ifv) {
+          return false;
+        }
+        v = getV(i);
+        s += v;
+        return true;
+      })
+      .setFinish((i) => {
+        ri = i;
+      })
+      .execute();
+    return [ri, s - v, v];
   }
 
   /**
@@ -1041,7 +1054,7 @@ class XTableDimensions extends Widget {
     let fx = 0;
     if (left <= fixedWidth && x > index.getWidth()) {
       let total = 0;
-      ColsIterator.getInstance()
+      this.xIteratorBuilder.getColIterator()
         .setBegin(fixedView.sci)
         .setEnd(fixedView.eci)
         .setLoop((i) => {
@@ -1055,7 +1068,7 @@ class XTableDimensions extends Widget {
     } else if (x > index.getWidth()) {
       let total = fixedWidth;
       const viewRange = this.getScrollView();
-      ColsIterator.getInstance()
+      this.xIteratorBuilder.getColIterator()
         .setBegin(viewRange.sci)
         .setEnd(viewRange.eci)
         .setLoop((i) => {
@@ -1071,7 +1084,7 @@ class XTableDimensions extends Widget {
     let fy = 0;
     if (top < fixedHeight && y > index.getHeight()) {
       let total = 0;
-      RowsIterator.getInstance()
+      this.xIteratorBuilder.getRowIterator()
         .setBegin(fixedView.sri)
         .setEnd(fixedView.eri)
         .setLoop((i) => {
@@ -1085,7 +1098,7 @@ class XTableDimensions extends Widget {
     } else if (y > index.getHeight()) {
       let total = fixedHeight;
       const viewRange = this.getScrollView();
-      RowsIterator.getInstance()
+      this.xIteratorBuilder.getRowIterator()
         .setBegin(viewRange.sri)
         .setEnd(viewRange.eri)
         .setLoop((i) => {
@@ -1174,6 +1187,12 @@ class XTableDimensions extends Widget {
         this.xIconsEvent(XIcon.ICON_EVENT_TYPE.MOUSE_DOWN, info, e);
       }
     });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_HEIGHT, () => {
+      this.rowHeightIndex.computeIndex();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE, () => {
+      this.rowHeightIndex.computeIndex();
+    });
   }
 
   /**
@@ -1204,7 +1223,7 @@ class XTableDimensions extends Widget {
     const fixedView = xFixedView.getFixedView();
     const [
       ci, left, width,
-    ] = XTableDimensions.colsReduceIf(fixedView.eci + 1, cols.len, 0, 0, x, i => cols.getWidth(i));
+    ] = this.colsReduceIf(fixedView.eci + 1, cols.len, 0, 0, x, i => cols.getWidth(i));
     let x1 = left;
     if (x > 0) x1 += width;
     let type;
@@ -1225,13 +1244,11 @@ class XTableDimensions extends Widget {
    * @param y
    */
   scrollY(y) {
-    const {
-      rows, xFixedView, scroll,
-    } = this;
-    const fixedView = xFixedView.getFixedView();
+    const { rows, scroll, rowHeightIndex } = this;
+    const find = rowHeightIndex.getTop(y);
     const [
       ri, top, height,
-    ] = XTableDimensions.rowsReduceIf(fixedView.eri + 1, rows.len, 0, 0, y, i => rows.getHeight(i));
+    ] = this.rowsReduceIf(find.ri, rows.len, find.top, 0, y, i => rows.getHeight(i));
     let y1 = top;
     if (y > 0) y1 += height;
     let type;
@@ -1301,13 +1318,14 @@ class XTableDimensions extends Widget {
       scroll.y = rows.sectionSumHeight(0, sri - 1);
       scroll.ri = sri;
     }
-    // 跟新固定条
+    // 更新固定条
     rowFixed.fxSri = fixedView.sri;
     rowFixed.fxEri = fixedView.eri;
     // 更新视图
     this.resize();
     // 发送更新通知
     this.trigger(Constant.TABLE_EVENT_TYPE.FIXED_CHANGE);
+    this.trigger(Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE);
   }
 
   /**

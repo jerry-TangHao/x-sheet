@@ -1,7 +1,5 @@
 import { PlainUtils } from '../../utils/PlainUtils';
 import { RectRange } from './tablebase/RectRange';
-import { RowsIterator } from './iterator/RowsIterator';
-import { ColsIterator } from './iterator/ColsIterator';
 
 const VIEW_MODE = {
   CHANGE_ADD: Symbol('change_add'),
@@ -46,6 +44,7 @@ class XTableScrollView {
    * @param scroll
    * @param rows
    * @param cols
+   * @param xIteratorBuilder
    * @param getHeight
    * @param getWidth
    */
@@ -53,12 +52,14 @@ class XTableScrollView {
     scroll,
     rows,
     cols,
+    xIteratorBuilder,
     getHeight = () => 0,
     getWidth = () => 0,
   }) {
     this.scroll = scroll;
     this.rows = rows;
     this.cols = cols;
+    this.xIteratorBuilder = xIteratorBuilder;
     this.getHeight = getHeight;
     this.getWidth = getWidth;
   }
@@ -69,13 +70,13 @@ class XTableScrollView {
    */
   getScrollView() {
     const {
-      rows, cols, scroll, getHeight, getWidth,
+      rows, cols, xIteratorBuilder, scroll, getHeight, getWidth,
     } = this;
     const { ri, ci } = scroll;
     let [width, height] = [0, 0];
     let [eri, eci] = [rows.len, cols.len];
     // 行
-    RowsIterator.getInstance()
+    xIteratorBuilder.getRowIterator()
       .setBegin(ri)
       .setEnd(rows.len - 1)
       .setLoop((i) => {
@@ -85,7 +86,7 @@ class XTableScrollView {
       })
       .execute();
     // 列
-    ColsIterator.getInstance()
+    xIteratorBuilder.getColIterator()
       .setBegin(ci)
       .setEnd(cols.len - 1)
       .setLoop((j) => {

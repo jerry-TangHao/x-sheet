@@ -1,7 +1,5 @@
 import { BaseCellsHelper } from './BaseCellsHelper';
 import { RectRange } from '../tablebase/RectRange';
-import { ColsIterator } from '../iterator/ColsIterator';
-import { RowsIterator } from '../iterator/RowsIterator';
 
 class OperateCellsHelper extends BaseCellsHelper {
 
@@ -14,13 +12,15 @@ class OperateCellsHelper extends BaseCellsHelper {
     rectRange = new RectRange(-1, -1, -1, -1),
     callback = () => {},
   }) {
+    const { table } = this;
+    const { xIteratorBuilder } = table;
     const cells = this.getCells();
     const { sri, eri, sci, eci } = rectRange;
-    RowsIterator.getInstance()
+    xIteratorBuilder.getRowIterator()
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((i) => {
-        ColsIterator.getInstance()
+        xIteratorBuilder.getColIterator()
           .setBegin(sci)
           .setEnd(eci)
           .setLoop((j) => {
@@ -40,8 +40,8 @@ class OperateCellsHelper extends BaseCellsHelper {
     return this.table.rows;
   }
 
-  getStyleTable() {
-    return this.table;
+  getCells() {
+    return this.table.cells;
   }
 
   getCols() {
@@ -52,8 +52,12 @@ class OperateCellsHelper extends BaseCellsHelper {
     return this.table.merges;
   }
 
-  getCells() {
-    return this.table.cells;
+  getStyleTable() {
+    return this.table;
+  }
+
+  getXIteratorBuilder() {
+    return this.table.xIteratorBuilder;
   }
 
 }

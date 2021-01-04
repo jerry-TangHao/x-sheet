@@ -66,13 +66,14 @@ class IFFilter extends ELContextMenuItem {
   }
 
   /**
-   * 卸载事件
-   * 处理程序
+   * 设置筛选条件
+   * @param value
    */
-  unbind() {
-    const { titleEle, selectEle } = this;
-    XEvent.unbind(titleEle);
-    XEvent.unbind(selectEle);
+  setValue(value) {
+    if (PlainUtils.isBlank(value)) {
+      value = PlainUtils.EMPTY;
+    }
+    this.valueInput.setValue(value);
   }
 
   /**
@@ -103,14 +104,13 @@ class IFFilter extends ELContextMenuItem {
   }
 
   /**
-   * 设置筛选条件
-   * @param value
+   * 卸载事件
+   * 处理程序
    */
-  setValue(value) {
-    if (PlainUtils.isBlank(value)) {
-      value = PlainUtils.EMPTY;
-    }
-    this.valueInput.setValue(value);
+  unbind() {
+    const { titleEle, selectEle } = this;
+    XEvent.unbind(titleEle);
+    XEvent.unbind(selectEle);
   }
 
   /**
@@ -167,6 +167,18 @@ class IFFilter extends ELContextMenuItem {
   }
 
   /**
+   * 隐藏条件搜索
+   * @returns {IFFilter}
+   */
+  hide() {
+    this.titleIconEle.removeClass('active');
+    this.status = false;
+    this.selectEleBox.hide();
+    this.valueInputEleBox.hide();
+    return this;
+  }
+
+  /**
    * 显示条件搜索
    * @returns {IFFilter}
    */
@@ -180,15 +192,64 @@ class IFFilter extends ELContextMenuItem {
   }
 
   /**
-   * 隐藏条件搜索
-   * @returns {IFFilter}
+   * 是否符合筛选条件
+   * @param type
+   * @param value
    */
-  hide() {
-    this.titleIconEle.removeClass('active');
-    this.status = false;
-    this.selectEleBox.hide();
-    this.valueInputEleBox.hide();
-    return this;
+  qualified(type, value) {
+    switch (type) {
+      case IFFilter.IF_TYPE.NOT: {
+        break;
+      }
+      case IFFilter.IF_TYPE.CT_NOT_EMPTY: {
+        break;
+      }
+      case IFFilter.IF_TYPE.CT_EMPTY: {
+        break;
+      }
+      case IFFilter.IF_TYPE.STR_NOT_INCLUDE: {
+        break;
+      }
+      case IFFilter.IF_TYPE.STR_INCLUDE: {
+        break;
+      }
+      case IFFilter.IF_TYPE.STR_EQ: {
+        break;
+      }
+      case IFFilter.IF_TYPE.STR_START: {
+        break;
+      }
+      case IFFilter.IF_TYPE.STR_END: {
+        break;
+      }
+      case IFFilter.IF_TYPE.DAT_EQ: {
+        break;
+      }
+      case IFFilter.IF_TYPE.DAT_BEFORE: {
+        break;
+      }
+      case IFFilter.IF_TYPE.DAT_AFTER: {
+        break;
+      }
+      case IFFilter.IF_TYPE.NUM_BEFORE: {
+        break;
+      }
+      case IFFilter.IF_TYPE.NUM_BEFORE_EQ: {
+        break;
+      }
+      case IFFilter.IF_TYPE.NUM_AFTER: {
+        break;
+      }
+      case IFFilter.IF_TYPE.NUM_AFTER_EQ: {
+        break;
+      }
+      case IFFilter.IF_TYPE.NUM_EQ: {
+        break;
+      }
+      case IFFilter.IF_TYPE.NUM_NOT_EQ: {
+        break;
+      }
+    }
   }
 
   /**

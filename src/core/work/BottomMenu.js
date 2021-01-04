@@ -5,8 +5,6 @@ import { XEvent } from '../../lib/XEvent';
 import { PlainUtils } from '../../utils/PlainUtils';
 import { XSelectItem } from '../table/xscreenitems/xselect/XSelectItem';
 import { Throttle } from '../../lib/Throttle';
-import { RowsIterator } from '../table/iterator/RowsIterator';
-import { ColsIterator } from '../table/iterator/ColsIterator';
 
 class BottomMenu extends Widget {
 
@@ -37,7 +35,7 @@ class BottomMenu extends Widget {
     const { sheetView } = body;
     const sheet = sheetView.getActiveSheet();
     const { table } = sheet;
-    const { xScreen } = table;
+    const { xScreen, xIteratorBuilder } = table;
     const merges = table.getTableMerges();
     const cells = table.getTableCells();
     const xSelect = xScreen.findType(XSelectItem);
@@ -46,11 +44,11 @@ class BottomMenu extends Widget {
       const { sri, sci, eri, eci } = selectRange;
       let number = 0;
       let total = 0;
-      RowsIterator.getInstance()
+      xIteratorBuilder.getRowIterator()
         .setBegin(sri)
         .setEnd(eri)
         .setLoop((ri) => {
-          ColsIterator.getInstance()
+          xIteratorBuilder.getColIterator()
             .setBegin(sci)
             .setEnd(eci)
             .setLoop((ci) => {

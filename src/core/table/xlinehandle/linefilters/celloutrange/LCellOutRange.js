@@ -2,7 +2,6 @@ import { CellOutRange } from './CellOutRange';
 import { XLineIteratorFilter } from '../../XLineIteratorFilter';
 import { PlainUtils } from '../../../../../utils/PlainUtils';
 import { BaseFont } from '../../../../../canvas/font/BaseFont';
-import { ColsIterator } from '../../../iterator/ColsIterator';
 
 class LCellOutRange extends CellOutRange {
 
@@ -66,14 +65,14 @@ class LCellOutRange extends CellOutRange {
     row, col,
   }) {
     const { table } = this;
-    const { cells, cols, merges } = table;
+    const { cells, cols, merges, xIteratorBuilder } = table;
     const master = cells.getCell(row, col);
     let find = true;
     let leftWidth = cols.getWidth(col - 1);
 
     // 左方向越界检查
     if (table.hasAngleCell(row)) {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col - 1)
         .setEnd(0)
         .setLoop((i) => {
@@ -143,7 +142,7 @@ class LCellOutRange extends CellOutRange {
         })
         .execute();
     } else {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col - 1)
         .setEnd(0)
         .setLoop((i) => {
@@ -197,7 +196,7 @@ class LCellOutRange extends CellOutRange {
     row, col,
   }) {
     const { table } = this;
-    const { cells, cols, merges } = table;
+    const { cells, cols, merges, xIteratorBuilder } = table;
     const { len } = cols;
     const last = cells.getCell(row, col - 1);
     const master = cells.getCell(row, col);
@@ -206,7 +205,7 @@ class LCellOutRange extends CellOutRange {
 
     // 右方向越界检查
     if (table.hasAngleCell(row)) {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col + 1)
         .setEnd(len)
         .setLoop((j) => {
@@ -279,7 +278,7 @@ class LCellOutRange extends CellOutRange {
         })
         .execute();
     } else {
-      ColsIterator.getInstance()
+      xIteratorBuilder.getColIterator()
         .setBegin(col + 1)
         .setEnd(len)
         .setLoop((j) => {

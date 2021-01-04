@@ -27,6 +27,7 @@ Constant.TABLE_EVENT_TYPE = {
   SELECT_OVER: 'selectover',
   SCALE_CHANGE: 'scalechange',
   FIXED_CHANGE: 'fixedchange',
+  FIXED_ROW_CHANGE: 'fixedrowchange',
   SELECT_DOWN: 'selectdown',
   SELECT_CHANGE: 'selectchange',
   DATA_CHANGE: 'datachange',
