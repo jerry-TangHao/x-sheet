@@ -6,10 +6,10 @@ class Code {
     scaleAdapter = new ScaleAdapter(),
     height = 33,
     width = 50,
-    background = '#f6f7fa',
-    color = '#585757',
+    background = 'rgb(246,247,250)',
+    color = 'rgb(88,87,87)',
     size = 11,
-    gridColor = '#e8e8e8',
+    gridColor = 'rgb(232,232,232)',
   }) {
     this.scaleAdapter = scaleAdapter;
     this.height = height;

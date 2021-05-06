@@ -1,8 +1,8 @@
-import { h } from '../../lib/Element';
+import { h } from '../../libs/Element';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { DragPanel } from '../dragpanel/DragPanel';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 
 class Confirm extends Widget {
 

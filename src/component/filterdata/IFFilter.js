@@ -1,8 +1,8 @@
 import { ELContextMenuItem } from '../contextmenu/ELContextMenuItem';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { h } from '../../lib/Element';
+import { h } from '../../libs/Element';
 import { Select } from '../form/select/Select';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 import { PlainInput } from '../form/input/PlainInput';
 import { PlainUtils } from '../../utils/PlainUtils';
 

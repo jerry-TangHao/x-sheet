@@ -2,7 +2,7 @@ import { PlainUtils } from '../../utils/PlainUtils';
 import { Rows } from './tablebase/Rows';
 import { Cols } from './tablebase/Cols';
 import { SCROLL_TYPE } from './tablebase/Scroll';
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix } from '../../const/Constant';
 import { XDraw } from '../../canvas/XDraw';
 import { Line } from '../../canvas/Line';
@@ -63,7 +63,7 @@ class XTableFrozenFullRect {
     draw.offset(dx, dy);
     // 绘制背景
     draw.attr({
-      fillStyle: '#f4f5f8',
+      fillStyle: 'rgb(244,245,248)',
     });
     draw.fillRect(0, 0, index.getWidth(), indexHeight);
     draw.offset(0, 0);
@@ -1438,48 +1438,52 @@ class XTableContentUI extends XTableUI {
   }
 
   /**
+   * 绘制条件
+   */
+  drawFilter() {
+    return true;
+  }
+
+  /**
    * 渲染界面
    */
   render() {
-    const { table } = this;
-    const renderMode = table.getRenderMode();
-    const viewMode = this.getViewMode();
-    if (viewMode === VIEW_MODE.STATIC && renderMode === RENDER_MODE.SCROLL) {
-      return;
+    if (this.drawFilter()) {
+      const { table } = this;
+      // 渲染贴图
+      this.drawMap();
+      // 清空画布
+      this.drawClear();
+      // 裁剪界面
+      const scrollView = this.getScrollView();
+      const x = this.getDrawX();
+      const y = this.getDrawY();
+      const width = scrollView.w;
+      const height = scrollView.h;
+      const { draw } = table;
+      const crop = new Crop({
+        rect: new Rect({
+          x,
+          y,
+          width,
+          height,
+        }),
+        draw,
+      });
+      crop.open();
+      // 绘制背景
+      this.drawBackground();
+      this.drawBoundOutBackground();
+      // 绘制文字
+      this.drawXFont();
+      this.drawBoundOutXFont();
+      // 绘制边框
+      this.drawGridBorder();
+      this.drawBoundOutGridBorder();
+      // 绘制小图标
+      this.drawXIcon();
+      crop.close();
     }
-    // 渲染贴图
-    this.drawMap();
-    // 清空画布
-    this.drawClear();
-    // 裁剪界面
-    const scrollView = this.getScrollView();
-    const x = this.getDrawX();
-    const y = this.getDrawY();
-    const width = scrollView.w;
-    const height = scrollView.h;
-    const { draw } = table;
-    const crop = new Crop({
-      rect: new Rect({
-        x,
-        y,
-        width,
-        height,
-      }),
-      draw,
-    });
-    crop.open();
-    // 绘制背景
-    this.drawBackground();
-    this.drawBoundOutBackground();
-    // 绘制文字
-    this.drawXFont();
-    this.drawBoundOutXFont();
-    // 绘制边框
-    this.drawGridBorder();
-    this.drawBoundOutGridBorder();
-    // 绘制小图标
-    this.drawXIcon();
-    crop.close();
   }
 
 }
@@ -1508,29 +1512,29 @@ class XTableIndexUI extends XTableUI {
   }
 
   /**
+   * 绘制条件
+   */
+  drawFilter() {
+    return true;
+  }
+
+  /**
    * 渲染界面
    */
   render() {
-    const { table } = this;
-    const renderMode = table.getRenderMode();
-    const viewMode = this.getViewMode();
-    if (viewMode === VIEW_MODE.STATIC && renderMode === RENDER_MODE.SCROLL) {
-      return;
+    if (this.drawFilter()) {
+      this.drawMap();
+      this.drawClear();
+      this.drawColor();
+      this.drawFont();
+      this.drawGridBorder();
     }
-    this.drawMap();
-    this.drawClear();
-    this.drawColor();
-    this.drawFont();
-    this.drawGridBorder();
   }
 
 }
 
 class XTableLeftIndexUI extends XTableIndexUI {
 
-  /**
-   * 绘制网格
-   */
   drawGridBorder() {
     const borderView = this.getLineView();
     const borderX = this.getLineX();
@@ -1554,9 +1558,6 @@ class XTableLeftIndexUI extends XTableIndexUI {
     draw.offset(0, 0);
   }
 
-  /**
-   * 绘制背景
-   */
   drawColor() {
     const dx = this.getDrawX();
     const dy = this.getDrawY();
@@ -1575,9 +1576,6 @@ class XTableLeftIndexUI extends XTableIndexUI {
     draw.offset(0, 0);
   }
 
-  /**
-   *  绘制文字
-   */
   drawFont() {
     const dx = this.getDrawX();
     const dy = this.getDrawY();
@@ -1590,30 +1588,62 @@ class XTableLeftIndexUI extends XTableIndexUI {
     const { sri, eri } = scrollView;
     draw.offset(dx, dy);
     draw.attr({
-      textAlign: 'center',
-      textBaseline: 'middle',
       font: `${index.getSize()}px Arial`,
       fillStyle: index.getColor(),
     });
     rows.eachHeight(sri, eri, (i, ch, y) => {
-      draw.fillText(i + 1, width / 2, y + (ch / 2));
+      const index = `${i + 1}`;
+      const metrics = draw.measureText(index);
+      const ascent = metrics.actualBoundingBoxAscent;
+      const descent = metrics.actualBoundingBoxDescent;
+      const fontWidth = metrics.width;
+      const fontHeight = ascent + descent;
+      const fx = (width / 2) - (fontWidth / 2);
+      const fy = y + ((ch / 2) - (fontHeight / 2)) + ascent;
+      draw.fillText(index, fx, fy);
     });
     draw.offset(0, 0);
+  }
+
+  drawFilter() {
+    const { table } = this;
+    const { scroll } = table;
+    const renderMode = table.getRenderMode();
+    const viewMode = this.getViewMode();
+    if (renderMode === RENDER_MODE.RENDER) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCALE) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCROLL) {
+      if (viewMode === VIEW_MODE.STATIC) {
+        return false;
+      }
+      switch (scroll.type) {
+        case SCROLL_TYPE.V_TOP:
+        case SCROLL_TYPE.V_BOTTOM:
+          return true;
+      }
+    }
+    return false;
   }
 
 }
 
 class XTableTopIndexUI extends XTableIndexUI {
 
-  /**
-   * 绘制网格
-   */
   drawGridBorder() {
     const borderView = this.getLineView();
     const borderX = this.getLineX();
     const borderY = this.getLineY();
     const { table } = this;
     const { draw, indexGrid } = table;
+    // 边缘线条
+    const lineWidth = XDraw.getLineWidthTypePx(XDraw.LINE_WIDTH_TYPE.low);
+    const width = table.visualWidth();
+    indexGrid.horizonLine(0, lineWidth, width, lineWidth);
+    // 索引边框
     const { iResult } = XLinePlainGenerator.run({
       scrollView: borderView,
       foldOnOff: false,
@@ -1631,9 +1661,6 @@ class XTableTopIndexUI extends XTableIndexUI {
     draw.offset(0, 0);
   }
 
-  /**
-   * 绘制背景
-   */
   drawColor() {
     const { table } = this;
     const {
@@ -1652,9 +1679,6 @@ class XTableTopIndexUI extends XTableIndexUI {
     draw.offset(0, 0);
   }
 
-  /**
-   *  绘制文字
-   */
   drawFont() {
     const dx = this.getDrawX();
     const dy = this.getDrawY();
@@ -1667,15 +1691,45 @@ class XTableTopIndexUI extends XTableIndexUI {
     const { sci, eci } = scrollView;
     draw.offset(dx, dy);
     draw.attr({
-      textAlign: 'center',
-      textBaseline: 'middle',
       font: `${index.getSize()}px Arial`,
       fillStyle: index.getColor(),
     });
     cols.eachWidth(sci, eci, (i, cw, x) => {
-      draw.fillText(PlainUtils.stringAt(i), x + (cw / 2), height / 2);
+      const index = PlainUtils.stringAt(i);
+      const metrics = draw.measureText(index);
+      const ascent = metrics.actualBoundingBoxAscent;
+      const descent = metrics.actualBoundingBoxDescent;
+      const fontWidth = metrics.width;
+      const fontHeight = ascent + descent;
+      const fx = x + ((cw / 2) - fontWidth / 2);
+      const fy = ((height / 2) - fontHeight / 2) + ascent;
+      draw.fillText(index, fx, fy);
     });
     draw.offset(0, 0);
+  }
+
+  drawFilter() {
+    const { table } = this;
+    const { scroll } = table;
+    const renderMode = table.getRenderMode();
+    const viewMode = this.getViewMode();
+    if (renderMode === RENDER_MODE.RENDER) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCALE) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCROLL) {
+      if (viewMode === VIEW_MODE.STATIC) {
+        return false;
+      }
+      switch (scroll.type) {
+        case SCROLL_TYPE.H_LEFT:
+        case SCROLL_TYPE.H_RIGHT:
+          return true;
+      }
+    }
+    return false;
   }
 
 }
@@ -1756,12 +1810,102 @@ class XTableFrozenLeftIndex extends XTableLeftIndexUI {
     return VIEW_MODE.STATIC;
   }
 
-  render() {
+  drawFilter() {
     const { table } = this;
     const renderMode = table.getRenderMode();
-    if (renderMode === RENDER_MODE.RENDER || renderMode === RENDER_MODE.SCALE) {
-      super.render();
+    switch (renderMode) {
+      case RENDER_MODE.RENDER:
+      case RENDER_MODE.SCALE:
+        return true;
     }
+    return false;
+  }
+
+}
+
+class XTableFrozenTopIndex extends XTableTopIndexUI {
+
+  getWidth() {
+    if (PlainUtils.isNumber(this.width)) {
+      return this.width;
+    }
+    const { table } = this;
+    const { xFixedMeasure } = table;
+    const width = xFixedMeasure.getWidth();
+    this.width = width;
+    return width;
+  }
+
+  getHeight() {
+    if (PlainUtils.isNumber(this.height)) {
+      return this.height;
+    }
+    const { table } = this;
+    const { index } = table;
+    const height = index.getHeight();
+    this.height = height;
+    return height;
+  }
+
+  getX() {
+    if (PlainUtils.isNumber(this.x)) {
+      return this.x;
+    }
+    const { table } = this;
+    const { index } = table;
+    const x = index.getWidth();
+    this.x = x;
+    return x;
+  }
+
+  getY() {
+    if (PlainUtils.isNumber(this.y)) {
+      return this.y;
+    }
+    const y = 0;
+    this.y = y;
+    return y;
+  }
+
+  getScrollView() {
+    if (PlainUtils.isNotUnDef(this.scrollView)) {
+      return this.scrollView.clone();
+    }
+    const { table } = this;
+    const {
+      rows, cols, xFixedView,
+    } = table;
+    const fixedView = xFixedView.getFixedView();
+    const view = new RectRange(0, fixedView.sci, 0, fixedView.eci);
+    view.w = cols.rectRangeSumWidth(view);
+    view.h = rows.rectRangeSumHeight(view);
+    this.scrollView = view;
+    return view.clone();
+  }
+
+  getFullScrollView() {
+    if (PlainUtils.isNotUnDef(this.fullScrollView)) {
+      return this.fullScrollView.clone();
+    }
+    const fullScrollView = this.getScrollView();
+    this.fullScrollView = fullScrollView;
+    return fullScrollView.clone();
+  }
+
+  getViewMode() {
+    this.viewMode = VIEW_MODE.STATIC;
+    return VIEW_MODE.STATIC;
+  }
+
+  drawFilter() {
+    const { table } = this;
+    const renderMode = table.getRenderMode();
+    switch (renderMode) {
+      case RENDER_MODE.RENDER:
+      case RENDER_MODE.SCALE:
+        return true;
+    }
+    return false;
   }
 
 }
@@ -1841,96 +1985,15 @@ class XTableFrozenContent extends XTableContentUI {
     return VIEW_MODE.STATIC;
   }
 
-  render() {
+  drawFilter() {
     const { table } = this;
     const renderMode = table.getRenderMode();
-    if (renderMode === RENDER_MODE.RENDER || renderMode === RENDER_MODE.SCALE) {
-      super.render();
+    switch (renderMode) {
+      case RENDER_MODE.RENDER:
+      case RENDER_MODE.SCALE:
+        return true;
     }
-  }
-
-}
-
-class XTableFrozenTopIndex extends XTableTopIndexUI {
-
-  getWidth() {
-    if (PlainUtils.isNumber(this.width)) {
-      return this.width;
-    }
-    const { table } = this;
-    const { xFixedMeasure } = table;
-    const width = xFixedMeasure.getWidth();
-    this.width = width;
-    return width;
-  }
-
-  getHeight() {
-    if (PlainUtils.isNumber(this.height)) {
-      return this.height;
-    }
-    const { table } = this;
-    const { index } = table;
-    const height = index.getHeight();
-    this.height = height;
-    return height;
-  }
-
-  getX() {
-    if (PlainUtils.isNumber(this.x)) {
-      return this.x;
-    }
-    const { table } = this;
-    const { index } = table;
-    const x = index.getWidth();
-    this.x = x;
-    return x;
-  }
-
-  getY() {
-    if (PlainUtils.isNumber(this.y)) {
-      return this.y;
-    }
-    const y = 0;
-    this.y = y;
-    return y;
-  }
-
-  getScrollView() {
-    if (PlainUtils.isNotUnDef(this.scrollView)) {
-      return this.scrollView.clone();
-    }
-    const { table } = this;
-    const {
-      rows, cols, xFixedView,
-    } = table;
-    const fixedView = xFixedView.getFixedView();
-    const view = new RectRange(0, fixedView.sci, 0, fixedView.eci);
-    view.w = cols.rectRangeSumWidth(view);
-    view.h = rows.rectRangeSumHeight(view);
-    this.scrollView = view;
-    return view.clone();
-  }
-
-  getFullScrollView() {
-    if (PlainUtils.isNotUnDef(this.fullScrollView)) {
-      return this.fullScrollView.clone();
-    }
-    const fullScrollView = this.getScrollView();
-    this.fullScrollView = fullScrollView;
-    return fullScrollView.clone();
-  }
-
-  getViewMode() {
-    this.viewMode = VIEW_MODE.STATIC;
-    return VIEW_MODE.STATIC;
-  }
-
-  render() {
-    const { table } = this;
-    const renderMode = table.getRenderMode();
-    if (renderMode === RENDER_MODE.RENDER || renderMode === RENDER_MODE.SCALE) {
-      super.render();
-    }
+    return false;
   }
 
 }
@@ -2035,6 +2098,111 @@ class XTableLeftIndex extends XTableLeftIndexUI {
     scrollView.sci = 0;
     scrollView.eci = 0;
     scrollView.w = cols.sectionSumWidth(scrollView.sci, scrollView.eci);
+    const viewMode = XTableScrollView.viewMode(lastScrollView, scrollView);
+    this.viewMode = viewMode;
+    return viewMode;
+  }
+
+}
+
+class XTableTopIndex extends XTableTopIndexUI {
+
+  getWidth() {
+    if (PlainUtils.isNumber(this.width)) {
+      return this.width;
+    }
+    const { table } = this;
+    const { xLeft } = table;
+    const { index } = table;
+    const width = table.visualWidth() - (index.getWidth() + xLeft.getWidth());
+    this.width = width;
+    return width;
+  }
+
+  getHeight() {
+    if (PlainUtils.isNumber(this.height)) {
+      return this.height;
+    }
+    const { table } = this;
+    const { index } = table;
+    const height = index.getHeight();
+    this.height = height;
+    return height;
+  }
+
+  getX() {
+    if (PlainUtils.isNumber(this.x)) {
+      return this.x;
+    }
+    const { table } = this;
+    const { xLeft } = table;
+    const { index } = table;
+    const x = index.getWidth() + xLeft.getWidth();
+    this.x = x;
+    return x;
+  }
+
+  getY() {
+    if (PlainUtils.isNumber(this.y)) {
+      return this.y;
+    }
+    const y = 0;
+    this.y = y;
+    return y;
+  }
+
+  getScrollView() {
+    if (PlainUtils.isNotUnDef(this.scrollView)) {
+      return this.scrollView.clone();
+    }
+    const { table } = this;
+    const { index } = table;
+    const { xTableAreaView } = table;
+    const renderMode = table.getRenderMode();
+    const scrollView = xTableAreaView.getScrollView();
+    const enterView = xTableAreaView.getScrollEnterView();
+    const view = PlainUtils.isNotUnDef(enterView) && renderMode === RENDER_MODE.SCROLL
+      ? enterView
+      : scrollView;
+    view.sri = 0;
+    view.eri = 0;
+    view.h = index.getHeight();
+    this.scrollView = view;
+    return view.clone();
+  }
+
+  getFullScrollView() {
+    if (PlainUtils.isNotUnDef(this.fullScrollView)) {
+      return this.fullScrollView.clone();
+    }
+    const { table } = this;
+    const { index } = table;
+    const { xTableAreaView } = table;
+    const scrollView = xTableAreaView.getScrollView();
+    scrollView.sri = 0;
+    scrollView.eri = 0;
+    scrollView.h = index.getHeight();
+    this.fullScrollView = scrollView;
+    return scrollView.clone();
+  }
+
+  getViewMode() {
+    if (PlainUtils.isNotUnDef(this.viewMode)) {
+      return this.viewMode;
+    }
+    const { table } = this;
+    const { xTableAreaView } = table;
+    const { rows } = table;
+    const lastScrollView = xTableAreaView.getLastScrollView();
+    const scrollView = xTableAreaView.getScrollView();
+    if (PlainUtils.isNotUnDef(lastScrollView)) {
+      lastScrollView.sri = 0;
+      lastScrollView.eri = 0;
+      lastScrollView.h = rows.sectionSumHeight(lastScrollView.sri, lastScrollView.eri);
+    }
+    scrollView.sri = 0;
+    scrollView.eri = 0;
+    scrollView.h = rows.sectionSumHeight(scrollView.sri, scrollView.eri);
     const viewMode = XTableScrollView.viewMode(lastScrollView, scrollView);
     this.viewMode = viewMode;
     return viewMode;
@@ -2153,109 +2321,28 @@ class XTableLeft extends XTableContentUI {
     return viewMode;
   }
 
-}
-
-class XTableTopIndex extends XTableTopIndexUI {
-
-  getWidth() {
-    if (PlainUtils.isNumber(this.width)) {
-      return this.width;
-    }
+  drawFilter() {
     const { table } = this;
-    const { xLeft } = table;
-    const { index } = table;
-    const width = table.visualWidth() - (index.getWidth() + xLeft.getWidth());
-    this.width = width;
-    return width;
-  }
-
-  getHeight() {
-    if (PlainUtils.isNumber(this.height)) {
-      return this.height;
-    }
-    const { table } = this;
-    const { index } = table;
-    const height = index.getHeight();
-    this.height = height;
-    return height;
-  }
-
-  getX() {
-    if (PlainUtils.isNumber(this.x)) {
-      return this.x;
-    }
-    const { table } = this;
-    const { xLeft } = table;
-    const { index } = table;
-    const x = index.getWidth() + xLeft.getWidth();
-    this.x = x;
-    return x;
-  }
-
-  getY() {
-    if (PlainUtils.isNumber(this.y)) {
-      return this.y;
-    }
-    const y = 0;
-    this.y = y;
-    return y;
-  }
-
-  getScrollView() {
-    if (PlainUtils.isNotUnDef(this.scrollView)) {
-      return this.scrollView.clone();
-    }
-    const { table } = this;
-    const { index } = table;
-    const { xTableAreaView } = table;
+    const { scroll } = table;
     const renderMode = table.getRenderMode();
-    const scrollView = xTableAreaView.getScrollView();
-    const enterView = xTableAreaView.getScrollEnterView();
-    const view = PlainUtils.isNotUnDef(enterView) && renderMode === RENDER_MODE.SCROLL
-      ? enterView
-      : scrollView;
-    view.sri = 0;
-    view.eri = 0;
-    view.h = index.getHeight();
-    this.scrollView = view;
-    return view.clone();
-  }
-
-  getFullScrollView() {
-    if (PlainUtils.isNotUnDef(this.fullScrollView)) {
-      return this.fullScrollView.clone();
+    const viewMode = this.getViewMode();
+    if (renderMode === RENDER_MODE.RENDER) {
+      return true;
     }
-    const { table } = this;
-    const { index } = table;
-    const { xTableAreaView } = table;
-    const scrollView = xTableAreaView.getScrollView();
-    scrollView.sri = 0;
-    scrollView.eri = 0;
-    scrollView.h = index.getHeight();
-    this.fullScrollView = scrollView;
-    return scrollView.clone();
-  }
-
-  getViewMode() {
-    if (PlainUtils.isNotUnDef(this.viewMode)) {
-      return this.viewMode;
+    if (renderMode === RENDER_MODE.SCALE) {
+      return true;
     }
-    const { table } = this;
-    const { xTableAreaView } = table;
-    const { rows } = table;
-    const lastScrollView = xTableAreaView.getLastScrollView();
-    const scrollView = xTableAreaView.getScrollView();
-    if (PlainUtils.isNotUnDef(lastScrollView)) {
-      lastScrollView.sri = 0;
-      lastScrollView.eri = 0;
-      lastScrollView.h = rows.sectionSumHeight(lastScrollView.sri, lastScrollView.eri);
+    if (renderMode === RENDER_MODE.SCROLL) {
+      if (viewMode === VIEW_MODE.STATIC) {
+        return false;
+      }
+      switch (scroll.type) {
+        case SCROLL_TYPE.V_TOP:
+        case SCROLL_TYPE.V_BOTTOM:
+          return true;
+      }
     }
-    scrollView.sri = 0;
-    scrollView.eri = 0;
-    scrollView.h = rows.sectionSumHeight(scrollView.sri, scrollView.eri);
-    const viewMode = XTableScrollView.viewMode(lastScrollView, scrollView);
-    this.viewMode = viewMode;
-    return viewMode;
+    return false;
   }
 
 }
@@ -2371,6 +2458,30 @@ class XTableTop extends XTableContentUI {
     return viewMode;
   }
 
+  drawFilter() {
+    const { table } = this;
+    const { scroll } = table;
+    const renderMode = table.getRenderMode();
+    const viewMode = this.getViewMode();
+    if (renderMode === RENDER_MODE.RENDER) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCALE) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCROLL) {
+      if (viewMode === VIEW_MODE.STATIC) {
+        return false;
+      }
+      switch (scroll.type) {
+        case SCROLL_TYPE.H_LEFT:
+        case SCROLL_TYPE.H_RIGHT:
+          return true;
+      }
+    }
+    return false;
+  }
+
 }
 
 class XTableContent extends XTableContentUI {
@@ -2461,6 +2572,24 @@ class XTableContent extends XTableContentUI {
     const viewMode = XTableScrollView.viewMode(lastScrollView, scrollView);
     this.viewMode = viewMode;
     return viewMode;
+  }
+
+  drawFilter() {
+    const { table } = this;
+    const renderMode = table.getRenderMode();
+    const viewMode = this.getViewMode();
+    if (renderMode === RENDER_MODE.RENDER) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCALE) {
+      return true;
+    }
+    if (renderMode === RENDER_MODE.SCROLL) {
+      if (viewMode === VIEW_MODE.STATIC) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

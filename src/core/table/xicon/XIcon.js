@@ -51,7 +51,7 @@ class XIcon {
     focus = null,
     height = 16,
     width = 16,
-    color = '#ffffff',
+    color = 'rgb(255,255,255)',
     offset = { x: 0, y: 0 },
     onDraw = () => {},
     onLeave = () => {},

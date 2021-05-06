@@ -1,6 +1,6 @@
 import { Item } from './Item';
 import { cssPrefix } from '../../../../const/Constant';
-import { h } from '../../../../lib/Element';
+import { h } from '../../../../libs/Element';
 import { Icon } from '../Icon';
 
 class DropDownItem extends Item {

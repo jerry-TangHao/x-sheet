@@ -1,9 +1,9 @@
 /* global window document */
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { h } from '../../lib/Element';
+import { h } from '../../libs/Element';
 import { PlainUtils } from '../../utils/PlainUtils';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 
 let root = PlainUtils.Nul;
 let instances = [];
@@ -21,7 +21,7 @@ class ElPopUp extends Widget {
    */
   constructor(options) {
     super(`${cssPrefix}-el-pop-up`);
-    this.options = PlainUtils.mergeDeep({
+    this.options = PlainUtils.copy({
       el: PlainUtils.Nul,
       autoWidth: false,
       autoHeight: false,

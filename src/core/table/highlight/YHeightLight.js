@@ -1,7 +1,7 @@
-import { Widget } from '../../../lib/Widget';
+import { Widget } from '../../../libs/Widget';
 import { RANGE_OVER_GO } from '../xscreen/item/viewborder/XScreenStyleBorderItem';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { XEvent } from '../../../lib/XEvent';
+import { XEvent } from '../../../libs/XEvent';
 import { XSelectItem } from '../xscreenitems/xselect/XSelectItem';
 
 class YHeightLight extends Widget {

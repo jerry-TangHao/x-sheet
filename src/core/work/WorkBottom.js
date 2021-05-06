@@ -1,4 +1,4 @@
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix } from '../../const/Constant';
 import { BottomMenu } from './BottomMenu';
 

@@ -18,7 +18,7 @@ class DrawFontBuilder {
       direction: BaseFont.TEXT_DIRECTION.HORIZONTAL,
       name: 'Arial',
       size: 14,
-      color: '#000000',
+      color: 'rgb(0,0,0)',
       underline: false,
       strikethrough: false,
       bold: false,

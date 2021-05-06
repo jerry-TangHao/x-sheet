@@ -251,14 +251,26 @@ class CorsLine extends BaseLine {
 
   static offsetToLineInside(val) {
     return LINE_WIDTH_LOW > 1
-      ? val - LINE_WIDTH_LOW / 2
-      : val - 1;
+      ? val - LINE_PIXEL_OFFSET
+      : val - LINE_WIDTH_LOW;
+  }
+
+  static getLineWidthTypePx(type) {
+    switch (type) {
+      case CorsLine.LINE_WIDTH_TYPE.medium:
+        return LINE_WIDTH_MEDIUM;
+      case CorsLine.LINE_WIDTH_TYPE.low:
+        return LINE_WIDTH_LOW;
+      case CorsLine.LINE_WIDTH_TYPE.high:
+        return LINE_WIDTH_HIGH;
+    }
+    return 0;
   }
 
   constructor(canvas) {
     super(canvas);
     this.lineWidthType = CorsLine.LINE_WIDTH_TYPE.low;
-    this.lineColor = '#000000';
+    this.lineColor = 'rgb(0,0,0)';
   }
 
   corsLine([sx, sy], [ex, ey]) {

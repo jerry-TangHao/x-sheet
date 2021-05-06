@@ -1,8 +1,8 @@
 /* global document */
-import { Widget } from '../../../lib/Widget';
+import { Widget } from '../../../libs/Widget';
 import { cssPrefix, Constant } from '../../../const/Constant';
-import { h } from '../../../lib/Element';
-import { XEvent } from '../../../lib/XEvent';
+import { h } from '../../../libs/Element';
+import { XEvent } from '../../../libs/XEvent';
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { XTableMousePointer } from '../XTableMousePointer';
 import { RowFixed } from '../tablefixed/RowFixed';
@@ -35,7 +35,7 @@ class YReSizer extends Widget {
   bind() {
     const { table } = this;
     const {
-      rows, mousePointer, focus, xFixedView,
+      scale, rows, mousePointer, focus, xFixedView,
     } = table;
     const { tableDataSnapshot } = table;
     const { rowsDataProxy } = tableDataSnapshot;
@@ -63,7 +63,7 @@ class YReSizer extends Widget {
         }
         const newTop = my - (top - rows.getHeight(ri)) + this.height;
         tableDataSnapshot.begin();
-        rowsDataProxy.setHeight(ri, newTop);
+        rowsDataProxy.setHeight(ri, scale.back(newTop));
         tableDataSnapshot.end();
         table.resize();
       });

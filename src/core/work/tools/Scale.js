@@ -1,6 +1,5 @@
 import { DropDownItem } from './base/DropDownItem';
 import { cssPrefix } from '../../../const/Constant';
-import { PlainUtils } from '../../../utils/PlainUtils';
 import { ScaleContextMenu } from './contextmenu/scale/ScaleContextMenu';
 
 class Scale extends DropDownItem {

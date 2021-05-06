@@ -76,6 +76,7 @@ class Cells {
   }
 
   getData() {
+    this.xTableData.wrapAll();
     return this.xTableData.getItems().map(rows => rows.map((item) => {
       if (item) {
         return item.getCell();

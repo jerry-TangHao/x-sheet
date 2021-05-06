@@ -1,7 +1,7 @@
 import { Item } from './Item';
 import { cssPrefix } from '../../../../const/Constant';
 import { Icon } from '../Icon';
-import { h } from '../../../../lib/Element';
+import { h } from '../../../../libs/Element';
 
 class DropInputItem extends Item {
 

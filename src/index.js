@@ -1,8 +1,8 @@
 /* global window, document */
 import { cssPrefix, XSheetVersion } from './const/Constant';
-import { h } from './lib/Element';
+import { h } from './libs/Element';
 import { Work } from './core/work/Work';
-import { Widget } from './lib/Widget';
+import { Widget } from './libs/Widget';
 import { DragPanel } from './component/dragpanel/DragPanel';
 import { ElPopUp } from './component/elpopup/ElPopUp';
 import { XDraw } from './canvas/XDraw';
@@ -12,17 +12,33 @@ import { BaseFont } from './canvas/font/BaseFont';
 import { XIcon } from './core/table/xicon/XIcon';
 import './styles/base.less';
 import './styles/index.less';
+import { ColorPicker } from './component/colorpicker/ColorPicker';
+import { XlsxExport } from './io/XlsxExport';
 
-class XSheet extends Widget {
-  constructor(selectors, options = {
-    workConfig: {
-      body: {
-        sheets: [{
-          tableConfig: {},
-        }],
+const settings = {
+  workConfig: {
+    name: 'x-sheet',
+    top: {
+      option: {
+        show: true,
+      },
+      menu: {
+        show: true,
       },
     },
-  }) {
+    body: {
+      sheets: [{
+        tableConfig: {},
+      }],
+    },
+    bottom: {
+      show: true,
+    },
+  },
+};
+
+class XSheet extends Widget {
+  constructor(selectors, options) {
     super(`${cssPrefix}`);
     let root = selectors;
     if (typeof selectors === 'string') {
@@ -30,7 +46,8 @@ class XSheet extends Widget {
     }
     root = h(root);
     root.children(this);
-    this.work = new Work(options);
+    this.options = PlainUtils.copy({}, settings, options);
+    this.work = new Work(this.options.workConfig);
     this.attach(this.work);
     ElPopUp.setRoot(this);
     DragPanel.setRoot(this);
@@ -42,6 +59,8 @@ XSheet.XDraw = XDraw;
 XSheet.XIcon = XIcon;
 XSheet.RectRange = RectRange;
 XSheet.BaseFont = BaseFont;
+XSheet.ColorPicker = ColorPicker;
+XSheet.XlsxExport = XlsxExport;
 if (window) {
   window.XSheet = XSheet;
 }

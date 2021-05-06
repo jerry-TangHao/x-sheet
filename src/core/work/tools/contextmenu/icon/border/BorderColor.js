@@ -7,7 +7,7 @@ class BorderColor extends DropDownItem {
     super(`${cssPrefix}-tools-border-color`);
     this.icon = new Icon('border-color');
     this.setIcon(this.icon);
-    this.setColor('#000000');
+    this.setColor('rgb(0,0,0)');
   }
 
   setColor(color) {

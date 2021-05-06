@@ -6,6 +6,7 @@ class XTableDataItems {
 
   constructor(items = []) {
     this.items = items;
+    this.canWrapAll = true;
   }
 
   wrap(line, ci) {
@@ -21,6 +22,25 @@ class XTableDataItems {
     }
     line[ci] = item;
     return item;
+  }
+
+  wrapAll() {
+    const { canWrapAll } = this;
+    if (canWrapAll) {
+      const { items } = this;
+      this.canWrapAll = false;
+      for (let ri = 0, riLen = items.length; ri < riLen; ri++) {
+        const line = items[ri];
+        if (line) {
+          for (let ci = 0, ciLen = line.length; ci < ciLen; ci++) {
+            const item = line[ci];
+            if (item) {
+              this.wrap(line, ci);
+            }
+          }
+        }
+      }
+    }
   }
 
   set(ri, ci, item) {

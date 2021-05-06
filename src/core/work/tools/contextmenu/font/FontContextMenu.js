@@ -2,12 +2,12 @@ import { ELContextMenu } from '../../../../../component/contextmenu/ELContextMen
 import { cssPrefix, Constant } from '../../../../../const/Constant';
 import { PlainUtils } from '../../../../../utils/PlainUtils';
 import { FontContextMenuItem } from './FontContextMenuItem';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 
 class FontContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-font-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-font-context-menu`, PlainUtils.copy({
       onUpdate: () => {},
     }, options));
     this.items = [

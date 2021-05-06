@@ -4,15 +4,15 @@ import { PlainUtils } from '../../../../../utils/PlainUtils';
 import { TextWrappingIcon1 } from '../icon/textwrapping/TextWrappingIcon1';
 import { TextWrappingIcon2 } from '../icon/textwrapping/TextWrappingIcon2';
 import { TextWrappingIcon3 } from '../icon/textwrapping/TextWrappingIcon3';
-import { h } from '../../../../../lib/Element';
+import { h } from '../../../../../libs/Element';
 import { TextWrappingContextMenuItem } from './TextWrappingContextMenuItem';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 import { BaseFont } from '../../../../../canvas/font/BaseFont';
 
 class TextWrappingContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-text-wrapping-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-text-wrapping-context-menu`, PlainUtils.copy({
       onUpdate: () => {},
     }, options));
     this.textWrappingIcon1 = new TextWrappingIcon1();

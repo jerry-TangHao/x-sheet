@@ -1,9 +1,9 @@
 /* global document */
 import { XScreenCssBorderItem } from '../../xscreen/item/viewborder/XScreenCssBorderItem';
-import { XEvent } from '../../../../lib/XEvent';
+import { XEvent } from '../../../../libs/XEvent';
 import { Constant, cssPrefix } from '../../../../const/Constant';
 import { RectRange } from '../../tablebase/RectRange';
-import { Widget } from '../../../../lib/Widget';
+import { Widget } from '../../../../libs/Widget';
 import { XTableMousePointer } from '../../XTableMousePointer';
 import { RANGE_OVER_GO } from '../../xscreen/item/viewborder/XScreenStyleBorderItem';
 
@@ -301,8 +301,11 @@ class XSelectItem extends XScreenCssBorderItem {
    */
   cornerHandle() {
     const {
-      selectRange, selectLocal, display, border,
+      table, selectRange, selectLocal, display, border,
     } = this;
+    const {
+      xFixedView,
+    } = table;
     if (selectRange && display) {
       const overGo = this.getOverGo(selectRange);
       this.ltCorner.hide();
@@ -350,40 +353,264 @@ class XSelectItem extends XScreenCssBorderItem {
           this.ltCorner.addClass('br-pos');
           break;
       }
-      switch (overGo) {
-        case RANGE_OVER_GO.LT:
-          this.ltCorner.show();
-          this.tCorner.hide();
-          this.brCorner.hide();
-          this.lCorner.hide();
-          this.activeCorner = this.ltCorner;
-          break;
-        case RANGE_OVER_GO.LTT:
-        case RANGE_OVER_GO.T:
-          this.ltCorner.hide();
-          this.tCorner.show();
-          this.brCorner.hide();
-          this.lCorner.hide();
-          this.activeCorner = this.tCorner;
-          break;
-        case RANGE_OVER_GO.ALL:
-        case RANGE_OVER_GO.BRL:
-        case RANGE_OVER_GO.BRT:
-        case RANGE_OVER_GO.BR:
-          this.ltCorner.hide();
-          this.tCorner.hide();
-          this.brCorner.show();
-          this.lCorner.hide();
-          this.activeCorner = this.brCorner;
-          break;
-        case RANGE_OVER_GO.LTL:
-        case RANGE_OVER_GO.L:
-          this.ltCorner.hide();
-          this.tCorner.hide();
-          this.brCorner.hide();
-          this.lCorner.show();
-          this.activeCorner = this.lCorner;
-          break;
+      if (xFixedView.hasFixedTop() && xFixedView.hasFixedLeft()) {
+        switch (overGo) {
+          /**
+           * 单个区域
+           */
+          case RANGE_OVER_GO.LT: {
+            this.ltCorner.show();
+            this.tCorner.hide();
+            this.brCorner.hide();
+            this.lCorner.hide();
+            this.activeCorner = this.ltCorner;
+            break;
+          }
+          case RANGE_OVER_GO.T: {
+            this.tCorner.show();
+            this.ltCorner.hide();
+            this.lCorner.hide();
+            this.brCorner.hide();
+            this.activeCorner = this.tCorner;
+            break;
+          }
+          case RANGE_OVER_GO.BR: {
+            this.brCorner.show();
+            this.lCorner.hide();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.activeCorner = this.brCorner;
+            break;
+          }
+          case RANGE_OVER_GO.L: {
+            this.lCorner.show();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.brCorner.hide();
+            this.activeCorner = this.lCorner;
+            break;
+          }
+          /**
+           * 双区域
+           */
+          case RANGE_OVER_GO.LTT: {
+            if (selectLocal === SELECT_LOCAL.L) {
+              this.ltCorner.show();
+              this.tCorner.hide();
+              this.lCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.ltCorner;
+            } else {
+              this.tCorner.show();
+              this.ltCorner.hide();
+              this.lCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.tCorner;
+            }
+            break;
+          }
+          case RANGE_OVER_GO.BRT: {
+            if (selectLocal === SELECT_LOCAL.T) {
+              this.tCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.tCorner;
+            } else {
+              this.brCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.brCorner;
+            }
+            break;
+          }
+          case RANGE_OVER_GO.BRL: {
+            if (selectLocal === SELECT_LOCAL.L) {
+              this.lCorner.show();
+              this.brCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.lCorner;
+            } else {
+              this.brCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.brCorner;
+            }
+            break;
+          }
+          case RANGE_OVER_GO.LTL: {
+            if (selectLocal === SELECT_LOCAL.T) {
+              this.ltCorner.show();
+              this.lCorner.hide();
+              this.tCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.ltCorner;
+            } else {
+              this.lCorner.show();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.lCorner;
+            }
+            break;
+          }
+          /**
+           * 所有区域
+           */
+          case RANGE_OVER_GO.ALL: {
+            if (selectLocal === SELECT_LOCAL.T) {
+              this.tCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.tCorner;
+            } else if (selectLocal === SELECT_LOCAL.L) {
+              this.lCorner.show();
+              this.brCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.lCorner;
+            } else {
+              this.brCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.brCorner;
+            }
+            break;
+          }
+        }
+      } else if (xFixedView.hasFixedTop()) {
+        switch (overGo) {
+          /**
+           * 单个区域
+           */
+          case RANGE_OVER_GO.LT: {
+            this.ltCorner.show();
+            this.tCorner.hide();
+            this.brCorner.hide();
+            this.lCorner.hide();
+            this.activeCorner = this.ltCorner;
+            break;
+          }
+          case RANGE_OVER_GO.T: {
+            this.tCorner.show();
+            this.ltCorner.hide();
+            this.lCorner.hide();
+            this.brCorner.hide();
+            this.activeCorner = this.tCorner;
+            break;
+          }
+          case RANGE_OVER_GO.BR: {
+            this.brCorner.show();
+            this.lCorner.hide();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.activeCorner = this.brCorner;
+            break;
+          }
+          case RANGE_OVER_GO.L: {
+            this.lCorner.show();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.brCorner.hide();
+            this.activeCorner = this.lCorner;
+            break;
+          }
+          /**
+           * 双区域
+           */
+          case RANGE_OVER_GO.BRT: {
+            if (selectLocal === SELECT_LOCAL.T) {
+              this.tCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.brCorner.hide();
+              this.activeCorner = this.tCorner;
+            } else {
+              this.brCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.brCorner;
+            }
+            break;
+          }
+        }
+      } else if (xFixedView.hasFixedLeft()) {
+        switch (overGo) {
+          /**
+           * 单个区域
+           */
+          case RANGE_OVER_GO.LT: {
+            this.ltCorner.show();
+            this.tCorner.hide();
+            this.brCorner.hide();
+            this.lCorner.hide();
+            this.activeCorner = this.ltCorner;
+            break;
+          }
+          case RANGE_OVER_GO.T: {
+            this.tCorner.show();
+            this.ltCorner.hide();
+            this.lCorner.hide();
+            this.brCorner.hide();
+            this.activeCorner = this.tCorner;
+            break;
+          }
+          case RANGE_OVER_GO.BR: {
+            this.brCorner.show();
+            this.lCorner.hide();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.activeCorner = this.brCorner;
+            break;
+          }
+          case RANGE_OVER_GO.L: {
+            this.lCorner.show();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.brCorner.hide();
+            this.activeCorner = this.lCorner;
+            break;
+          }
+          /**
+           * 双区域
+           */
+          case RANGE_OVER_GO.BRL: {
+            if (selectLocal === SELECT_LOCAL.L) {
+              this.lCorner.show();
+              this.brCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.lCorner;
+            } else {
+              this.brCorner.show();
+              this.lCorner.hide();
+              this.ltCorner.hide();
+              this.tCorner.hide();
+              this.activeCorner = this.brCorner;
+            }
+            break;
+          }
+        }
+      } else {
+        switch (overGo) {
+          /**
+           * 单个区域
+           */
+          case RANGE_OVER_GO.BR: {
+            this.brCorner.show();
+            this.lCorner.hide();
+            this.ltCorner.hide();
+            this.tCorner.hide();
+            this.activeCorner = this.brCorner;
+            break;
+          }
+        }
       }
     }
   }

@@ -1,11 +1,11 @@
 /* global navigator document window */
-
 function S4() {
   // eslint-disable-next-line no-bitwise
   return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 }
 
 const alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
 const DATA_TYPE = {
   String: 1,
   Boolean: 2,
@@ -95,30 +95,6 @@ class PlainUtils {
     return obj instanceof parent;
   }
 
-  static mergeDeep(object = {}, ...sources) {
-    if (PlainUtils.isUnDef(object)) {
-      return {};
-    }
-    if (PlainUtils.isUnDef(sources) || sources.length === 0) {
-      return object;
-    }
-    sources.forEach((source) => {
-      if (PlainUtils.isUnDef(source)) return;
-      Object.keys(source).forEach((key) => {
-        const v = source[key];
-        if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
-          object[key] = v;
-        } else if (typeof v !== 'function' && !Array.isArray(v) && PlainUtils.isPlainObject(v)) {
-          object[key] = object[key] || {};
-          PlainUtils.mergeDeep(object[key], v);
-        } else {
-          object[key] = v;
-        }
-      });
-    });
-    return object;
-  }
-
   static toLowCase(str) {
     return str.toLowerCase();
   }
@@ -155,13 +131,33 @@ class PlainUtils {
     }
   }
 
+  static copy(object = {}, ...sources) {
+    if (PlainUtils.isUnDef(object)) {
+      return {};
+    }
+    if (PlainUtils.isUnDef(sources) || sources.length === 0) {
+      return object;
+    }
+    sources.forEach((source) => {
+      if (PlainUtils.isUnDef(source)) return;
+      Object.keys(source).forEach((key) => {
+        const v = source[key];
+        if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+          object[key] = v;
+        } else if (typeof v !== 'function' && !Array.isArray(v) && PlainUtils.isPlainObject(v)) {
+          object[key] = object[key] || {};
+          PlainUtils.copy(object[key], v);
+        } else {
+          object[key] = v;
+        }
+      });
+    });
+    return object;
+  }
+
   static cloneDeep(object) {
     const json = JSON.stringify(object);
     return JSON.parse(json);
-  }
-
-  static copyProp(t, s) {
-    return Object.assign(t, s);
   }
 
   static sum(objOrAry, cb = value => value) {
@@ -332,7 +328,16 @@ class PlainUtils {
     return undefined;
   }
 
+  static arrayHead(array) {
+    return array[0];
+  }
+
+  static arrayLast(array) {
+    return array[array.length - 1];
+  }
+
 }
+
 PlainUtils.EMPTY = '';
 PlainUtils.Nul = null;
 PlainUtils.Undef = undefined;

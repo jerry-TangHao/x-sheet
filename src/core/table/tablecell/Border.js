@@ -27,7 +27,7 @@ class Border {
   constructor({
     widthType = XDraw.LINE_WIDTH_TYPE.low,
     width = -1,
-    color = '#000000',
+    color = 'rgb(0,0,0)',
     zIndex = 0,
     display = false,
     type = LINE_TYPE.SOLID_LINE,

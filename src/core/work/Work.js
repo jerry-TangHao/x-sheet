@@ -1,18 +1,36 @@
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix } from '../../const/Constant';
-import { VerticalLayer } from '../../lib/layer/VerticalLayer';
-import { VerticalLayerElement } from '../../lib/layer/VerticalLayerElement';
+import { VerticalLayer } from '../../libs/layer/VerticalLayer';
+import { VerticalLayerElement } from '../../libs/layer/VerticalLayerElement';
 import { WorkTop } from './WorkTop';
 import { WorkBody } from './WorkBody';
 import { WorkBottom } from './WorkBottom';
+import { PlainUtils } from '../../utils/PlainUtils';
+
+const settings = {
+  top: {
+    option: {
+      show: true,
+    },
+    menu: {
+      show: true,
+    },
+  },
+  body: {
+    sheets: [{
+      tableConfig: {},
+    }],
+  },
+  bottom: {
+    show: true,
+  },
+};
 
 class Work extends Widget {
 
-  constructor(options = {
-    body: {},
-  }) {
+  constructor(options) {
     super(`${cssPrefix}-work`);
-    this.options = options.workConfig;
+    this.options = PlainUtils.copy({}, settings, options);
     this.root = null;
     // 布局
     this.topLayer = new VerticalLayerElement();
@@ -27,19 +45,19 @@ class Work extends Widget {
     this.verticalLayer.children(this.bodyLayer);
     this.verticalLayer.children(this.bottomLayer);
     this.children(this.verticalLayer);
-    // 组件
-    this.top = new WorkTop(this);
-    this.body = new WorkBody(this, this.options.body);
-    this.bottom = new WorkBottom(this);
   }
 
   onAttach(element) {
+    const { options, bodyLayer, topLayer, bottomLayer } = this;
     this.root = element;
-    const {
-      bodyLayer, topLayer, bottomLayer,
-    } = this;
+    // 组件
+    this.top = new WorkTop(this, this.options.top);
+    this.body = new WorkBody(this, this.options.body);
+    this.bottom = new WorkBottom(this);
     topLayer.attach(this.top);
-    bottomLayer.attach(this.bottom);
+    if (options.bottom.show) {
+      bottomLayer.attach(this.bottom);
+    }
     bodyLayer.attach(this.body);
     this.bottom.bottomMenu.setSum(0);
     this.bottom.bottomMenu.setAvg(0);

@@ -1,8 +1,13 @@
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { h } from '../../lib/Element';
+import { h } from '../../libs/Element';
 import { PlainUtils } from '../../utils/PlainUtils';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
+
+const settings = {
+  onAdd(tab) { return tab; },
+  onSwitch(tab) { return tab; },
+};
 
 class TabView extends Widget {
 
@@ -20,10 +25,7 @@ class TabView extends Widget {
       this.content,
       this.plus,
     ]);
-    this.optiions = PlainUtils.mergeDeep({
-      onAdd(tab) { return tab; },
-      onSwitch(tab) { return tab; },
-    }, options);
+    this.options = PlainUtils.copy({}, settings, options);
     this.left = null;
     this.tabList = [];
   }
@@ -68,7 +70,7 @@ class TabView extends Widget {
       this.tabs.css('marginLeft', `${this.left}px`);
     });
     XEvent.bind(plus, Constant.SYSTEM_EVENT_TYPE.CLICK, () => {
-      this.optiions.onAdd();
+      this.options.onAdd();
       this.offsetSizeLeft();
     });
   }
@@ -79,7 +81,7 @@ class TabView extends Widget {
     tab.onAttach();
     XEvent.bind(tab, Constant.SYSTEM_EVENT_TYPE.CLICK, () => {
       this.setActive(tab);
-      this.optiions.onSwitch(tab);
+      this.options.onSwitch(tab);
     });
   }
 

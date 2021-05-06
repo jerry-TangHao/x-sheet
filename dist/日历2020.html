@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>x-sheet 2020日历模板</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <link rel="shortcut icon" href="logo.ico">
+    <link href="XSheet.css" rel="stylesheet">
+    <script src="XSheet.js" type="text/javascript"></script>
+    <script src="../template/calendar_2020/2020日历.js"></script>
+    <script src="../template/calendar_2020/2020年1月.js"></script>
+    <script src="../template/calendar_2020/2020年2月.js"></script>
+    <script src="../template/calendar_2020/2020年3月.js"></script>
+    <script src="../template/calendar_2020/2020年4月.js"></script>
+    <script src="../template/calendar_2020/2020年5月.js"></script>
+    <script src="../template/calendar_2020/2020年6月.js"></script>
+    <script src="../template/calendar_2020/2020年7月.js"></script>
+    <script src="../template/calendar_2020/2020年8月.js"></script>
+    <script src="../template/calendar_2020/2020年9月.js"></script>
+    <script src="../template/calendar_2020/2020年10月.js"></script>
+    <script src="../template/calendar_2020/2020年11月.js"></script>
+    <script src="../template/calendar_2020/2020年12月.js"></script>
+</head>
+<body id="dome"></body>
+<script>
+  const xSheet = new XSheet('#dome', {
+    workConfig: {
+      body: {
+        sheets: [
+          window['2020日历'],
+          window['2020年1月'],
+          window['2020年2月'],
+          window['2020年3月'],
+          window['2020年4月'],
+          window['2020年5月'],
+          window['2020年6月'],
+          window['2020年7月'],
+          window['2020年8月'],
+          window['2020年9月'],
+          window['2020年10月'],
+          window['2020年11月'],
+          window['2020年12月'],
+        ],
+      },
+    },
+  });
+</script>
+</html>

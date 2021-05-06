@@ -1,10 +1,11 @@
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { h } from '../../lib/Element';
-import { XEvent } from '../../lib/XEvent';
+import { h } from '../../libs/Element';
+import { XEvent } from '../../libs/XEvent';
 import { PlainUtils } from '../../utils/PlainUtils';
 import { XSelectItem } from '../table/xscreenitems/xselect/XSelectItem';
-import { Throttle } from '../../lib/Throttle';
+import { Throttle } from '../../libs/Throttle';
+import { Cell } from '../table/tablecell/Cell';
 
 class BottomMenu extends Widget {
 
@@ -44,6 +45,7 @@ class BottomMenu extends Widget {
       const { sri, sci, eri, eci } = selectRange;
       let number = 0;
       let total = 0;
+      // 性能杀手(后续优化)
       xIteratorBuilder.getRowIterator()
         .setBegin(sri)
         .setEnd(eri)
@@ -53,17 +55,17 @@ class BottomMenu extends Widget {
             .setEnd(eci)
             .setLoop((ci) => {
               const merge = merges.getFirstIncludes(ri, ci);
-              const cell = cells.getCell(ri, ci);
               if (merge) {
                 if (merge.sri !== ri || merge.sci !== ci) {
                   return;
                 }
               }
+              const cell = cells.getCell(ri, ci);
               if (cell) {
+                const { text, contentType } = cell;
                 number += 1;
-                const { text } = cell;
-                if (PlainUtils.isNumber(text)) {
-                  total += parseFloat(text);
+                if (contentType === Cell.CONTENT_TYPE.NUMBER) {
+                  total += text;
                 }
               }
             })
@@ -71,13 +73,13 @@ class BottomMenu extends Widget {
         })
         .execute();
       const avg = total / number;
-      this.setNumber(number);
       this.setSum(total);
       this.setAvg(avg);
+      this.setNumber(number);
     } else {
-      this.setNumber(0);
       this.setSum(0);
       this.setAvg(0);
+      this.setNumber(0);
     }
   }
 
@@ -125,16 +127,16 @@ class BottomMenu extends Widget {
     });
   }
 
-  setNumber(val) {
-    this.number.text(`数量: ${val}`);
-  }
-
   setSum(val) {
     this.sum.text(`求和: ${val}`);
   }
 
   setAvg(val) {
     this.avg.text(`平均数: ${val}`);
+  }
+
+  setNumber(val) {
+    this.number.text(`数量: ${val}`);
   }
 
   destroy() {

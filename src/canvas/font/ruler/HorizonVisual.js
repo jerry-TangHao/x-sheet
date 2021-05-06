@@ -13,93 +13,129 @@ class HorizonVisual extends PlainRuler {
 
   displayFont(rect) {
     const { align } = this;
+    const { text } = this;
     const { width } = rect;
-    const origin = this.text;
-    const length = origin.length;
+    const { length } = text;
     switch (align) {
       case BaseFont.ALIGN.left: {
-        let text = '';
-        let textWidth = 0;
-        let start = 0;
-        while (start < length) {
-          const str = text + origin.charAt(start);
-          const len = this.textWidth(str);
-          if (len >= width) {
+        let displayHeight = 0;
+        let displayWidth = 0;
+        let displayAscent = 0;
+        let displayStart = 0;
+        let displayText = '';
+        while (displayStart < length) {
+          const measureText = displayText + text.charAt(displayStart);
+          const measure = this.textSize(measureText);
+          if (measure.width >= width) {
             break;
           }
-          text = str;
-          textWidth = len;
-          start += 1;
+          displayText = measureText;
+          displayAscent = measure.ascent;
+          displayWidth = measure.width;
+          displayHeight = measure.height;
+          displayStart += 1;
         }
         return {
-          text, textWidth,
+          text: displayText,
+          ascent: displayAscent,
+          width: displayWidth,
+          height: displayHeight,
         };
       }
       case BaseFont.ALIGN.center: {
-        const textWidth = this.textWidth(origin);
-        const lOffset = width / 2 - textWidth / 2;
+        const measure = this.textSize(text);
+        const lOffset = width / 2 - measure.width / 2;
         if (lOffset < 0) {
-          let start = 0;
-          let temp = '';
-          while (start < length) {
-            const str = temp + origin.charAt(start);
-            if (lOffset + this.textWidth(str) >= 0) {
+          // 测量左边的起始位置
+          let displayStart = 0;
+          let displayTemp = '';
+          while (displayStart < length) {
+            const measureText = displayTemp + text.charAt(displayStart);
+            const measureWidth = this.textWidth(measureText);
+            if ((lOffset + measureWidth) >= 0) {
               break;
             }
-            temp = str;
-            start += 1;
+            displayTemp = measureText;
+            displayStart += 1;
           }
-          let over = start;
-          let text = '';
-          let textWidth = 0;
-          while (over < length) {
-            const str = text + origin.charAt(over);
-            const len = this.textWidth(str);
-            if (len >= width) {
+          // 测量右边的结束位置
+          let displayHeight = 0;
+          let displayWidth = 0;
+          let displayAscent = 0;
+          let displayText = '';
+          let displayOver = displayStart;
+          while (displayOver < length) {
+            const measureText = displayText + text.charAt(displayOver);
+            const measure = this.textSize(measureText);
+            if (measure.width >= width) {
               break;
             }
-            text = str;
-            textWidth = len;
-            over += 1;
+            displayText = measureText;
+            displayHeight = measure.height;
+            displayWidth = measure.width;
+            displayAscent = measure.ascent;
+            displayOver += 1;
           }
           return {
-            text, textWidth,
+            text: displayText,
+            ascent: displayAscent,
+            width: displayWidth,
+            height: displayHeight,
           };
         }
+        let displayText = text;
+        let displayHeight = measure.height;
+        let displayWidth = measure.width;
+        let displayAscent = measure.ascent;
         return {
-          text: origin, textWidth,
+          text: displayText,
+          ascent: displayAscent,
+          width: displayWidth,
+          height: displayHeight,
         };
+
       }
       case BaseFont.ALIGN.right: {
-        let start = length - 1;
-        let text = '';
-        let textWidth = 0;
-        while (start >= 0) {
-          const str = origin.charAt(start) + text;
-          const len = this.textWidth(str);
-          if (len >= width) {
+        let displayStart = length - 1;
+        let displayWidth = 0;
+        let displayText = '';
+        let displayAscent = 0;
+        let displayHeight = 0;
+        while (displayStart >= 0) {
+          const measureText = text.charAt(displayStart) + displayText;
+          const measure = this.textSize(measureText);
+          if (measure.width >= width) {
             break;
           }
-          text = str;
-          textWidth = len;
-          start -= 1;
+          displayText = measureText;
+          displayHeight = measure.height;
+          displayWidth = measure.width;
+          displayAscent = measure.ascent;
+          displayStart -= 1;
         }
         return {
-          text, textWidth,
+          text: displayText,
+          ascent: displayAscent,
+          width: displayWidth,
+          height: displayHeight,
         };
       }
     }
     return {
       text: '',
-      textWidth: 0,
+      ascent: 0,
+      width: 0,
+      height: 0,
     };
   }
 
   getAlignPadding() {
-    if (this.align === BaseFont.ALIGN.center) {
-      return 0;
+    const { align, padding } = this;
+    switch (align) {
+      case BaseFont.ALIGN.center:
+        return 0;
     }
-    return this.padding;
+    return padding;
   }
 
 }

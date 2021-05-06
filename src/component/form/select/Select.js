@@ -1,7 +1,7 @@
-import { Widget } from '../../../lib/Widget';
+import { Widget } from '../../../libs/Widget';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { XEvent } from '../../../lib/XEvent';
-import { h } from '../../../lib/Element';
+import { XEvent } from '../../../libs/XEvent';
+import { h } from '../../../libs/Element';
 import { ELContextMenuDivider } from '../../contextmenu/ELContextMenuDivider';
 import { SelectContextMenu } from './SelectContextMenu';
 import { SelectContextMenuItem } from './SelectContextMenuItem';

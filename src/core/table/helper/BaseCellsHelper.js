@@ -263,7 +263,7 @@ class BaseCellsHelper {
   getCellOverFlow(ri, ci, rect, cell) {
     const styleTable = this.getStyleTable();
     const { x, y, height, width } = rect;
-    const { fontAttr, contentWidth } = cell;
+    const { fontAttr, contentWidth, ruler } = cell;
     const { direction } = fontAttr;
     const blank = PlainUtils.isUnDef(cell) || PlainUtils.isBlank(cell.text);
     switch (direction) {
@@ -271,10 +271,10 @@ class BaseCellsHelper {
         if (blank === false) {
           const { textWrap } = fontAttr;
           if (textWrap === BaseFont.TEXT_WRAP.OVER_FLOW) {
-            if (contentWidth === 0 || contentWidth > width) {
-              const max = this.getHorizontalMaxWidth(ri, ci, cell);
+            if (contentWidth === 0 || contentWidth > width || (ruler === null || ruler.rect.width !== width)) {
+              const maxWidth = this.getHorizontalMaxWidth(ri, ci, cell);
               return new Rect({
-                x: x + max.offset, y, width: max.width, height,
+                x: x + maxWidth.offset, y, width: maxWidth.width, height,
               });
             }
           }
@@ -288,15 +288,15 @@ class BaseCellsHelper {
             switch (textWrap) {
               case BaseFont.TEXT_WRAP.OVER_FLOW:
               case BaseFont.TEXT_WRAP.TRUNCATE: {
-                const max = this.getAngleBarMaxWidth(ri, ci, cell, rect);
+                const maxWidth = this.getAngleBarMaxWidth(ri, ci, cell, rect);
                 return new Rect({
-                  x: x + max.offset, y, width: max.width, height,
+                  x: x + maxWidth.offset, y, width: maxWidth.width, height,
                 });
               }
               case BaseFont.TEXT_WRAP.WORD_WRAP: {
-                const max = this.getAngleBarWrapWidth(ri, ci, cell, rect);
+                const maxWidth = this.getAngleBarWrapWidth(ri, ci, cell, rect);
                 return new Rect({
-                  x: x + max.offset, y, width: max.width, height,
+                  x: x + maxWidth.offset, y, width: maxWidth.width, height,
                 });
               }
             }

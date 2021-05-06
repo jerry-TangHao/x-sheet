@@ -1,6 +1,6 @@
 import { Constant, cssPrefix } from '../../../const/Constant';
 import { DropInputItem } from './base/DropInputItem';
-import { XEvent } from '../../../lib/XEvent';
+import { XEvent } from '../../../libs/XEvent';
 import { FontAngleValueContextMenu } from './contextmenu/fontanglevalue/FontAngleValueContextMenu';
 import { PlainUtils } from '../../../utils/PlainUtils';
 

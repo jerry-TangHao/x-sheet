@@ -1,7 +1,7 @@
 import { ELContextMenu } from '../contextmenu/ELContextMenu';
 import { Constant, cssPrefix } from '../../const/Constant';
 import { AutoFillTypeMenuItem } from './AutoFillTypeMenuItem';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 
 class AutoFillTypeMenu extends ELContextMenu {
 

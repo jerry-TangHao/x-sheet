@@ -1,7 +1,7 @@
 import { XSelectItem } from '../xselect/XSelectItem';
-import { Widget } from '../../../../lib/Widget';
+import { Widget } from '../../../../libs/Widget';
 import { Constant, cssPrefix } from '../../../../const/Constant';
-import { XEvent } from '../../../../lib/XEvent';
+import { XEvent } from '../../../../libs/XEvent';
 import { RectRange } from '../../tablebase/RectRange';
 import { XScreenSvgBorderItem } from '../../xscreen/item/viewborder/XScreenSvgBorderItem';
 

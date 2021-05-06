@@ -1,7 +1,7 @@
 import { ELContextMenu } from '../../../../../component/contextmenu/ELContextMenu';
 import { cssPrefix, Constant } from '../../../../../const/Constant';
 import { ColorArray } from '../../../../../component/colorpicker/colorarray/ColorArray';
-import { h } from '../../../../../lib/Element';
+import { h } from '../../../../../libs/Element';
 import { ColorItem } from '../../../../../component/colorpicker/colorarray/ColorItem';
 import { ELContextMenuDivider } from '../../../../../component/contextmenu/ELContextMenuDivider';
 import { Icon } from '../../Icon';
@@ -9,12 +9,12 @@ import { PlainUtils } from '../../../../../utils/PlainUtils';
 
 import { FillColorContextMenuItem } from './FillColorContextMenuItem';
 import { ColorPicker } from '../../../../../component/colorpicker/ColorPicker';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 
 class FillColorContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-font-color-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-font-color-context-menu`, PlainUtils.copy({
       onUpdate: () => {},
     }, options));
     this.colorPicker = new ColorPicker({

@@ -1,10 +1,10 @@
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 import { PlainUtils } from '../../utils/PlainUtils';
 import { XSelectItem } from './xscreenitems/xselect/XSelectItem';
 import { XDraw } from '../../canvas/XDraw';
-import { Throttle } from '../../lib/Throttle';
+import { Throttle } from '../../libs/Throttle';
 import { BaseFont } from '../../canvas/font/BaseFont';
 
 class XTableEdit extends Widget {
@@ -149,11 +149,10 @@ class XTableEdit extends Widget {
     const { table } = this;
     const merges = table.getTableMerges();
     const cells = table.getTableCells();
-    const scrollView = table.getScrollView();
     const { xScreen } = table;
     const xSelect = xScreen.findType(XSelectItem);
     const { selectRange } = xSelect;
-    if (selectRange && scrollView.intersects(selectRange)) {
+    if (selectRange) {
       const { sri, sci } = selectRange;
       const merge = merges.getFirstIncludes(sri, sci);
       const cell = cells.getCellOrNew(sri, sci);

@@ -1,7 +1,7 @@
-import { h } from '../../../lib/Element';
+import { h } from '../../../libs/Element';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { Widget } from '../../../lib/Widget';
-import { XEvent } from '../../../lib/XEvent';
+import { Widget } from '../../../libs/Widget';
+import { XEvent } from '../../../libs/XEvent';
 
 class SearchInput extends Widget {
 

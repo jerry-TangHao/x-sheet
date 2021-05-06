@@ -1,14 +1,14 @@
-import { Widget } from '../../../lib/Widget';
+import { Widget } from '../../../libs/Widget';
 import { cssPrefix, Constant } from '../../../const/Constant';
 import { ColorItem } from './ColorItem';
 import { PlainUtils } from '../../../utils/PlainUtils';
-import { XEvent } from '../../../lib/XEvent';
+import { XEvent } from '../../../libs/XEvent';
 
 class ColorArray extends Widget {
 
   constructor(options) {
     super(`${cssPrefix}-color-array`);
-    this.options = PlainUtils.mergeDeep({
+    this.options = PlainUtils.copy({
       colors: [
         new ColorItem({ color: 'rgb(0,0,0)' }),
         new ColorItem({ color: 'rgb(67, 67, 67)' }),

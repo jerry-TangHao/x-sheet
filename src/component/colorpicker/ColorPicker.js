@@ -1,16 +1,16 @@
 /* global document */
-import { h } from '../../lib/Element';
+import { h } from '../../libs/Element';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { DragPanel } from '../dragpanel/DragPanel';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 import { PlainUtils } from '../../utils/PlainUtils';
 
 class ColorPicker extends Widget {
 
   constructor(options) {
     super(`${cssPrefix}-color-picker`);
-    this.options = PlainUtils.mergeDeep({
+    this.options = PlainUtils.copy({
       selectCb: () => {},
     }, options);
     // 拖拽组件
@@ -290,6 +290,27 @@ class ColorPicker extends Widget {
     };
   }
 
+  static isRgb(rgb) {
+    return rgb.startsWith('rgb');
+  }
+
+  static isHex(hex) {
+    return hex.startsWith('#');
+  }
+
+  static isDark(rgb) {
+    if (PlainUtils.isBlank(rgb)) {
+      return false;
+    }
+    if (this.isHex(rgb)) {
+      const v = ColorPicker.hexToRgb(rgb);
+      rgb = `rgb(${v.r}, ${v.g}, ${v.b})`;
+    }
+    const result = ColorPicker.parseRgb(rgb);
+    const { r, g, b } = result;
+    return (r * 0.299) + (g * 0.578) + (b * 0.114) >= 192;
+  }
+
   static hexToRgb(hex) {
     // eslint-disable-next-line no-redeclare,no-param-reassign
     hex = parseInt(((hex.indexOf('#') > -1) ? hex.substring(1) : hex), 16);
@@ -385,37 +406,25 @@ class ColorPicker extends Widget {
     return this.rgbToHex(this.hsbToRgb(hsb));
   }
 
-  static isRgb(rgb) {
-    return rgb.startsWith('rgb');
-  }
-
-  static isHex(hex) {
-    return hex.startsWith('#');
-  }
-
   static parseRgb(rgb) {
     const rxp = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/;
     const result = rgb.match(rxp);
     return {
-      r: result[1],
-      g: result[2],
-      b: result[3],
+      r: parseInt(result[1], 10),
+      g: parseInt(result[2], 10),
+      b: parseInt(result[3], 10),
     };
   }
 
-  static isDark(rgb) {
-    if (PlainUtils.isBlank(rgb)) {
-      return false;
+  static parseRgbToHex(rgb) {
+    if (rgb) {
+      if (this.isHex(rgb)) {
+        return rgb.substring(1);
+      }
+      const value = this.parseRgb(rgb);
+      return this.rgbToHex(value);
     }
-    if (this.isHex(rgb)) {
-      const v = ColorPicker.hexToRgb(rgb);
-      rgb = `rgb(${v.r}, ${v.g}, ${v.b})`;
-    }
-    const result = ColorPicker.parseRgb(rgb);
-    const r = parseInt(result.r, 10);
-    const g = parseInt(result.g, 10);
-    const b = parseInt(result.b, 10);
-    return (r * 0.299) + (g * 0.578) + (b * 0.114) >= 192;
+    return 'ffffff';
   }
 
 }

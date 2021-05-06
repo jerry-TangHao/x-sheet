@@ -1,9 +1,9 @@
 import { XSelectItem } from '../xselect/XSelectItem';
 import { PlainUtils } from '../../../../utils/PlainUtils';
 import { RectRange } from '../../tablebase/RectRange';
-import { Widget } from '../../../../lib/Widget';
+import { Widget } from '../../../../libs/Widget';
 import { Constant, cssPrefix } from '../../../../const/Constant';
-import { XEvent } from '../../../../lib/XEvent';
+import { XEvent } from '../../../../libs/XEvent';
 import { Alert } from '../../../../component/alert/Alert';
 import { XScreenCssBorderItem } from '../../xscreen/item/viewborder/XScreenCssBorderItem';
 import darkFilter from '../../../../../assets/svg/filter-dark.svg';
@@ -52,7 +52,7 @@ class XFilter extends XScreenCssBorderItem {
     this.bl.children(this.fl);
     this.bt.children(this.ft);
     this.bbr.children(this.fbr);
-    this.setBorderColor('#0071cf');
+    this.setBorderColor('rgb(0,113,207)');
     this.bind();
   }
 
@@ -89,6 +89,12 @@ class XFilter extends XScreenCssBorderItem {
     });
     XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RENDER, () => {
       if (this.display) {
+        this.xFilterOffset();
+      }
+    });
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, () => {
+      if (this.display) {
+        ElPopUp.closeAll();
         this.xFilterOffset();
       }
     });
@@ -446,16 +452,16 @@ class XFilter extends XScreenCssBorderItem {
           continue;
         }
         const icon = icons[ci];
-        // 数值筛选
-        const { valueFilterItems } = icon;
-        const { valueFilterValue } = icon;
-        if (valueFilterItems) {
-
-        }
         // 条件筛选
         const { ifFilterType } = icon;
         const { ifFilterValue } = icon;
         if (ifFilterType) {
+
+        }
+        // 数值筛选
+        const { valueFilterItems } = icon;
+        const { valueFilterValue } = icon;
+        if (valueFilterItems) {
 
         }
       }

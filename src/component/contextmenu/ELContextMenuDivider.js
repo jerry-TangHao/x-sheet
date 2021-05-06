@@ -1,5 +1,5 @@
 import { cssPrefix } from '../../const/Constant';
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 
 class ELContextMenuDivider extends Widget {
 

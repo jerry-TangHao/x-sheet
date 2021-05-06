@@ -1,22 +1,13 @@
 import { BaseRuler } from '../BaseRuler';
-import { RTSinKit } from '../../RTFunction';
+import { RTCosKit, RTSinKit } from '../../RTFunction';
 import { PlainRuler } from '../PlainRuler';
 import { BaseFont } from '../BaseFont';
 
 class AngleBoxRuler extends PlainRuler {
 
   constructor({
-    draw,
-    text,
-    size,
-    angle,
-    rect,
-    overflow,
-    align,
-    verticalAlign,
-    textWrap,
-    lineHeight = 4,
-    padding,
+    draw, text, size, angle, rect, overflow, align, verticalAlign,
+    textWrap, lineHeight = 8, padding,
   }) {
     super({
       draw, text,
@@ -27,18 +18,21 @@ class AngleBoxRuler extends PlainRuler {
     this.rect = rect;
     this.overflow = overflow;
     this.align = align;
-    this.verticalAlign = verticalAlign;
     this.textWrap = textWrap;
-    this.lineHeight = lineHeight;
     this.padding = padding;
+    this.lineHeight = lineHeight;
+    this.verticalAlign = verticalAlign;
 
     this.overflowText = '';
     this.overflowTextWidth = 0;
+    this.overflowTextHeight = 0;
+    this.overflowTextAscent = 0;
+    this.overflowBlockWidth = 0;
+    this.overflowBlockHeight = 0;
 
-    this.textWrapText = '';
-    this.textWrapTextWidth = 0;
     this.textWrapTextArray = [];
-    this.textWrapMaxLen = 0;
+    this.textWrapTextWidth = 0;
+    this.textWrapTextHeight = 0;
   }
 
   equals(other) {
@@ -69,23 +63,12 @@ class AngleBoxRuler extends PlainRuler {
     if (other.padding !== this.padding) {
       return false;
     }
+    const diffWidth = other.overflow.width !== this.overflow.width;
+    const diffHeight = other.overflow.height !== this.overflow.height;
+    if (diffWidth || diffHeight) {
+      return false;
+    }
     switch (this.textWrap) {
-      case BaseFont.TEXT_WRAP.TRUNCATE: {
-        const notWidth = other.rect.width !== this.rect.width;
-        const notHeight = other.rect.height !== this.rect.height;
-        if (notWidth || notHeight) {
-          return false;
-        }
-        break;
-      }
-      case BaseFont.TEXT_WRAP.OVER_FLOW: {
-        const notWidth = other.overflow.width !== this.overflow.width;
-        const notHeight = other.overflow.height !== this.overflow.height;
-        if (notWidth || notHeight) {
-          return false;
-        }
-        break;
-      }
       case BaseFont.TEXT_WRAP.WORD_WRAP: {
         if (other.lineHeight !== this.lineHeight) {
           return false;
@@ -102,190 +85,323 @@ class AngleBoxRuler extends PlainRuler {
 
   overflowRuler() {
     if (this.used) { return; }
-    const { text } = this;
-    const textWidth = this.textWidth(text);
+    const { angle, text } = this;
+    const { width, height, ascent } = this.textSize(text);
+    const blockWidth = Math.max(RTCosKit.nearby({
+      tilt: width,
+      angle,
+    }), height);
+    const blockHeight = RTSinKit.inverse({
+      tilt: width,
+      angle,
+    });
     this.overflowText = text;
-    this.overflowTextWidth = textWidth;
+    this.overflowTextWidth = width;
+    this.overflowTextHeight = height;
+    this.overflowTextAscent = ascent;
+    this.overflowBlockWidth = blockWidth;
+    this.overflowBlockHeight = blockHeight;
     this.used = BaseRuler.USED.OVER_FLOW;
   }
 
   textWrapRuler() {
     if (this.used) { return; }
-    const { text, size, angle, rect, lineHeight, padding } = this;
+    const { angle, rect, align, lineHeight, padding } = this;
     const { height } = rect;
+    const textHypotenuseWidth = RTSinKit.tilt({
+      inverse: height - (padding * 2),
+      angle,
+    });
     if (angle > 0) {
-      const textHypotenuseWidth = RTSinKit.tilt({
-        inverse: height - (padding * 2),
-        angle,
-      });
-      // 折行文本计算
       const breakArray = this.textBreak();
       const textArray = [];
-      const breakLen = breakArray.length;
-      let bi = 0;
-      let maxLen = 0;
-      while (bi < breakLen) {
-        const text = breakArray[bi];
-        const textLen = text.length;
+      const breakLength = breakArray.length;
+      // 折行文本计算
+      let breakIndex = 0;
+      while (breakIndex < breakLength) {
+        const text = breakArray[breakIndex];
+        const textLength = text.length;
         const line = {
-          str: '',
-          len: 0,
-          start: 0,
+          text: '',
+          width: 0,
+          height: 0,
+          ascent: 0,
         };
-        let ii = 0;
-        while (ii < textLen) {
-          const str = line.str + text.charAt(ii);
-          const len = this.textWidth(str);
-          if (len > textHypotenuseWidth) {
-            if (line.len === 0) {
+        let innerIndex = 0;
+        while (innerIndex < textLength) {
+          const measureText = line.text + text.charAt(innerIndex);
+          const measure = this.textSize(measureText);
+          if (measure.width > textHypotenuseWidth) {
+            if (line.width === 0) {
+              const blockWidth = Math.max(RTCosKit.nearby({
+                tilt: measure.width,
+                angle,
+              }), measure.height);
+              const blockHeight = RTSinKit.inverse({
+                tilt: measure.width,
+                angle,
+              });
               textArray.push({
-                text: str,
-                len,
                 tx: 0,
                 ty: 0,
+                blockWidth,
+                blockHeight,
+                text: measureText,
+                ascent: measure.ascent,
+                width: measure.width,
+                height: measure.height,
               });
-              if (len > maxLen) {
-                maxLen = len;
-              }
-              ii += 1;
+              innerIndex += 1;
             } else {
+              const blockWidth = Math.max(RTCosKit.nearby({
+                tilt: line.width,
+                angle,
+              }), line.height);
+              const blockHeight = RTSinKit.inverse({
+                tilt: line.width,
+                angle,
+              });
               textArray.push({
-                text: line.str,
-                len: line.len,
                 tx: 0,
                 ty: 0,
+                blockWidth,
+                blockHeight,
+                text: line.text,
+                ascent: line.ascent,
+                width: line.width,
+                height: line.height,
               });
-              if (line.len > maxLen) {
-                maxLen = line.len;
-              }
             }
-            line.str = '';
-            line.len = 0;
-            line.start = ii;
+            line.text = '';
+            line.width = 0;
+            line.height = 0;
+            line.ascent = 0;
           } else {
-            line.str = str;
-            line.len = len;
-            ii += 1;
+            line.text = measureText;
+            line.width = measure.width;
+            line.height = measure.height;
+            line.ascent = measure.ascent;
+            innerIndex += 1;
           }
         }
-        if (line.len > 0) {
+        if (line.width > 0) {
+          const blockWidth = Math.max(RTCosKit.nearby({
+            tilt: line.width,
+            angle,
+          }), line.height);
+          const blockHeight = RTSinKit.inverse({
+            tilt: line.width,
+            angle,
+          });
           textArray.push({
-            text: line.str,
-            len: line.len,
             tx: 0,
             ty: 0,
+            blockWidth,
+            blockHeight,
+            text: line.text,
+            height: line.height,
+            width: line.width,
+            ascent: line.ascent,
           });
         }
-        if (line.len > maxLen) {
-          maxLen = line.len;
-        }
-        bi += 1;
+        breakIndex += 1;
       }
       // x坐标偏移量
-      const spacing = RTSinKit.tilt({
-        inverse: size + lineHeight,
-        angle,
-      });
-      const textArrayLen = textArray.length;
-      let wOffset = 0;
-      let ii = 0;
-      while (ii < textArrayLen) {
-        const item = textArray[ii];
-        item.tx = wOffset;
-        wOffset += spacing;
-        ii += 1;
+      const textArrayLength = textArray.length;
+      let maxTextHeight = textArrayLength > 0 ? textArray[0].blockHeight : 0;
+      let maxTextWidth = textArrayLength > 0 ? textArray[0].blockWidth : 0;
+      let innerIndex = 1;
+      while (innerIndex < textArrayLength) {
+        const last = textArray[innerIndex - 1];
+        const item = textArray[innerIndex];
+        // 将文本偏移到上一个文本的指定位置
+        item.tx = last.tx;
+        item.ty = last.ty;
+        switch (align) {
+          case BaseFont.ALIGN.left:
+            item.ty += (last.blockHeight - item.blockHeight);
+            break;
+          case BaseFont.ALIGN.center:
+            item.tx += (last.blockWidth / 2 - item.blockWidth / 2);
+            item.ty += (last.blockHeight / 2 - item.blockHeight / 2);
+            break;
+          case BaseFont.ALIGN.right:
+            item.tx += (last.blockWidth - item.blockWidth);
+            break;
+        }
+        // 偏移上一个文本的行宽
+        const spacing = RTSinKit.tilt({
+          inverse: last.height + lineHeight,
+          angle,
+        });
+        item.tx += spacing;
+        // 统计文本块的总宽度
+        const widthOffset = item.tx + item.blockWidth;
+        if (widthOffset > maxTextWidth) {
+          maxTextWidth = widthOffset;
+        }
+        // 统计文本块的最大高度
+        if (item.blockHeight > maxTextHeight) {
+          maxTextHeight = item.blockHeight;
+        }
+        innerIndex += 1;
       }
+      // 折行文本信息
       this.textWrapTextArray = textArray;
-      this.textWrapMaxLen = maxLen;
+      this.textWrapTextWidth = maxTextWidth;
+      this.textWrapTextHeight = maxTextHeight;
     } else {
-      const textHypotenuseWidth = RTSinKit.tilt({
-        inverse: height - (padding * 2),
-        angle,
-      });
-      // 折行文本计算
       const breakArray = this.textBreak();
       const textArray = [];
       const breakLen = breakArray.length;
-      let bi = 0;
-      let maxLen = 0;
-      while (bi < breakLen) {
-        const text = breakArray[bi];
-        const textLen = text.length;
+      // 折行文本计算
+      let breakIndex = 0;
+      while (breakIndex < breakLen) {
+        const text = breakArray[breakIndex];
+        const textLength = text.length;
         const line = {
-          str: '',
-          len: 0,
+          text: '',
           start: 0,
+          width: 0,
+          height: 0,
+          ascent: 0,
         };
-        let ii = 0;
-        while (ii < textLen) {
-          const str = line.str + text.charAt(ii);
-          const len = this.textWidth(str);
-          if (len > textHypotenuseWidth) {
-            if (line.len === 0) {
+        let innerIndex = 0;
+        while (innerIndex < textLength) {
+          const measureText = line.text + text.charAt(innerIndex);
+          const measure = this.textSize(measureText);
+          if (measure.width > textHypotenuseWidth) {
+            if (line.width === 0) {
+              const blockWidth = Math.max(RTCosKit.nearby({
+                tilt: measure.width,
+                angle,
+              }), measure.height);
+              const blockHeight = RTSinKit.inverse({
+                tilt: measure.width,
+                angle,
+              });
               textArray.push({
-                text: str,
-                len,
                 tx: 0,
                 ty: 0,
+                blockWidth,
+                blockHeight,
+                text: measureText,
+                ascent: measure.ascent,
+                width: measure.width,
+                height: measure.height,
               });
-              if (len > maxLen) {
-                maxLen = len;
-              }
-              ii += 1;
+              innerIndex += 1;
             } else {
+              const blockWidth = Math.max(RTCosKit.nearby({
+                tilt: line.width,
+                angle,
+              }), line.height);
+              const blockHeight = RTSinKit.inverse({
+                tilt: line.width,
+                angle,
+              });
               textArray.push({
-                text: line.str,
-                len: line.len,
                 tx: 0,
                 ty: 0,
+                blockWidth,
+                blockHeight,
+                text: line.text,
+                ascent: line.ascent,
+                width: line.width,
+                height: line.height,
               });
-              if (line.len > maxLen) {
-                maxLen = line.len;
-              }
             }
-            line.str = '';
-            line.len = 0;
-            line.start = ii;
+            line.text = '';
+            line.width = 0;
+            line.height = 0;
+            line.ascent = 0;
+            line.start = innerIndex;
           } else {
-            line.str = str;
-            line.len = len;
-            ii += 1;
+            line.text = measureText;
+            line.width = measure.width;
+            line.height = measure.height;
+            line.ascent = measure.ascent;
+            innerIndex += 1;
           }
         }
-        if (line.len > 0) {
+        if (line.width > 0) {
+          const blockWidth = Math.max(RTCosKit.nearby({
+            tilt: line.width,
+            angle,
+          }), line.height);
+          const blockHeight = RTSinKit.inverse({
+            tilt: line.width,
+            angle,
+          });
           textArray.push({
-            text: line.str,
-            len: line.len,
             tx: 0,
             ty: 0,
+            blockWidth,
+            blockHeight,
+            text: line.text,
+            ascent: line.ascent,
+            width: line.width,
+            height: line.height,
           });
         }
-        if (line.len > maxLen) {
-          maxLen = line.len;
+        breakIndex += 1;
+      }
+      // x坐标偏移量
+      const textArrayLength = textArray.length;
+      let innerIndex = 1;
+      while (innerIndex < textArrayLength) {
+        const last = textArray[innerIndex - 1];
+        const item = textArray[innerIndex];
+        // 将文本偏移到下一个文本的指定位置
+        item.tx = last.tx;
+        item.ty = last.ty;
+        switch (align) {
+          case BaseFont.ALIGN.left:
+            break;
+          case BaseFont.ALIGN.center:
+            item.tx += (last.blockWidth / 2 - item.blockWidth / 2);
+            item.ty += (last.blockHeight / 2 - item.blockHeight / 2);
+            break;
+          case BaseFont.ALIGN.right:
+            item.tx += (last.blockWidth - item.blockWidth);
+            item.ty += (last.blockHeight - item.blockHeight);
+            break;
         }
-        bi += 1;
+        // 偏移下一个文本的行宽
+        const spacing = RTSinKit.tilt({
+          inverse: last.height + lineHeight,
+          angle,
+        });
+        item.tx -= spacing;
+        innerIndex += 1;
       }
-      // 计算x坐标偏移量
-      const spacing = RTSinKit.tilt({
-        inverse: size + lineHeight,
-        angle,
-      });
-      const textArrayLen = textArray.length;
-      let wOffset = 0;
-      let ii = textArrayLen - 1;
-      while (ii >= 0) {
-        const item = textArray[ii];
-        item.tx = wOffset;
-        wOffset += spacing;
-        ii -= 1;
+      // 坐标偏移到起始处
+      const last = textArray[textArrayLength - 1];
+      const offsetX = textArrayLength > 0 && last.tx < 0 ? -last.tx : 0;
+      const offsetY = textArrayLength > 0 && last.ty < 0 ? -last.ty : 0;
+      let maxTextHeight = textArrayLength > 0 ? last.blockHeight : 0;
+      let maxTextWidth = textArrayLength > 0 ? last.blockWidth : 0;
+      innerIndex = textArrayLength - 1;
+      while (innerIndex >= 0) {
+        // 偏移到起始位置
+        const item = textArray[innerIndex];
+        item.tx += offsetX;
+        item.ty += offsetY;
+        // 统计文本块的总宽度
+        const widthOffset = item.tx + item.blockWidth;
+        if (widthOffset > maxTextWidth) {
+          maxTextWidth = widthOffset;
+        }
+        // 统计文本块的最大高度
+        if (item.blockHeight > maxTextHeight) {
+          maxTextHeight = item.blockHeight;
+        }
+        innerIndex -= 1;
       }
+      // 折行文本信息
       this.textWrapTextArray = textArray;
-      this.textWrapMaxLen = maxLen;
-    }
-    const { textWrapTextArray } = this;
-    if (textWrapTextArray.length === 0) {
-      this.textWrapText = text;
-      this.textWrapTextWidth = this.textWidth(text);
+      this.textWrapTextWidth = maxTextWidth;
+      this.textWrapTextHeight = maxTextHeight;
     }
     this.used = BaseRuler.USED.TEXT_WRAP;
   }

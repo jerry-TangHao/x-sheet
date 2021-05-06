@@ -1,10 +1,10 @@
-import { Widget } from '../../../lib/Widget';
+import { Widget } from '../../../libs/Widget';
 import { Constant, cssPrefix } from '../../../const/Constant';
 import { XScreenBRZone } from './zone/XScreenBRZone';
 import { XScreenLTZone } from './zone/XScreenLTZone';
 import { XScreenLZone } from './zone/XScreenLZone';
 import { XScreenTZone } from './zone/XScreenTZone';
-import { XEvent } from '../../../lib/XEvent';
+import { XEvent } from '../../../libs/XEvent';
 import { XDraw } from '../../../canvas/XDraw';
 
 const DISPLAY_AREA = {

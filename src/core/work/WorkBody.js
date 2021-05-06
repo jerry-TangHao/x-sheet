@@ -1,32 +1,36 @@
 /* global window */
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix, Constant, XSheetVersion } from '../../const/Constant';
-import { VerticalLayer } from '../../lib/layer/VerticalLayer';
-import { HorizontalLayer } from '../../lib/layer/HorizontalLayer';
-import { VerticalLayerElement } from '../../lib/layer/VerticalLayerElement';
+import { VerticalLayer } from '../../libs/layer/VerticalLayer';
+import { HorizontalLayer } from '../../libs/layer/HorizontalLayer';
+import { VerticalLayerElement } from '../../libs/layer/VerticalLayerElement';
 import { ScrollBarX } from '../../component/scrollbar/ScrollBarX';
 import { ScrollBarY } from '../../component/scrollbar/ScrollBarY';
-import { HorizontalLayerElement } from '../../lib/layer/HorizontalLayerElement';
-import { VerticalCenterElement } from '../../lib/layer/center/VerticalCenterElement';
-import { VerticalCenter } from '../../lib/layer/center/VerticalCenter';
+import { HorizontalLayerElement } from '../../libs/layer/HorizontalLayerElement';
+import { VerticalCenterElement } from '../../libs/layer/center/VerticalCenterElement';
+import { VerticalCenter } from '../../libs/layer/center/VerticalCenter';
 import { SheetView } from './SheetView';
 import { TabView } from './TabView';
 import { PlainUtils } from '../../utils/PlainUtils';
-import { XEvent } from '../../lib/XEvent';
-import { h } from '../../lib/Element';
+import { XEvent } from '../../libs/XEvent';
+import { h } from '../../libs/Element';
 import { Tab } from './Tab';
 import { Sheet } from './Sheet';
-import Download from '../../lib/donwload/Download';
-import { Throttle } from '../../lib/Throttle';
+import Download from '../../libs/donwload/Download';
+import { Throttle } from '../../libs/Throttle';
 import { XDraw } from '../../canvas/XDraw';
+
+const settings = {
+  sheets: [],
+};
 
 class WorkBody extends Widget {
 
-  constructor(work, options = { sheets: [] }) {
+  constructor(work, options) {
     super(`${cssPrefix}-work-body`);
     this.work = work;
-    this.workConfig = options;
-    this.sheets = this.workConfig.sheets;
+    this.options = PlainUtils.copy({}, settings, options);
+    this.sheets = this.options.sheets;
     this.tabSheet = [];
     this.activeIndex = -1;
     // 版本标识
@@ -82,6 +86,17 @@ class WorkBody extends Widget {
     this.layerVerticalLayer.children(this.horizontalLayer2Layer);
     this.children(this.layerVerticalLayer);
     // 组件
+    this.sheetView = new SheetView();
+    this.tabView = new TabView({
+      onAdd: () => {
+        const tab = new Tab();
+        const sheet = new Sheet(tab);
+        this.addTabSheet({ tab, sheet });
+      },
+      onSwitch: (tab) => {
+        this.setActiveTab(tab);
+      },
+    });
     this.scrollBarY = new ScrollBarY({
       scroll: (move) => {
         const sheet = this.sheetView.getActiveSheet();
@@ -92,17 +107,6 @@ class WorkBody extends Widget {
       scroll: (move) => {
         const sheet = this.sheetView.getActiveSheet();
         sheet.table.scrollX(move);
-      },
-    });
-    this.sheetView = new SheetView();
-    this.tabView = new TabView({
-      onAdd: () => {
-        const sheet = new Sheet();
-        const tab = new Tab();
-        this.addTabSheet({ tab, sheet });
-      },
-      onSwitch: (tab) => {
-        this.setActiveTab(tab);
       },
     });
   }
@@ -180,9 +184,9 @@ class WorkBody extends Widget {
         }
       }
       if (scroll.blockTop < scroll.maxBlockTop && scroll.blockTop > 0) {
-        e.preventDefault();
         e.stopPropagation();
       }
+      e.preventDefault();
     });
     XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.RESIZE, () => {
       throttle.action(() => {
@@ -244,8 +248,8 @@ class WorkBody extends Widget {
     for (const item of this.sheets) {
       // eslint-disable-next-line no-restricted-syntax
       const { name } = item;
-      const sheet = new Sheet(item);
       const tab = new Tab(name);
+      const sheet = new Sheet(tab, item);
       this.addTabSheet({ tab, sheet });
     }
     if (this.tabSheet.length) {
@@ -299,17 +303,15 @@ class WorkBody extends Widget {
     return null;
   }
 
-  toJSONTemplate() {
-    const { activeIndex, sheetView, tabView } = this;
-    const sheet = sheetView.sheetList[activeIndex];
-    const tab = tabView.tabList[activeIndex];
-    if (sheet && tab) {
-      const { table } = sheet;
-      const {
-        rows, cols, settings,
-      } = table;
-      const cells = table.getTableCells();
+  toJson() {
+    const { activeIndex, sheetView } = this;
+    const { sheetList } = sheetView;
+    const sheet = sheetList[activeIndex];
+    if (sheet) {
+      const { table, tab } = sheet;
+      const { rows, cols, settings } = table;
       const merges = table.getTableMerges();
+      const cells = table.getTableCells();
       const data = {
         name: tab.name,
         tableConfig: {
@@ -317,18 +319,18 @@ class WorkBody extends Widget {
             showGrid: settings.table.showGrid,
             background: settings.table.background,
           },
-          rows: {
-            len: rows.len,
-            height: rows.height,
-            data: rows.getData(),
+          merge: {
+            merges: merges.getData(),
           },
           cols: {
             len: cols.len,
             width: cols.width,
             data: cols.getData(),
           },
-          merge: {
-            merges: merges.getData(),
+          rows: {
+            len: rows.len,
+            height: rows.height,
+            data: rows.getData(),
           },
           data: cells.getData(),
         },
@@ -336,6 +338,42 @@ class WorkBody extends Widget {
       const text = `window['${tab.name}'] = ${JSON.stringify(data)}`;
       Download(text, `${tab.name}.js`, 'application/x-javascript');
     }
+  }
+
+  toJsonAll() {
+    const { sheetView } = this;
+    const { sheetList } = sheetView;
+    sheetList.forEach((sheet) => {
+      const { table, tab } = sheet;
+      const { rows, cols, settings } = table;
+      const merges = table.getTableMerges();
+      const cells = table.getTableCells();
+      const data = {
+        name: tab.name,
+        tableConfig: {
+          table: {
+            showGrid: settings.table.showGrid,
+            background: settings.table.background,
+          },
+          merge: {
+            merges: merges.getData(),
+          },
+          cols: {
+            len: cols.len,
+            width: cols.width,
+            data: cols.getData(),
+          },
+          rows: {
+            len: rows.len,
+            height: rows.height,
+            data: rows.getData(),
+          },
+          data: cells.getData(),
+        },
+      };
+      const text = `window['${tab.name}'] = ${JSON.stringify(data)}`;
+      Download(text, `${tab.name}.js`, 'application/x-javascript');
+    });
   }
 
   destroy() {

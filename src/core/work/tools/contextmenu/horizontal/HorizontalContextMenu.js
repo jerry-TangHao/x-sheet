@@ -1,18 +1,18 @@
 import { ELContextMenu } from '../../../../../component/contextmenu/ELContextMenu';
 import { cssPrefix, Constant } from '../../../../../const/Constant';
 import { PlainUtils } from '../../../../../utils/PlainUtils';
-import { h } from '../../../../../lib/Element';
+import { h } from '../../../../../libs/Element';
 import { HorizontalIcon1 } from '../icon/horizontal/HorizontalIcon1';
 import { HorizontalIcon2 } from '../icon/horizontal/HorizontalIcon2';
 import { HorizontalIcon3 } from '../icon/horizontal/HorizontalIcon3';
 import { HorizontalContextMenuItem } from './HorizontalContextMenuItem';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 import { BaseFont } from '../../../../../canvas/font/BaseFont';
 
 class HorizontalContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-horizontal-type-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-horizontal-type-context-menu`, PlainUtils.copy({
       onUpdate: () => {},
     }, options));
     this.horizontalIcon1 = new HorizontalIcon1();

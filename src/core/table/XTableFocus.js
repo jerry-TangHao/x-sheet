@@ -1,7 +1,7 @@
 /* global document */
 import { Constant } from '../../const/Constant';
-import { XEvent } from '../../lib/XEvent';
-import { Element } from '../../lib/Element';
+import { XEvent } from '../../libs/XEvent';
+import { Element } from '../../libs/Element';
 
 class XTableFocus {
 

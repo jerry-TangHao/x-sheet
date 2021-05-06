@@ -1,11 +1,11 @@
 /* global document */
 import { SELECT_LOCAL, XSelectItem } from '../xselect/XSelectItem';
 import { XScreenCssBorderItem } from '../../xscreen/item/viewborder/XScreenCssBorderItem';
-import { Widget } from '../../../../lib/Widget';
+import { Widget } from '../../../../libs/Widget';
 import { Constant, cssPrefix } from '../../../../const/Constant';
 import { RectRange } from '../../tablebase/RectRange';
 import { PlainUtils } from '../../../../utils/PlainUtils';
-import { XEvent } from '../../../../lib/XEvent';
+import { XEvent } from '../../../../libs/XEvent';
 import { XTableMousePointer } from '../../XTableMousePointer';
 import { AutoFillType } from '../../../../component/autofilltype/AutoFillType';
 import { Serialize } from '../../helper/CellMergeCopyHelper';
@@ -15,7 +15,7 @@ class XAutoFillItem extends XScreenCssBorderItem {
 
   constructor(table, options = {}) {
     super({ table });
-    this.options = PlainUtils.mergeDeep({
+    this.options = PlainUtils.copy({
       mergeForceSplit: false,
       onBeforeAutoFill: () => {},
       onAfterAutoFill: () => {},

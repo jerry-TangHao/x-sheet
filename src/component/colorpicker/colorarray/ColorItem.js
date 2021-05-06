@@ -1,4 +1,4 @@
-import { Widget } from '../../../lib/Widget';
+import { Widget } from '../../../libs/Widget';
 import { cssPrefix } from '../../../const/Constant';
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { Icon } from '../../../core/work/tools/Icon';
@@ -8,7 +8,7 @@ class ColorItem extends Widget {
 
   constructor(options) {
     super(`${cssPrefix}-color-array-item`);
-    this.options = PlainUtils.mergeDeep({
+    this.options = PlainUtils.copy({
       color: null,
       icon: null,
     }, options);

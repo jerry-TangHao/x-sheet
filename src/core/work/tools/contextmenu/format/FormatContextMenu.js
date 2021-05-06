@@ -3,22 +3,23 @@ import { ELContextMenu } from '../../../../../component/contextmenu/ELContextMen
 import { FormatContextMenuItem } from './FormatContextMenuItem';
 import { ELContextMenuDivider } from '../../../../../component/contextmenu/ELContextMenuDivider';
 import { PlainUtils } from '../../../../../utils/PlainUtils';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 
 class FormatContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-format-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-format-context-menu`, PlainUtils.copy({
       onUpdate: () => {},
     }, options));
     this.items = [
       new FormatContextMenuItem('常规', '').data('type', 'default'),
       new FormatContextMenuItem('文本', '').data('type', 'text'),
       new ELContextMenuDivider(),
-      new FormatContextMenuItem('数值', '0.59').data('type', 'number'),
+      new FormatContextMenuItem('小数', '0.59').data('type', 'decimal'),
+      new FormatContextMenuItem('数值', '100').data('type', 'number'),
       new FormatContextMenuItem('百分比', '90.00%').data('type', 'percentage'),
       new FormatContextMenuItem('分数', '1/2').data('type', 'fraction'),
-      new FormatContextMenuItem('科学计数', '9.50e-01').data('type', 'ENotation'),
+      new FormatContextMenuItem('科学计数', '9.50e-01').data('type', 'eNotation'),
       new ELContextMenuDivider(),
       new FormatContextMenuItem('人民币', '￥5.00').data('type', 'rmb'),
       new FormatContextMenuItem('港币', 'HK5.00').data('type', 'hk'),

@@ -1,8 +1,8 @@
 /* global document */
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { Widget } from '../../../lib/Widget';
-import { h } from '../../../lib/Element';
-import { XEvent } from '../../../lib/XEvent';
+import { Widget } from '../../../libs/Widget';
+import { h } from '../../../libs/Element';
+import { XEvent } from '../../../libs/XEvent';
 import { XTableMousePointer } from '../XTableMousePointer';
 
 class ColFixed extends Widget {

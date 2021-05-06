@@ -2,12 +2,12 @@ import { ELContextMenu } from '../../../../../component/contextmenu/ELContextMen
 import { PlainUtils } from '../../../../../utils/PlainUtils';
 import { cssPrefix, Constant } from '../../../../../const/Constant';
 import { FontSizeContextMenuItem } from './FontSizeContextMenuItem';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 
 class FontSizeContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-font-size-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-font-size-context-menu`, PlainUtils.copy({
       onUpdate: () => {},
     }, options));
     this.items = [
@@ -23,6 +23,7 @@ class FontSizeContextMenu extends ELContextMenu {
       new FontSizeContextMenuItem(18),
       new FontSizeContextMenuItem(24),
       new FontSizeContextMenuItem(36),
+      new FontSizeContextMenuItem(500),
     ];
     this.items.forEach((item) => {
       this.addItem(item);

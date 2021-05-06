@@ -1,6 +1,6 @@
 import { Constant, cssPrefix } from '../../const/Constant';
 import { ELContextMenu } from '../contextmenu/ELContextMenu';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 import { AutoFillTypeMenu } from './AutoFillTypeMenu';
 
 class AutoFillType extends ELContextMenu {

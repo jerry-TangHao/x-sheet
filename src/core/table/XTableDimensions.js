@@ -3,9 +3,9 @@ import { Code } from './tablebase/Code';
 import { Rows } from './tablebase/Rows';
 import { Cols } from './tablebase/Cols';
 import { Scroll, SCROLL_TYPE } from './tablebase/Scroll';
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 import { Scale, ScaleAdapter } from './tablebase/Scale';
 import { XTableMousePointer } from './XTableMousePointer';
 import { XTableKeyboard } from './XTableKeyboard';
@@ -33,12 +33,12 @@ import { XFixedView } from './tablebase/XFixedView';
 import { XFilter } from './xscreenitems/xfilter/XFilter';
 import { TableDataSnapshot } from './datasnapshot/TableDataSnapshot';
 import { CellMergeCopyHelper } from './helper/CellMergeCopyHelper';
-import { Clipboard } from '../../lib/Clipboard';
+import { Clipboard } from '../../libs/Clipboard';
 import { XIcon } from './xicon/XIcon';
 import { XIconBuilder } from './xicon/XIconBuilder';
 import { BaseFont } from '../../canvas/font/BaseFont';
-import { RowHeightIndex } from './tablebase/RowHeightIndex';
 import { XIteratorBuilder } from './iterator/XIteratorBuilder';
+import { RowHeightGroupIndex } from './tablebase/RowHeightGroupIndex';
 
 class Dimensions {
 
@@ -470,7 +470,7 @@ class KeyBoardTabCode {
 
   static register(table) {
     const {
-      keyboard, cols, rows, xScreen, edit,
+      keyboard, xTableScrollView, cols, rows, xScreen, edit,
     } = table;
     const xSelect = xScreen.findType(XSelectItem);
     const merges = table.getTableMerges();
@@ -480,11 +480,12 @@ class KeyBoardTabCode {
       keyCode: 9,
       callback: () => {
         edit.hideEdit();
+        const scrollView = xTableScrollView.getScrollView();
         const { selectRange } = xSelect;
         const { tabNext } = selectRange;
-        const rect = selectRange.clone();
+        const selectRangeClone = selectRange.clone();
         if (!tabNext) {
-          const { sri, sci } = rect;
+          const { sri, sci } = selectRangeClone;
           $tabNext = { sri, sci };
         }
         const cLen = cols.len - 1;
@@ -514,13 +515,17 @@ class KeyBoardTabCode {
           eri = targetMerges.eri;
           eci = targetMerges.eci;
         }
-        rect.tabNext = true;
-        rect.sri = sri;
-        rect.sci = sci;
-        rect.eri = eri;
-        rect.eci = eci;
-        xSelect.setRange(rect);
-        edit.showEdit();
+        selectRangeClone.tabNext = true;
+        selectRangeClone.sri = sri;
+        selectRangeClone.sci = sci;
+        selectRangeClone.eri = eri;
+        selectRangeClone.eci = eci;
+        xSelect.setRange(selectRangeClone);
+        if (scrollView.intersects(selectRangeClone)) {
+          edit.showEdit();
+        } else {
+          edit.hideEdit();
+        }
       },
     });
   }
@@ -529,6 +534,47 @@ class KeyBoardTabCode {
 
 // ================================= XTable ================================
 
+const settings = {
+  index: {
+    height: 30,
+    width: 50,
+    gridColor: 'rgb(193,193,193)',
+    size: 11,
+    color: 'rgb(0,0,0)',
+  },
+  table: {
+    showGrid: true,
+    background: 'rgb(255,255,255)',
+    borderColor: 'rgb(0,0,0)',
+    gridColor: 'rgb(225,225,225)',
+  },
+  rows: {
+    len: 1000,
+    height: 30,
+    data: [],
+  },
+  cols: {
+    len: 36,
+    width: 110,
+    data: [],
+  },
+  xFixedView: {
+    fixedView: new RectRange(0, 0, -1, -1),
+    fxLeft: -1,
+    fxTop: -1,
+  },
+  xFixedBar: {
+    height: RowFixed.HEIGHT,
+    width: ColFixed.WIDTH,
+    background: 'rgb(234,234,234)',
+    buttonColor: 'rgb(293,293,293)',
+  },
+  data: [],
+  merge: {
+    merges: [],
+  },
+};
+
 /**
  * XTable
  */
@@ -536,51 +582,12 @@ class XTableDimensions extends Widget {
 
   /**
    * XTable
-   * @param settings
+   * @param options
    */
-  constructor({ settings }) {
+  constructor(options) {
     super(`${cssPrefix}-table`);
     // 表格设置
-    this.settings = PlainUtils.mergeDeep({
-      index: {
-        height: 30,
-        width: 50,
-        gridColor: '#c1c1c1',
-        size: 11,
-        color: '#000000',
-      },
-      table: {
-        showGrid: true,
-        background: '#ffffff',
-        borderColor: '#000000',
-        gridColor: '#e1e1e1',
-      },
-      rows: {
-        len: 1000,
-        height: 30,
-        data: [],
-      },
-      cols: {
-        len: 36,
-        width: 110,
-        data: [],
-      },
-      xFixedView: {
-        fixedView: new RectRange(0, 0, -1, -1),
-        fxLeft: -1,
-        fxTop: -1,
-      },
-      xFixedBar: {
-        height: RowFixed.HEIGHT,
-        width: ColFixed.WIDTH,
-        background: '#eaeaea',
-        buttonColor: '#c1c1c1',
-      },
-      data: [],
-      merge: {
-        merges: [],
-      },
-    }, settings);
+    this.settings = PlainUtils.copy({}, settings, options);
     // 视口区域大小
     this.visualHeightCache = null;
     this.visualWidthCache = null;
@@ -687,12 +694,11 @@ class XTableDimensions extends Widget {
       paste: () => {},
     });
     // 表格行高索引
-    this.rowHeightIndex = new RowHeightIndex({
+    this.rowHeightGroupIndex = new RowHeightGroupIndex({
       rows: this.rows,
       xFixedView: this.xFixedView,
       xIteratorBuilder: this.xIteratorBuilder,
     });
-    this.rowHeightIndex.computeIndex();
   }
 
   /**
@@ -819,7 +825,7 @@ class XTableDimensions extends Widget {
     let height;
     if (xFixedView.hasFixedTop()) {
       const fixedView = xFixedView.getFixedView();
-      height = rows.sectionSumHeight(fixedView.eri, rows.len - 1);
+      height = rows.sectionSumHeight(fixedView.eri + 1, rows.len - 1);
     } else {
       height = rows.sectionSumHeight(0, rows.len - 1);
     }
@@ -1188,10 +1194,10 @@ class XTableDimensions extends Widget {
       }
     });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_HEIGHT, () => {
-      this.rowHeightIndex.computeIndex();
+      this.rowHeightGroupIndex.clear();
     });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE, () => {
-      this.rowHeightIndex.computeIndex();
+      this.rowHeightGroupIndex.clear();
     });
   }
 
@@ -1244,8 +1250,8 @@ class XTableDimensions extends Widget {
    * @param y
    */
   scrollY(y) {
-    const { rows, scroll, rowHeightIndex } = this;
-    const find = rowHeightIndex.getTop(y);
+    const { rows, scroll, rowHeightGroupIndex } = this;
+    const find = rowHeightGroupIndex.get(y);
     const [
       ri, top, height,
     ] = this.rowsReduceIf(find.ri, rows.len, find.top, 0, y, i => rows.getHeight(i));

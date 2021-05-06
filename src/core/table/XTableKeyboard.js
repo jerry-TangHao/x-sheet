@@ -1,5 +1,5 @@
 /* global document */
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 import { Constant } from '../../const/Constant';
 
 class XTableKeyboard {

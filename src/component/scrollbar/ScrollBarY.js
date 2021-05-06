@@ -1,16 +1,16 @@
 /* global document */
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { h } from '../../lib/Element';
+import { h } from '../../libs/Element';
 
 import { PlainUtils } from '../../utils/PlainUtils';
-import { XEvent } from '../../lib/XEvent';
+import { XEvent } from '../../libs/XEvent';
 
 class ScrollBarY extends Widget {
 
   constructor(option) {
     super(`${cssPrefix}-scroll-bar-y`);
-    this.option = PlainUtils.mergeDeep({
+    this.option = PlainUtils.copy({
       style: {},
       scroll: to => to,
     }, option);

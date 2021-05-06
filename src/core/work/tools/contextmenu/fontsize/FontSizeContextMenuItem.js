@@ -1,6 +1,6 @@
 import { ELContextMenuItem } from '../../../../../component/contextmenu/ELContextMenuItem';
 import { cssPrefix } from '../../../../../const/Constant';
-import { h } from '../../../../../lib/Element';
+import { h } from '../../../../../libs/Element';
 
 class FontSizeContextMenuItem extends ELContextMenuItem {
 

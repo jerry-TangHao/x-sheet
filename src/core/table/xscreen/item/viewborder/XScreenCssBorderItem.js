@@ -6,7 +6,7 @@ class XScreenCssBorderItem extends XScreenStyleBorderItem {
   constructor({ table }) {
     super({ table }, `${cssPrefix}-part-border-css`);
     this.type = 'solid';
-    this.color = '#42a642';
+    this.color = 'rgb(66,166,66)';
     this.setBorderType(this.type);
   }
 

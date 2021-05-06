@@ -1,5 +1,5 @@
 import { cssPrefix } from '../../const/Constant';
-import { Widget } from '../../lib/Widget';
+import { Widget } from '../../libs/Widget';
 import { ElPopUp } from '../elpopup/ElPopUp';
 import { PlainUtils } from '../../utils/PlainUtils';
 
@@ -7,7 +7,7 @@ class ELContextMenu extends Widget {
 
   constructor(className = '', options = {}) {
     super(`${cssPrefix}-el-context-menu ${className}`);
-    this.options = PlainUtils.mergeDeep({}, options);
+    this.options = PlainUtils.copy({}, options);
     this.menus = [];
     this.elPopUp = new ElPopUp(this.options);
     this.elPopUp.children(this);

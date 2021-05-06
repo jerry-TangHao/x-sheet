@@ -42,6 +42,11 @@ class Rows {
     return 0;
   }
 
+  getDefaultHeight() {
+    const { scaleAdapter } = this;
+    return scaleAdapter.goto(this.height);
+  }
+
   get(ri) {
     let row = this.data[ri];
     if (row) {

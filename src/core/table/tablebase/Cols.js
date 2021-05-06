@@ -42,6 +42,11 @@ class Cols {
     return 0;
   }
 
+  getDefaultWidth() {
+    const { scaleAdapter } = this;
+    return scaleAdapter.goto(this.width);
+  }
+
   get(ci) {
     let col = this.data[ci];
     if (col) {

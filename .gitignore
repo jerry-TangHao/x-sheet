@@ -1,4 +1,5 @@
 node_modules
+debug.log
 .nyc_output/*
 .idea/*
 .vscode/*

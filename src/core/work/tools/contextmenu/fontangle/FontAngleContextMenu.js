@@ -1,7 +1,7 @@
 import { ELContextMenu } from '../../../../../component/contextmenu/ELContextMenu';
 import { FontAngleContextMenuItem } from './FontAngleContextMenuItem';
 import { FontAngleDivider } from '../icon/fontangle/FontAngleDivider';
-import { h } from '../../../../../lib/Element';
+import { h } from '../../../../../libs/Element';
 import { FontAngleValue } from '../../FontAngleValue';
 import { Constant, cssPrefix } from '../../../../../const/Constant';
 import { PlainUtils } from '../../../../../utils/PlainUtils';
@@ -11,13 +11,13 @@ import { FontAngle3 } from '../icon/fontangle/FontAngle3';
 import { FontAngle4 } from '../icon/fontangle/FontAngle4';
 import { FontAngle5 } from '../icon/fontangle/FontAngle5';
 import { FontAngle6 } from '../icon/fontangle/FontAngle6';
-import { XEvent } from '../../../../../lib/XEvent';
+import { XEvent } from '../../../../../libs/XEvent';
 import { BaseFont } from '../../../../../canvas/font/BaseFont';
 
 class FontAngleContextMenu extends ELContextMenu {
 
   constructor(options = {}) {
-    super(`${cssPrefix}-font-angle-context-menu`, PlainUtils.mergeDeep({
+    super(`${cssPrefix}-font-angle-context-menu`, PlainUtils.copy({
       onUpdateAngle: () => {},
       onUpdateType: () => {},
     }, options));
