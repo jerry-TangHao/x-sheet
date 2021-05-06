@@ -47,7 +47,8 @@ class DrawFontBuilder {
   }
 
   buildFont() {
-    const { text, draw, rect, attr, overflow } = this;
+    const { draw, rect, attr, overflow } = this;
+    const text = (this.text || "").toString();
     switch (attr.direction) {
       case BaseFont.TEXT_DIRECTION.ANGLE:
         return new AngleBoxDraw({
@@ -70,9 +71,10 @@ class DrawFontBuilder {
   }
 
   buildRuler() {
-    const { attr } = this;
-    const { text, draw, rect, overflow } = this;
-    const { size, align, angle, padding, textWrap } = attr;
+    const { attr, draw, rect, overflow } = this;
+    const { size, align, angle } = attr;
+    const { padding, textWrap } = attr;
+    const text = (this.text || "").toString();
     switch (attr.direction) {
       case BaseFont.TEXT_DIRECTION.ANGLE:
         return new AngleBoxRuler({
