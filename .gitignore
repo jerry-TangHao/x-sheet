@@ -3,3 +3,4 @@ debug.log
 .nyc_output/*
 .idea/*
 .vscode/*
+.DS_Store

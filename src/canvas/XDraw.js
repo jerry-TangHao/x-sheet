@@ -8,20 +8,32 @@ let LINE_PIXEL_OFFSET = LINE_WIDTH_LOW / 2;
 
 class Base {
 
-  static styleTransformCssPx(px) {
+  static srcPx(px) {
     return px / this.dpr();
   }
 
-  static srcTransformCssPx(px) {
-    return this.styleTransformCssPx(this.srcTransformStylePx(px));
+  static cssPx(px) {
+    return this.srcPx(this.stylePx(px));
   }
 
-  static srcTransformStylePx(px) {
-    return this.rounding(px * this.dpr());
+  static stylePx(px) {
+    return this.round(px * this.dpr());
   }
 
-  static rounding(val) {
-    return Math.round(val);
+  static round(val) {
+    let round;
+    // eslint-disable-next-line no-bitwise
+    round = (0.5 + val) | 0;
+    // eslint-disable-next-line no-bitwise
+    round = ~~(0.5 + val);
+    // eslint-disable-next-line no-bitwise
+    round = (0.5 + val) << 0;
+    return round;
+  }
+
+  static trunc(val) {
+    // eslint-disable-next-line no-bitwise
+    return ~~val;
   }
 
   static radian(angle) {
@@ -32,7 +44,7 @@ class Base {
     return DPR;
   }
 
-  static dprUpdate() {
+  static refresh() {
     DPR = window.devicePixelRatio || 1;
     LINE_WIDTH_LOW = Math.round(DPR);
     LINE_WIDTH_MEDIUM = LINE_WIDTH_LOW + 2;
@@ -64,8 +76,8 @@ class Base {
 
   resize(width, height) {
     const { canvas } = this;
-    canvas.width = Base.srcTransformStylePx(width);
-    canvas.height = Base.srcTransformStylePx(height);
+    canvas.width = Base.stylePx(width);
+    canvas.height = Base.stylePx(height);
     canvas.style.width = `${canvas.width / Base.dpr()}px`;
     canvas.style.height = `${canvas.height / Base.dpr()}px`;
     return this;
@@ -230,8 +242,8 @@ class BaseLine extends Position {
   line(...xys) {
     this.polyStroke((xys) => {
       const [x, y] = xys;
-      return [this.transformLinePx(Base.rounding(x + this.getOffsetX())),
-        this.transformLinePx(Base.rounding(y + this.getOffsetY()))];
+      return [this.transformLinePx(Base.round(x + this.getOffsetX())),
+        this.transformLinePx(Base.round(y + this.getOffsetY()))];
     }, ...xys);
     return this;
   }
@@ -296,8 +308,8 @@ class CorsLine extends BaseLine {
     this.polyStroke((xys) => {
       const [x, y] = xys;
       return [
-        Base.rounding(x + this.getOffsetX()) - LINE_PIXEL_OFFSET,
-        Base.rounding(y + this.getOffsetY()) - LINE_PIXEL_OFFSET,
+        Base.round(x + this.getOffsetX()) - LINE_PIXEL_OFFSET,
+        Base.round(y + this.getOffsetY()) - LINE_PIXEL_OFFSET,
       ];
     }, [sx, sy], [ex, ey]);
   }
@@ -336,14 +348,14 @@ class XDraw extends CorsLine {
   fillText(text, x, y) {
     x += this.getOffsetX();
     y += this.getOffsetY();
-    this.ctx.fillText(text, XDraw.rounding(x), XDraw.rounding(y));
+    this.ctx.fillText(text, XDraw.round(x), XDraw.round(y));
     return this;
   }
 
   fillPath(path) {
     this.polyInFill((xys) => {
       const { x, y } = xys;
-      return [Base.rounding(x + this.getOffsetX()), Base.rounding(y + this.getOffsetY())];
+      return [Base.round(x + this.getOffsetX()), Base.round(y + this.getOffsetY())];
     }, ...path.points);
     return this;
   }
@@ -351,16 +363,16 @@ class XDraw extends CorsLine {
   fillRect(x, y, w, h) {
     x += this.getOffsetX();
     y += this.getOffsetY();
-    this.ctx.fillRect(XDraw.rounding(x), XDraw.rounding(y),
-      XDraw.rounding(w), XDraw.rounding(h));
+    this.ctx.fillRect(XDraw.round(x), XDraw.round(y),
+      XDraw.round(w), XDraw.round(h));
     return this;
   }
 
   rect(x, y, w, h) {
     x += this.getOffsetX();
     y += this.getOffsetY();
-    this.ctx.rect(XDraw.rounding(x), XDraw.rounding(y),
-      XDraw.rounding(w), XDraw.rounding(h));
+    this.ctx.rect(XDraw.round(x), XDraw.round(y),
+      XDraw.round(w), XDraw.round(h));
     return this;
   }
 
@@ -371,10 +383,10 @@ class XDraw extends CorsLine {
     ty += this.getOffsetY();
     sy += this.getOffsetY();
     ctx.drawImage(this.canvas,
-      XDraw.rounding(sx), XDraw.rounding(sy),
-      XDraw.rounding(sw), XDraw.rounding(sh),
-      XDraw.rounding(tx), XDraw.rounding(ty),
-      XDraw.rounding(tw), XDraw.rounding(th));
+      XDraw.round(sx), XDraw.round(sy),
+      XDraw.round(sw), XDraw.round(sh),
+      XDraw.round(tx), XDraw.round(ty),
+      XDraw.round(tw), XDraw.round(th));
     return this;
   }
 
@@ -383,10 +395,10 @@ class XDraw extends CorsLine {
     tx += this.getOffsetX();
     ty += this.getOffsetY();
     ctx.drawImage(el,
-      XDraw.rounding(sx), XDraw.rounding(sy),
-      XDraw.rounding(sw), XDraw.rounding(sh),
-      XDraw.rounding(tx), XDraw.rounding(ty),
-      XDraw.rounding(tw), XDraw.rounding(th));
+      XDraw.round(sx), XDraw.round(sy),
+      XDraw.round(sw), XDraw.round(sh),
+      XDraw.round(tx), XDraw.round(ty),
+      XDraw.round(tw), XDraw.round(th));
     return this;
   }
 

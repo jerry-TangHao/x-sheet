@@ -85,10 +85,10 @@ class XIcon {
     // 图标信息
     const iconHorizontal = this.horizontal;
     const iconVertical = this.vertical;
-    const iconOffsetX = XDraw.srcTransformStylePx(this.offset.x);
-    const iconOffsetY = XDraw.srcTransformStylePx(this.offset.y);
-    const iconWidth = XDraw.srcTransformStylePx(this.width);
-    const iconHeight = XDraw.srcTransformStylePx(this.height);
+    const iconOffsetX = XDraw.stylePx(this.offset.x);
+    const iconOffsetY = XDraw.stylePx(this.offset.y);
+    const iconWidth = XDraw.stylePx(this.width);
+    const iconHeight = XDraw.stylePx(this.height);
     // 矩形位置
     const rectX = rect.x;
     const rectY = rect.y;

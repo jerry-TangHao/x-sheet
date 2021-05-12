@@ -77,12 +77,17 @@ class Cells {
 
   getData() {
     this.xTableData.wrapAll();
-    return this.xTableData.getItems().map(rows => rows.map((item) => {
-      if (item) {
-        return item.getCell();
+    return this.xTableData.getItems().map((rows) => {
+      if (rows) {
+        return rows.map((item) => {
+          if (item) {
+            return item.getCell();
+          }
+          return null;
+        });
       }
       return null;
-    }));
+    });
   }
 
 }

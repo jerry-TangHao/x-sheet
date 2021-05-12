@@ -5,26 +5,14 @@
         ? layui.define((exports) => { exports('findDPI', factory()); }) : (global.findDPI = global.findDPI = factory());
 }(this, () => {
 
-  /**
-   * 96 dpi = 96 px / in
-   * 1 inch = 2.54 cm
-   * 96 dpi = 96 px / 2.54 cm
-   *
-   * See https://github.com/ryanve/res
-   */
-
-  let counter = 0;
-
-  function findDPI() {
-    return findFirstPositive(x => (++counter, matchMedia(`(max-resolution: ${x}dpi)`).matches));
-  }
-
-  // Binary search
-  // http://www.geeksforgeeks.org/find-the-point-where-a-function-becomes-negative/
   function findFirstPositive(fn) {
     let start = 1;
     while (fn(start) <= 0) start <<= 1;
     return binSearch(fn, start >>> 1, start) | 0;
+  }
+
+  function findDPI() {
+    return findFirstPositive(x => matchMedia(`(max-resolution: ${x}dpi)`).matches);
   }
 
   function binSearch(fn, min, max) {

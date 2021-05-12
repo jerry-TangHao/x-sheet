@@ -127,10 +127,10 @@ class XFilter extends XScreenCssBorderItem {
         const item = { ri, ci, icon };
         icon.setOnEnter((event) => {
           const { position } = event;
-          const cssHeight = XDraw.styleTransformCssPx(position.height);
-          const cssWidth = XDraw.styleTransformCssPx(position.width);
-          const cssLeft = XDraw.styleTransformCssPx(position.x);
-          const cssTop = XDraw.styleTransformCssPx(position.y);
+          const cssHeight = XDraw.srcPx(position.height);
+          const cssWidth = XDraw.srcPx(position.width);
+          const cssLeft = XDraw.srcPx(position.x);
+          const cssTop = XDraw.srcPx(position.y);
           this.mask.setLeft(cssLeft)
             .setTop(cssTop)
             .setWidth(cssWidth)

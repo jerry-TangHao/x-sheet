@@ -11,13 +11,14 @@ class FontContextMenu extends ELContextMenu {
       onUpdate: () => {},
     }, options));
     this.items = [
+      new FontContextMenuItem('Source Sans Pro'),
+      new FontContextMenuItem('Verdana'),
       new FontContextMenuItem('Arial'),
       new FontContextMenuItem('Helvetica'),
-      new FontContextMenuItem('Source Sans Pro'),
+      new FontContextMenuItem('Lalo'),
       new FontContextMenuItem('Comic Sans Ms'),
       new FontContextMenuItem('Courier New'),
-      new FontContextMenuItem('Verdana'),
-      new FontContextMenuItem('Lalo'),
+      new FontContextMenuItem('微软雅黑'),
     ];
     this.items.forEach((item) => {
       this.addItem(item);

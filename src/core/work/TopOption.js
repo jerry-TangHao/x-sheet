@@ -9,7 +9,7 @@ import { Update } from './options/Update';
 import { XEvent } from '../../libs/XEvent';
 import { ElPopUp } from '../../component/elpopup/ElPopUp';
 import { Alert } from '../../component/alert/Alert';
-import { XlsxExport } from '../../io/XlsxExport';
+import { XlsxExport } from '../../io/xlsx/XlsxExport';
 
 class TopOption extends Widget {
 

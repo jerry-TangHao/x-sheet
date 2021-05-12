@@ -100,12 +100,16 @@ class Cell {
   convert(text) {
     const { contentType } = this;
     switch (contentType) {
-      case Cell.CONTENT_TYPE.NUMBER:
-        this.text = PlainUtils.parseFloat(text);
+      case Cell.CONTENT_TYPE.NUMBER: {
+        if (!PlainUtils.isBlank(text)) {
+          this.text = PlainUtils.parseFloat(text);
+        }
         break;
-      case Cell.CONTENT_TYPE.STRING:
+      }
+      case Cell.CONTENT_TYPE.STRING: {
         this.text = text;
         break;
+      }
     }
   }
 

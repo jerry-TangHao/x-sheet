@@ -190,7 +190,7 @@ class WorkBody extends Widget {
     });
     XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.RESIZE, () => {
       throttle.action(() => {
-        XDraw.dprUpdate();
+        XDraw.refresh();
         const table = this.getActiveTable();
         if (table) {
           table.reset();

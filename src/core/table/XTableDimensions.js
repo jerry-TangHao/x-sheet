@@ -1,7 +1,7 @@
 import { PlainUtils } from '../../utils/PlainUtils';
 import { Code } from './tablebase/Code';
-import { Rows } from './tablebase/Rows';
-import { Cols } from './tablebase/Cols';
+import { Rows } from './tablerow/Rows';
+import { Cols } from './tablecol/Cols';
 import { Scroll, SCROLL_TYPE } from './tablebase/Scroll';
 import { Widget } from '../../libs/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
@@ -599,23 +599,23 @@ class XTableDimensions extends Widget {
     this.scale = new Scale();
     this.index = new Code({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.srcTransformCssPx(this.scale.goto(v)),
+        goto: v => XDraw.cssPx(this.scale.goto(v)),
       }),
       ...this.settings.index,
     });
-    this.rows = new Rows({
-      scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.srcTransformCssPx(this.scale.goto(v)),
-      }),
-      xIteratorBuilder: this.xIteratorBuilder,
-      ...this.settings.rows,
-    });
     this.cols = new Cols({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.srcTransformCssPx(this.scale.goto(v)),
+        goto: v => XDraw.cssPx(this.scale.goto(v)),
       }),
       xIteratorBuilder: this.xIteratorBuilder,
       ...this.settings.cols,
+    });
+    this.rows = new Rows({
+      scaleAdapter: new ScaleAdapter({
+        goto: v => XDraw.cssPx(this.scale.goto(v)),
+      }),
+      xIteratorBuilder: this.xIteratorBuilder,
+      ...this.settings.rows,
     });
     // 冻结视图坐标
     this.xFixedView = new XFixedView(this.settings.xFixedView);
@@ -861,7 +861,7 @@ class XTableDimensions extends Widget {
     const cell = cells.getCell(row, col);
     const { fontAttr, background } = cell;
     const { align, size, color, bold, italic, name } = fontAttr;
-    const fontSize = XDraw.srcTransformCssPx(this.scale.goto(size));
+    const fontSize = XDraw.cssPx(this.scale.goto(size));
     let textAlign = 'left';
     switch (align) {
       case BaseFont.ALIGN.left:
@@ -880,7 +880,7 @@ class XTableDimensions extends Widget {
       background:${background};
       font-style: ${italic ? 'italic' : 'initial'};
       font-weight: ${bold ? 'bold' : 'initial'};
-      font-size: ${XDraw.srcTransformCssPx(fontSize)}px;
+      font-size: ${XDraw.cssPx(fontSize)}px;
       font-family: ${name};
     `;
     return css.replace(/\s/g, '');
@@ -1007,10 +1007,10 @@ class XTableDimensions extends Widget {
       type,
       staticIcons: staticIconArray,
       fixedIcons: fixedIconArray,
-      sx: XDraw.srcTransformStylePx(sx),
-      sy: XDraw.srcTransformStylePx(sy),
-      fx: XDraw.srcTransformStylePx(fx),
-      fy: XDraw.srcTransformStylePx(fy),
+      sx: XDraw.stylePx(sx),
+      sy: XDraw.stylePx(sy),
+      fx: XDraw.stylePx(fx),
+      fy: XDraw.stylePx(fy),
     });
   }
 
