@@ -1,4 +1,5 @@
 import { XDraw } from '../../../canvas/XDraw';
+import { PlainUtils } from '../../../utils/PlainUtils';
 
 /**
  * WideUnit
@@ -21,14 +22,13 @@ class WideUnit {
   } = {}) {
     const { draw, heightUnit } = table;
     // 字体像素
-    const devPixel = heightUnit.getPixel(fontSize);
-    const cssPixel = XDraw.srcPx(devPixel);
+    const fontPixel = heightUnit.getPixel(fontSize);
+    const srcPixel = XDraw.srcPx(fontPixel);
+    const sizePixel = XDraw.trunc(srcPixel);
     // 字体样式
-    const name = `${fontName}`;
-    const size = XDraw.round(cssPixel);
     const bold = `${fontBold ? 'bold' : ''}`;
     const italic = `${fontItalic ? 'italic' : ''}`;
-    const style = `${italic} ${bold} ${size}px ${name}`;
+    const style = `${italic} ${bold} ${sizePixel}px ${fontName}`;
     // 度量字体
     draw.save();
     draw.attr({
@@ -42,6 +42,16 @@ class WideUnit {
       }
     }
     this.unit = unit;
+    // Firefox 好像不准确😓
+    const { type } = PlainUtils.getExplorerInfo();
+    switch (type) {
+      case 'Firefox':
+        this.unit = XDraw.trunc(unit) + 0.22;
+        break;
+      case 'Chrome':
+        this.unit = unit;
+        break;
+    }
   }
 
   /**

@@ -21,19 +21,11 @@ class Base {
   }
 
   static round(val) {
-    let round;
-    // eslint-disable-next-line no-bitwise
-    round = (0.5 + val) | 0;
-    // eslint-disable-next-line no-bitwise
-    round = ~~(0.5 + val);
-    // eslint-disable-next-line no-bitwise
-    round = (0.5 + val) << 0;
-    return round;
+    return Math.round(val);
   }
 
   static trunc(val) {
-    // eslint-disable-next-line no-bitwise
-    return ~~val;
+    return Math.trunc(val);
   }
 
   static radian(angle) {
