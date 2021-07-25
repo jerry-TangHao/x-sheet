@@ -13,6 +13,14 @@ class Point {
     this.y = y;
   }
 
+  addX(x) {
+    this.x += x;
+  }
+
+  addY(y) {
+    this.y += y;
+  }
+
 }
 
 export {

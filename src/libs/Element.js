@@ -1,4 +1,4 @@
-/* global document CustomEvent window */
+/* global document MouseEvent CustomEvent window */
 import { PlainUtils } from '../utils/PlainUtils';
 
 /**
@@ -350,12 +350,27 @@ class Element {
    * @param message
    */
   trigger(type, message) {
-    const event = new CustomEvent(type, {
-      detail: message,
-      bubbles: true,
-      cancelable: false,
-    });
-    this.el.dispatchEvent(event);
+    switch (type) {
+      case 'click': {
+        const evt = new MouseEvent(type, {
+          detail: message,
+          bubbles: true,
+          cancelable: false,
+        });
+        evt.initEvent('click', true, true);
+        this.el.dispatchEvent(evt);
+        break;
+      }
+      default: {
+        const evt = new CustomEvent(type, {
+          detail: message,
+          bubbles: true,
+          cancelable: false,
+        });
+        this.el.dispatchEvent(evt);
+        break;
+      }
+    }
   }
 
   /**
@@ -423,6 +438,15 @@ class Element {
    */
   empty() {
     this.html('');
+  }
+
+  /**
+   * 相等比较
+   * @param other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return this.el === other.el;
   }
 
 }

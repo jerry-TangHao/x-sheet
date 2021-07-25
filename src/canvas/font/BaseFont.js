@@ -8,16 +8,8 @@ class BaseFont {
     this.ruler = ruler;
   }
 
-  hasBreak(text) {
-    return text.indexOf('\n') > -1;
-  }
-
   setRuler(ruler) {
     this.ruler = ruler;
-  }
-
-  isBlank(text) {
-    return text === null || text === undefined || text.toString().trim() === '';
   }
 
   getAlignPadding() {
@@ -35,6 +27,7 @@ class BaseFont {
   }
 
 }
+
 BaseFont.VERTICAL_ALIGN = {
   top: 'top',
   center: 'middle',
@@ -56,6 +49,39 @@ BaseFont.TEXT_DIRECTION = {
   ANGLE: 'angle',
   ANGLE_BAR: 'bar',
 };
+BaseFont.DEFAULT_FONT_ATTR = {
+  name: 'Arial',
+  size: 14,
+  color: 'rgb(0,0,0)',
+  bold: false,
+  italic: false,
+  strikethrough: false,
+  underline: false,
+  angle: 0,
+  padding: 8,
+  align: BaseFont.ALIGN.left,
+  textWrap: BaseFont.TEXT_WRAP.TRUNCATE,
+  verticalAlign: BaseFont.VERTICAL_ALIGN.center,
+  direction: BaseFont.TEXT_DIRECTION.HORIZONTAL,
+};
+BaseFont.DEFAULT_RICH_ATTR = {
+  angle: 0,
+  padding: 8,
+  align: BaseFont.ALIGN.left,
+  textWrap: BaseFont.TEXT_WRAP.TRUNCATE,
+  verticalAlign: BaseFont.VERTICAL_ALIGN.center,
+  direction: BaseFont.TEXT_DIRECTION.HORIZONTAL,
+};
+BaseFont.DEFAULT_RICH_ITEM_ATTR = {
+  name: 'Arial',
+  size: 14,
+  color: 'rgb(0,0,0)',
+  bold: false,
+  italic: false,
+  strikethrough: false,
+  underline: false,
+};
+
 export {
   BaseFont,
 };

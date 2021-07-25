@@ -1,21 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>x-sheet</title>
-    <style>
-        * {
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><title>x-sheet</title><style>* {
             padding: 0;
             margin: 0;
         }
         html, body {
             height: 100%;
             display: block;
-        }
-    </style>
-<link rel="shortcut icon" href="logo.ico"><link href="XSheet.css" rel="stylesheet"></head>
-<body id="dome"><script type="text/javascript" src="XSheet.js"></script></body>
-<script>
-    const xSheet = new XSheet(document.getElementById('dome'));
-</script>
-</html>
+        }</style><link rel="icon" href="logo.ico"><link href="css/XSheet.css" rel="stylesheet"></head><body id="dome"><script src="js/runtime.js"></script><script src="js/vendor.js"></script><script src="js/XSheet.js"></script></body><script>const dome = document.getElementById('dome');
+  const xSheet = new XSheet(dome, {
+    workConfig: {
+      body: {
+        sheets: [{
+          tableConfig: {
+            data: [
+              [
+                {text: "x-sheet"},
+                {text: "x-sheet"},
+                {text: "x-sheet"},
+                {text: "x-sheet"},
+                {text: "x-sheet", readOnly: true}
+              ]
+            ]
+          }
+        }],
+      },
+    },
+  });
+  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_START, (e) => {
+    console.log("开始编辑", e);
+  });
+  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_INPUT, () => {
+    console.log("编辑中");
+  });
+  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_FINISH, () => {
+    console.log("编辑结束");
+  });</script></html>

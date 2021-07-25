@@ -96,6 +96,9 @@ class DateUtils {
   }
 
   static dateFormat(fmt, date) {
+    if (!(date instanceof Date)) {
+      return date;
+    }
     const o = {
       'M+': date.getMonth() + 1,
       'd+': date.getDate(),
@@ -110,7 +113,6 @@ class DateUtils {
     if (resultYear) {
       const yearFormatPart = resultYear[0];
       const yearVal = (date.getFullYear().toString()).substr(4 - yearFormatPart.length);
-      // eslint-disable-next-line no-param-reassign
       fmt = fmt.replace(yearFormatPart, yearVal);
     }
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
@@ -121,7 +123,6 @@ class DateUtils {
         const Val = o[k].toString();
         const formatPart = res[0];
         const replaceVal = (formatPart.length === 1) ? (Val) : ((`00${Val}`).substr(Val.length));
-        // eslint-disable-next-line no-param-reassign
         fmt = fmt.replace(formatPart, replaceVal);
       }
     }

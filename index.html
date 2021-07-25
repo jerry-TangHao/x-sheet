@@ -16,6 +16,34 @@
 </head>
 <body id="dome"></body>
 <script>
-    const xSheet = new XSheet(document.getElementById('dome'));
+  const dome = document.getElementById('dome');
+  const xSheet = new XSheet(dome, {
+    workConfig: {
+      body: {
+        sheets: [{
+          tableConfig: {
+            data: [
+              [
+                {text: "x-sheet"},
+                {text: "x-sheet"},
+                {text: "x-sheet"},
+                {text: "x-sheet"},
+                {text: "x-sheet", readOnly: true}
+              ]
+            ]
+          }
+        }],
+      },
+    },
+  });
+  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_START, (e) => {
+    console.log("开始编辑", e);
+  });
+  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_INPUT, () => {
+    console.log("编辑中");
+  });
+  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_FINISH, () => {
+    console.log("编辑结束");
+  });
 </script>
 </html>

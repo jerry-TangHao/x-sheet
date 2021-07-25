@@ -1,4 +1,4 @@
-/* global navigator document window */
+/* global navigator document window self */
 function S4() {
   // eslint-disable-next-line no-bitwise
   return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
@@ -20,7 +20,9 @@ const DATA_TYPE = {
   AsyncFunction: 11,
   BigInt: 12,
   Symbol: 13,
-  Un: 14,
+  DedicatedWorkerGlobalScope: 14,
+  Date: 15,
+  Un: 0,
 };
 
 class PlainUtils {
@@ -104,6 +106,8 @@ class PlainUtils {
     switch (type) {
       case '[object Null]':
         return DATA_TYPE.Null;
+      case '[object Object]':
+        return DATA_TYPE.Object;
       case '[object Undefined]':
         return DATA_TYPE.Undefined;
       case '[object String]':
@@ -126,6 +130,10 @@ class PlainUtils {
         return DATA_TYPE.BigInt;
       case '[object Symbol]':
         return DATA_TYPE.Symbol;
+      case '[object Date]':
+        return DATA_TYPE.Date;
+      case '[object DedicatedWorkerGlobalScope]':
+        return DATA_TYPE.DedicatedWorkerGlobalScope;
       default:
         return DATA_TYPE.Un;
     }
@@ -158,6 +166,20 @@ class PlainUtils {
   static cloneDeep(object) {
     const json = JSON.stringify(object);
     return JSON.parse(json);
+  }
+
+  static extends(target, ...src) {
+    for (let i = 0, len = src.length; i < len; i++) {
+      const item = src[i];
+      // eslint-disable-next-line guard-for-in,no-restricted-syntax
+      for (let key in item) {
+        const value = item[key];
+        if (value) {
+          target[key] = value;
+        }
+      }
+    }
+    return target;
   }
 
   static sum(objOrAry, cb = value => value) {
@@ -232,17 +254,9 @@ class PlainUtils {
   }
 
   static keepLastIndex(obj) {
-    if (window.getSelection) {
-      obj.focus();
-      const range = window.getSelection();
-      range.selectAllChildren(obj);
-      range.collapseToEnd();
-    } else if (document.selection) {
-      const range = document.selection.createRange();
-      range.moveToElementText(obj);
-      range.collapse(false);
-      range.select();
-    }
+    const range = window.getSelection();
+    range.selectAllChildren(obj);
+    range.collapseToEnd();
   }
 
   static trim(s) {
@@ -315,7 +329,7 @@ class PlainUtils {
       return { type: 'Opera', version: ver };
     }
     // Safari
-    if (explorer.indexOf('Safari') >= 0) {
+    if (explorer.indexOf('safari') >= 0) {
       const ver = explorer.match(/version\/([\d.]+)/)[1];
       return { type: 'Safari', version: ver };
     }
@@ -336,8 +350,42 @@ class PlainUtils {
     return array[0];
   }
 
+  static blankClear(value) {
+    if (PlainUtils.isString(value)) {
+      return value.replace(/\s*/g, PlainUtils.EMPTY);
+    }
+    return value;
+  }
+
+  static equals(src, target) {
+    if (PlainUtils.isUnDef(src)) {
+      return false;
+    }
+    if (PlainUtils.isUnDef(target)) {
+      return false;
+    }
+    return JSON.stringify(src) === JSON.stringify(target);
+  }
+
+  static toFixed(num, fixed) {
+    if (num.toString().indexOf('.') > -1) {
+      return num.toFixed(fixed);
+    }
+    return num;
+  }
+
   static safeValue(value, defaultValue = '') {
     return PlainUtils.isUnDef(value) ? defaultValue : value;
+  }
+
+  static inWorker() {
+    // eslint-disable-next-line no-restricted-globals
+    const type = PlainUtils.type(self);
+    return type === DATA_TYPE.DedicatedWorkerGlobalScope;
+  }
+
+  static if(condition, establish, otherwise) {
+    return condition ? establish() : otherwise();
   }
 
 }
@@ -346,6 +394,7 @@ PlainUtils.EMPTY = '';
 PlainUtils.Nul = null;
 PlainUtils.Undef = undefined;
 PlainUtils.noop = () => {};
+PlainUtils.DATA_TYPE = DATA_TYPE;
 
 export {
   PlainUtils,

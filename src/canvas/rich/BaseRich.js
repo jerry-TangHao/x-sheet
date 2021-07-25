@@ -1,7 +1,0 @@
-class BaseXRich {
-
-}
-
-export {
-  BaseXRich,
-};
