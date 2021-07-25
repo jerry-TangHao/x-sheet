@@ -123,6 +123,7 @@ class XEvent {
   static mouseMoveUp(target, moveFunc = () => {}, upFunc = () => {}) {
     const xEvtMove = (evt) => {
       moveFunc(evt);
+      evt.stopPropagation();
       evt.preventDefault();
     };
     const xEvtUp = (evt) => {

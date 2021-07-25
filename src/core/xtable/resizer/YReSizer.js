@@ -6,7 +6,6 @@ import { XEvent } from '../../../libs/XEvent';
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { XTableMousePointer } from '../XTableMousePointer';
 import { RowFixed } from '../tablefixed/RowFixed';
-import { RectRange } from '../tablebase/RectRange';
 
 class YReSizer extends Widget {
 
@@ -32,7 +31,7 @@ class YReSizer extends Widget {
     const { table } = this;
     const { scale, rows, mousePointer } = table;
     const { focus, xFixedView } = table;
-    const { snapshot, index, cols } = table;
+    const { snapshot, index } = table;
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
       mousePointer.lock(YReSizer);
       mousePointer.set(XTableMousePointer.KEYS.rowResize, YReSizer);

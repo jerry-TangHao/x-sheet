@@ -6,7 +6,6 @@ import { XEvent } from '../../../libs/XEvent';
 import { PlainUtils } from '../../../utils/PlainUtils';
 import { XTableMousePointer } from '../XTableMousePointer';
 import { ColFixed } from '../tablefixed/ColFixed';
-import { RectRange } from '../tablebase/RectRange';
 
 class XReSizer extends Widget {
 
@@ -34,7 +33,7 @@ class XReSizer extends Widget {
       scale, cols, mousePointer, focus, xFixedView,
     } = table;
     const { snapshot } = table;
-    const { rows, index } = table;
+    const { index } = table;
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
       mousePointer.lock(XReSizer);
       mousePointer.set(XTableMousePointer.KEYS.colResize, XReSizer);
@@ -71,6 +70,13 @@ class XReSizer extends Widget {
       mousePointer.lock(XReSizer);
       mousePointer.set(XTableMousePointer.KEYS.colResize, XReSizer);
     });
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, () => {
+      const { activate } = focus;
+      const { target } = activate;
+      if (target !== table && target !== this) {
+        this.hide();
+      }
+    });
     XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_MOVE, (e) => {
       // eslint-disable-next-line prefer-const
       let { left, ci } = this.getEventLeft(e);
@@ -95,13 +101,6 @@ class XReSizer extends Widget {
     });
     XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, () => {
       this.hide();
-    });
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, () => {
-      const { activate } = focus;
-      const { target } = activate;
-      if (target !== table && target !== this) {
-        this.hide();
-      }
     });
   }
 
