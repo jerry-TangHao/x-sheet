@@ -176,11 +176,24 @@ class XWorkBody extends Widget {
         XDraw.refresh();
         const table = this.getActiveTable();
         if (table) {
+          const { xTableScrollView } = table;
+          let scrollView = xTableScrollView.getScrollView();
           table.recache();
           table.reset();
           this.scrollBarLocal();
           this.scrollBarSize();
           table.resize();
+          let { maxRi, maxCi } = xTableScrollView.getScrollMaxRiCi();
+          if (scrollView.sri > maxRi) {
+            table.scrollRi(maxRi);
+            this.scrollBarSize();
+            this.scrollBarLocal();
+          }
+          if (scrollView.sci > maxCi) {
+            table.scrollCi(maxCi);
+            this.scrollBarSize();
+            this.scrollBarLocal();
+          }
         }
       });
     });

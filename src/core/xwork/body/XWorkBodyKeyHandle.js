@@ -14,6 +14,7 @@ function enter({ table, body, response }) {
         edit.hideEdit(event);
       }
       let scrollView = xTableScrollView.getScrollView();
+      let { maxRi } = xTableScrollView.getScrollMaxRiCi();
       let { selectPath, selectRange } = xSelect;
       let rLen = rows.len - 1;
       let clone = selectRange.clone();
@@ -41,11 +42,12 @@ function enter({ table, body, response }) {
         xSelect.setRange(clone);
       }
       // 是否超过视图区域
-      let maxRi = scrollView.eri - 1;
-      if (sri > maxRi) {
-        let diff = sri - maxRi;
+      let maxERi = scrollView.eri - 1;
+      if (sri > maxERi) {
+        let diff = sri - maxERi;
         let next = scrollView.sri + diff;
-        table.scrollRi(next);
+        let scroll = next > maxRi ? maxRi : next;
+        table.scrollRi(scroll);
         body.scrollBarSize();
         body.scrollBarLocal();
       }
@@ -293,6 +295,7 @@ function arrowDown({ table, body, response }) {
         return;
       }
       let scrollView = xTableScrollView.getScrollView();
+      let { maxRi } = xTableScrollView.getScrollMaxRiCi();
       let { selectPath, selectRange } = xSelect;
       let rLen = rows.len - 1;
       let clone = selectRange.clone();
@@ -320,11 +323,12 @@ function arrowDown({ table, body, response }) {
         xSelect.setRange(clone);
       }
       // 是否超过视图区域
-      let maxRi = scrollView.eri - 1;
-      if (sri > maxRi) {
-        let diff = sri - maxRi;
+      let maxERi = scrollView.eri - 1;
+      if (sri > maxERi) {
+        let diff = sri - maxERi;
         let next = scrollView.sri + diff;
-        table.scrollRi(next);
+        let scroll = next > maxRi ? maxRi : next;
+        table.scrollRi(scroll);
         body.scrollBarSize();
         body.scrollBarLocal();
       }
@@ -434,6 +438,7 @@ function arrowRight({ table, body, response }) {
         return;
       }
       let scrollView = xTableScrollView.getScrollView();
+      let { maxCi } = xTableScrollView.getScrollMaxRiCi();
       let { selectPath, selectRange } = xSelect;
       let clone = selectRange.clone();
       let cLen = cols.len - 1;
@@ -461,11 +466,12 @@ function arrowRight({ table, body, response }) {
         xSelect.setRange(clone);
       }
       // 是否超过视图区域
-      let maxCi = scrollView.eci - 1;
-      if (sci > maxCi) {
-        let diff = sci - maxCi;
+      let maxECi = scrollView.eci - 1;
+      if (sci > maxECi) {
+        let diff = sci - maxECi;
         let next = scrollView.sci + diff;
-        table.scrollCi(next);
+        let scroll = next > maxCi ? maxCi : next;
+        table.scrollCi(scroll);
         body.scrollBarSize();
         body.scrollBarLocal();
       }

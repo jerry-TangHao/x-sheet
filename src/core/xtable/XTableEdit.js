@@ -222,20 +222,20 @@ class XTableEdit extends Widget {
               // TODO ...
               //
               this.text(PlainUtils.EMPTY);
-              this.show();
               break;
             }
             case Cell.CONTENT_TYPE.DATE:
             case Cell.CONTENT_TYPE.NUMBER:
             case Cell.CONTENT_TYPE.STRING: {
               const text = cell.toString();
+              const style = table.getCellCssStyle(sri, sci);
+              this.attr('style', style);
               this.text(text);
-              this.attr('style', table.getCellCssStyle(sri, sci));
-              this.show();
               break;
             }
           }
         }
+        this.show();
         this.editOffset();
         this.throttle.action(() => {
           this.focus();
