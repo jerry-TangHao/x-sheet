@@ -1,4 +1,4 @@
-import { PlainUtils } from '../../../../utils/PlainUtils';
+import { SheetUtils } from '../../../../utils/SheetUtils';
 
 class XSelectPath {
 
@@ -12,13 +12,13 @@ class XSelectPath {
     sri, sci, mode, set = false,
   }) {
     if (this.mode !== mode || set) {
-      if (PlainUtils.isNotUnDef(sri)) {
+      if (SheetUtils.isNotUnDef(sri)) {
         this.dri = sri;
       }
-      if (PlainUtils.isNotUnDef(sci)) {
+      if (SheetUtils.isNotUnDef(sci)) {
         this.dci = sci;
       }
-      if (PlainUtils.isNotUnDef(mode)) {
+      if (SheetUtils.isNotUnDef(mode)) {
         this.mode = mode;
       }
     }

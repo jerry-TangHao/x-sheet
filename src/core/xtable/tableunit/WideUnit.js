@@ -1,5 +1,5 @@
-import { XDraw } from '../../../canvas/XDraw';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { XDraw } from '../../../draw/XDraw';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 /**
  * WideUnit
@@ -23,7 +23,7 @@ class WideUnit {
     fontBold = false,
     fontItalic = false,
   } = {}) {
-    if (PlainUtils.isNotUnDef(unit)) {
+    if (SheetUtils.isNotUnDef(unit)) {
       this.unit = unit;
     } else {
       const { draw, heightUnit } = table;
@@ -50,7 +50,7 @@ class WideUnit {
       draw.restore();
       this.unit = unit;
       // Firefox 好像不准确😓
-      const { type } = PlainUtils.getExplorerInfo();
+      const { type } = SheetUtils.getExplorerInfo();
       switch (type) {
         case 'Firefox':
           this.unit = XDraw.trunc(unit) + 0.22;

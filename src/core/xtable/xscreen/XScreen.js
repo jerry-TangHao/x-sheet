@@ -1,11 +1,11 @@
-import { Widget } from '../../../libs/Widget';
+import { Widget } from '../../../lib/Widget';
 import { Constant, cssPrefix } from '../../../const/Constant';
 import { XScreenBRZone } from './zone/XScreenBRZone';
 import { XScreenLTZone } from './zone/XScreenLTZone';
 import { XScreenLZone } from './zone/XScreenLZone';
 import { XScreenTZone } from './zone/XScreenTZone';
-import { XEvent } from '../../../libs/XEvent';
-import { XDraw } from '../../../canvas/XDraw';
+import { XEvent } from '../../../lib/XEvent';
+import { XDraw } from '../../../draw/XDraw';
 
 const DISPLAY_AREA = {
   BRT: Symbol('BRT'),
@@ -18,17 +18,26 @@ class XScreen extends Widget {
 
   constructor(table) {
     super(`${cssPrefix}-x-screen`);
-    this.pool = [];
     this.table = table;
+    this.pool = [];
     this.displayArea = DISPLAY_AREA.BR;
-    this.ltZone = new XScreenLTZone();
     this.tZone = new XScreenTZone();
-    this.brZone = new XScreenBRZone();
     this.lZone = new XScreenLZone();
-    this.children(this.ltZone);
+    this.ltZone = new XScreenLTZone();
+    this.brZone = new XScreenBRZone();
     this.children(this.tZone);
-    this.children(this.brZone);
     this.children(this.lZone);
+    this.children(this.ltZone);
+    this.children(this.brZone);
+    this.tableScaleChange = () => {
+      this.setZone();
+    };
+    this.tableWidthChange = () => {
+      this.setZone();
+    };
+    this.tableHeightChange = () => {
+      this.setZone();
+    };
   }
 
   onAttach() {
@@ -38,20 +47,22 @@ class XScreen extends Widget {
 
   unbind() {
     const { table } = this;
-    XEvent.unbind(table);
+    const { tableScaleChange } = this;
+    const { tableWidthChange } = this;
+    const { tableHeightChange } = this;
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, tableScaleChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableWidthChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableHeightChange);
   }
 
   bind() {
     const { table } = this;
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, () => {
-      this.setZone();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
-      this.setZone();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, () => {
-      this.setZone();
-    });
+    const { tableScaleChange } = this;
+    const { tableWidthChange } = this;
+    const { tableHeightChange } = this;
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, tableScaleChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableWidthChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableHeightChange);
   }
 
   addItem(item) {
@@ -123,7 +134,6 @@ class XScreen extends Widget {
   }
 
   findType(type) {
-    // eslint-disable-next-line no-restricted-syntax
     for (const item of this.pool) {
       if (item instanceof type) {
         return item;

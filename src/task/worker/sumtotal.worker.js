@@ -1,3 +1,5 @@
+import { Cell } from '../../core/xtable/tablecell/Cell';
+
 addEventListener('message', (event) => {
   const { data } = event;
   let total = 0;
@@ -12,7 +14,7 @@ addEventListener('message', (event) => {
           if (cell) {
             switch (cell.contentType) {
               // 数字类型
-              case 0:
+              case Cell.TYPE.NUMBER:
                 total += cell.text;
                 number++;
                 break;

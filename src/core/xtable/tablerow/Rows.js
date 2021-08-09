@@ -1,11 +1,11 @@
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 import { ScaleAdapter } from '../tablebase/Scale';
 import { RectRange } from '../tablebase/RectRange';
 import { Row } from './Row';
 import { CacheHeight } from './CacheHeight';
 import { XIteratorBuilder } from '../iterator/XIteratorBuilder';
 import { Snapshot } from '../snapshot/Snapshot';
-import { Listen } from '../../../libs/Listen';
+import { Listen } from '../../../lib/Listen';
 
 class Rows {
 
@@ -25,7 +25,7 @@ class Rows {
     this.min = 5;
     this.len = len;
     this.data = data;
-    this.height = PlainUtils.minIf(height, this.min);
+    this.height = SheetUtils.minIf(height, this.min);
     if (this.data.length > this.len) {
       this.len = this.data.length;
     }
@@ -49,7 +49,7 @@ class Rows {
         listen.execute('changeHeight', row);
       },
       redo: () => {
-        row.height = scaleAdapter.back(PlainUtils.minIf(height, this.min));
+        row.height = scaleAdapter.back(SheetUtils.minIf(height, this.min));
         listen.execute('changeHeight', row);
       },
     };
@@ -61,7 +61,7 @@ class Rows {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (PlainUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isNotUnDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri + 1, 1);
           }
@@ -70,7 +70,7 @@ class Rows {
         listen.execute('insertRowAfter', ri);
       },
       redo: () => {
-        if (PlainUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isNotUnDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri + 1, 0, {});
           }
@@ -87,7 +87,7 @@ class Rows {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (PlainUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isNotUnDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri, 1);
           }
@@ -96,7 +96,7 @@ class Rows {
         listen.execute('insertRowBefore', ri);
       },
       redo: () => {
-        if (PlainUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isNotUnDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri, 0, {});
           }
@@ -114,7 +114,7 @@ class Rows {
     let oldValue;
     let action = {
       undo: () => {
-        if (PlainUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isNotUnDef(ri)) {
           if (ri <= data.length || oldValue) {
             data.splice(ri, 0, oldValue);
           }
@@ -123,7 +123,7 @@ class Rows {
         listen.execute('removeRow', ri);
       },
       redo: () => {
-        if (PlainUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isNotUnDef(ri)) {
           if (ri <= data.length) {
             oldValue = data.splice(ri, 1);
           }

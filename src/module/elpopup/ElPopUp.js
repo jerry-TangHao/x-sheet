@@ -1,11 +1,11 @@
 /* global window document */
-import { Widget } from '../../libs/Widget';
+import { Widget } from '../../lib/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { h } from '../../libs/Element';
-import { PlainUtils } from '../../utils/PlainUtils';
-import { XEvent } from '../../libs/XEvent';
+import { h } from '../../lib/Element';
+import { SheetUtils } from '../../utils/SheetUtils';
+import { XEvent } from '../../lib/XEvent';
 
-let root = PlainUtils.Nul;
+let root = SheetUtils.Nul;
 let instances = [];
 
 /**
@@ -21,13 +21,13 @@ class ElPopUp extends Widget {
    */
   constructor(options) {
     super(`${cssPrefix}-el-pop-up`);
-    this.options = PlainUtils.copy({
-      el: PlainUtils.Nul,
+    this.options = SheetUtils.copy({
+      el: SheetUtils.Nul,
       autoWidth: false,
       autoHeight: false,
       position: ElPopUp.POPUP_POSTION.TB,
     }, options);
-    this.direction = PlainUtils.Undef;
+    this.direction = SheetUtils.Undef;
     this.status = false;
     this.location = 0;
     this.spaces = 0;
@@ -36,55 +36,6 @@ class ElPopUp extends Widget {
     };
     instances.push(this);
     this.bind();
-  }
-
-  /**
-   * 显示弹框
-   */
-  open() {
-    if (this.status === false && root) {
-      root.children(this);
-      this.status = true;
-    }
-    this.elPopUpPosition();
-    this.elPopUpAutosize();
-    this.elPopUpLocation();
-  }
-
-  /**
-   * 关闭弹框
-   */
-  close() {
-    if (this.status === true && root) {
-      root.remove(this);
-      this.status = false;
-    }
-  }
-
-  /**
-   * 卸载事件
-   */
-  unbind() {
-    XEvent.unbind(this);
-    XEvent.unbind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, this.elPopUpDownHandle);
-  }
-
-  /**
-   * 绑定事件
-   */
-  bind() {
-    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
-      e.stopPropagation();
-    });
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, this.elPopUpDownHandle);
-  }
-
-  /**
-   * 设置环绕元素
-   * @param el
-   */
-  setEL(el) {
-    this.options.el = el;
   }
 
   /**
@@ -135,7 +86,7 @@ class ElPopUp extends Widget {
     const elBox = el.box();
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
-    this.direction = PlainUtils.Undef;
+    this.direction = SheetUtils.Undef;
     this.spaces = 0;
     this.location = 0;
     switch (position) {
@@ -203,6 +154,91 @@ class ElPopUp extends Widget {
         this.css('top', `${location}px`);
         break;
     }
+  }
+
+  /**
+   * 设置显示位置
+   */
+  mousePopUpLocation(mouse) {
+    const mLeft = mouse.pageX;
+    const mlTop = mouse.pageY;
+    const winHeight = window.innerHeight;
+    const winWidth = window.innerWidth;
+    const box = this.box();
+    const rightDiff = winWidth - (mLeft + box.width);
+    const bottomDIff = winHeight - (mlTop + box.height);
+    if (rightDiff < 0) {
+      this.css('left', `${mLeft - box.width}px`);
+    } else {
+      this.css('left', `${mLeft}px`);
+    }
+    if (bottomDIff < 0) {
+      this.css('top', `${mlTop - box.height}px`);
+    } else {
+      this.css('top', `${mlTop}px`);
+    }
+  }
+
+  /**
+   * 显示弹框
+   */
+  open() {
+    if (this.status === false && root) {
+      root.children(this);
+      this.status = true;
+    }
+    this.elPopUpPosition();
+    this.elPopUpAutosize();
+    this.elPopUpLocation();
+  }
+
+  /**
+   * 显示弹框
+   * @param mouse
+   */
+  openByMouse(mouse) {
+    if (this.status === false && root) {
+      root.children(this);
+      this.status = true;
+    }
+    this.mousePopUpLocation(mouse);
+    this.elPopUpAutosize();
+  }
+
+  /**
+   * 关闭弹框
+   */
+  close() {
+    if (this.status === true && root) {
+      root.remove(this);
+      this.status = false;
+    }
+  }
+
+  /**
+   * 卸载事件
+   */
+  unbind() {
+    XEvent.unbind(this);
+    XEvent.unbind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, this.elPopUpDownHandle);
+  }
+
+  /**
+   * 绑定事件
+   */
+  bind() {
+    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      e.stopPropagation();
+    });
+    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, this.elPopUpDownHandle);
+  }
+
+  /**
+   * 设置环绕元素
+   * @param el
+   */
+  setEL(el) {
+    this.options.el = el;
   }
 
   /**

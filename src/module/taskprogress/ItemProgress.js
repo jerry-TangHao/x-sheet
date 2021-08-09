@@ -1,4 +1,4 @@
-import { Widget } from '../../libs/Widget';
+import { Widget } from '../../lib/Widget';
 import { cssPrefix } from '../../const/Constant';
 
 class ItemProgress extends Widget {

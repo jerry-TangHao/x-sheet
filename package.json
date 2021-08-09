@@ -14,15 +14,6 @@
     "type": "gitee",
     "url": "https://gitee.com/eigi/x-sheet"
   },
-  "nyc": {
-    "all": true,
-    "include": [
-      "src/core/*.js"
-    ],
-    "exclude": [
-      "**/*.spec.js"
-    ]
-  },
   "scripts": {
     "dev": "webpack-dev-server --open --config build/webpack.dev.js",
     "build": "webpack --config build/webpack.prod.js"

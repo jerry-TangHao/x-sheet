@@ -1,16 +1,16 @@
 /* global document */
-import { Widget } from '../../libs/Widget';
+import { Widget } from '../../lib/Widget';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { h } from '../../libs/Element';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { h } from '../../lib/Element';
+import { SheetUtils } from '../../utils/SheetUtils';
 
-import { XEvent } from '../../libs/XEvent';
+import { XEvent } from '../../lib/XEvent';
 
 class ScrollBarX extends Widget {
 
   constructor(option) {
     super(`${cssPrefix}-scroll-bar-x`);
-    this.option = PlainUtils.copy({
+    this.option = SheetUtils.copy({
       style: {},
       last: () => 0,
       next: () => 0,
@@ -38,12 +38,16 @@ class ScrollBarX extends Widget {
   }
 
   unbind() {
-    XEvent.unbind(this.block);
     XEvent.unbind(this.nextBut);
     XEvent.unbind(this.lastBut);
+    XEvent.unbind(this.block);
+    XEvent.unbind(this);
   }
 
   bind() {
+    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, () => {
+      XEvent.mouseHold(document, () => {});
+    });
     XEvent.bind(this.block, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (evt1) => {
       if (evt1.button !== 0) return;
       const downEventXy = this.eventXy(evt1, this.block);

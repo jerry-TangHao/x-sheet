@@ -1,12 +1,12 @@
 /* global document */
-import { Widget } from '../../libs/Widget';
+import { Widget } from '../../lib/Widget';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { XEvent } from '../../libs/XEvent';
+import { XEvent } from '../../lib/XEvent';
 
-import { h } from '../../libs/Element';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { h } from '../../lib/Element';
+import { SheetUtils } from '../../utils/SheetUtils';
 
-let root = PlainUtils.Undef;
+let root = SheetUtils.Undef;
 let instances = [];
 
 /**
@@ -23,7 +23,7 @@ class DragPanel extends Widget {
   constructor(options) {
     super(`${cssPrefix}-drag-panel`);
     instances.push(this);
-    this.options = PlainUtils.copy({
+    this.options = SheetUtils.copy({
       position: DragPanel.DRAG_PANEL_POSITION.CENTER,
     }, options);
     this.status = false;
@@ -97,7 +97,7 @@ class DragPanel extends Widget {
   dragPanelLocation() {
     const { options } = this;
     const { position } = options;
-    const { width, height } = PlainUtils.viewPort();
+    const { width, height } = SheetUtils.viewPort();
     const box = this.box();
     switch (position) {
       case DragPanel.DRAG_PANEL_POSITION.LEFT:

@@ -3,12 +3,12 @@ import { XMergesNoRow } from './XMergesNoRow';
 import { XMergesItems } from './XMergesItems';
 import { XMergesNoCol } from './XMergesNoCol';
 import { XMergesRange } from './XMergesRange';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 import { RectRange } from '../tablebase/RectRange';
 import { XTableDataItems } from '../XTableDataItems';
 import { XIteratorBuilder } from '../iterator/XIteratorBuilder';
 import { Snapshot } from '../snapshot/Snapshot';
-import { Listen } from '../../../libs/Listen';
+import { Listen } from '../../../lib/Listen';
 
 class XMerges {
 
@@ -43,13 +43,13 @@ class XMerges {
 
   getFirstIncludes(ri, ci) {
     const point = this.xMergesIndex.get(ri, ci);
-    if (PlainUtils.isNotUnDef(point)) {
+    if (SheetUtils.isNotUnDef(point)) {
       const view = this.xMergesItems.get(point);
-      if (PlainUtils.isNotUnDef(view)) {
+      if (SheetUtils.isNotUnDef(view)) {
         return view.getView();
       }
     }
-    return PlainUtils.Undef;
+    return SheetUtils.Undef;
   }
 
   push(view) {
@@ -68,9 +68,9 @@ class XMerges {
 
   shift(view) {
     const point = this.xMergesIndex.get(view.sri, view.sci);
-    if (PlainUtils.isNotUnDef(point)) {
+    if (SheetUtils.isNotUnDef(point)) {
       const full = this.xMergesItems.get(point);
-      if (PlainUtils.isNotUnDef(view)) {
+      if (SheetUtils.isNotUnDef(view)) {
         const fullView = full.getView();
         fullView.each(this.xIteratorBuilder, (ri, ci) => { this.xMergesIndex.clear(ri, ci); });
         this.xMergesItems.clear(point);
@@ -145,7 +145,7 @@ class XMerges {
       const { top, right, left, bottom } = view.brink();
       top.each(this.xIteratorBuilder, (ri, ci) => {
         const item = this.getFirstIncludes(ri, ci);
-        if (PlainUtils.isUnDef(item)) {
+        if (SheetUtils.isUnDef(item)) {
           return true;
         }
         if (view.contains(item)) {
@@ -159,7 +159,7 @@ class XMerges {
       }
       right.each(this.xIteratorBuilder, (ri, ci) => {
         const item = this.getFirstIncludes(ri, ci);
-        if (PlainUtils.isUnDef(item)) {
+        if (SheetUtils.isUnDef(item)) {
           return true;
         }
         if (view.contains(item)) {
@@ -173,7 +173,7 @@ class XMerges {
       }
       left.each(this.xIteratorBuilder, (ri, ci) => {
         const item = this.getFirstIncludes(ri, ci);
-        if (PlainUtils.isUnDef(item)) {
+        if (SheetUtils.isUnDef(item)) {
           return true;
         }
         if (view.contains(item)) {
@@ -187,7 +187,7 @@ class XMerges {
       }
       bottom.each(this.xIteratorBuilder, (ri, ci) => {
         const item = this.getFirstIncludes(ri, ci);
-        if (PlainUtils.isUnDef(item)) {
+        if (SheetUtils.isUnDef(item)) {
           return true;
         }
         if (view.contains(item)) {

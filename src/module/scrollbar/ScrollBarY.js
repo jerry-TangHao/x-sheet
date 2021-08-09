@@ -1,16 +1,16 @@
 /* global document */
-import { Widget } from '../../libs/Widget';
+import { Widget } from '../../lib/Widget';
 import { cssPrefix, Constant } from '../../const/Constant';
-import { h } from '../../libs/Element';
+import { h } from '../../lib/Element';
 
-import { PlainUtils } from '../../utils/PlainUtils';
-import { XEvent } from '../../libs/XEvent';
+import { SheetUtils } from '../../utils/SheetUtils';
+import { XEvent } from '../../lib/XEvent';
 
 class ScrollBarY extends Widget {
 
   constructor(option) {
     super(`${cssPrefix}-scroll-bar-y`);
-    this.option = PlainUtils.copy({
+    this.option = SheetUtils.copy({
       style: {},
       last: () => 0,
       next: () => 0,
@@ -38,13 +38,43 @@ class ScrollBarY extends Widget {
   }
 
   unbind() {
+    XEvent.unbind(this.nextBut);
+    XEvent.unbind(this.lastBut);
     XEvent.unbind(this.block);
+    XEvent.unbind(this);
   }
 
   bind() {
-    XEvent.bind(this.block, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (evt1) => {
-      if (evt1.button !== 0) return;
-      const downEventXy = this.eventXy(evt1, this.block);
+    XEvent.bind(this.content, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (event) => {
+      let { y } = this.eventXy(event, this.content);
+      let { height } = this.block.box();
+      let dir = 'head';
+      let { blockTop } = this;
+      blockTop += height / 2;
+      if (blockTop > y) {
+        dir = 'head';
+      }
+      if (blockTop < y) {
+        dir = 'foot';
+      }
+      XEvent.mouseHold(document, () => {
+        let { blockTop } = this;
+        blockTop += height / 2;
+        if (dir === 'head') {
+          if (blockTop > y) {
+            this.option.last();
+          }
+        }
+        if (dir === 'foot') {
+          if (blockTop < y) {
+            this.option.next();
+          }
+        }
+      }, () => {}, 60);
+    });
+    XEvent.bind(this.block, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (event) => {
+      if (event.button !== 0) return;
+      const downEventXy = this.eventXy(event, this.block);
       XEvent.mouseMoveUp(h(document), (evt2) => {
         // 计算移动的距离
         const moveEventXy = this.eventXy(evt2, this.content);
@@ -55,6 +85,7 @@ class ScrollBarY extends Widget {
         top = this.computeScrollTo(top);
         this.scrollMove(top);
       });
+      event.stopPropagation();
     });
     XEvent.bind(this.nextBut, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, () => {
       XEvent.mouseHold(document, () => {

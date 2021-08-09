@@ -1,15 +1,15 @@
 /* global FileReader */
 import { Workbook } from 'exceljs';
 import { ColorPicker } from '../../module/colorpicker/ColorPicker';
-import { BaseFont } from '../../canvas/font/BaseFont';
-import { XDraw } from '../../canvas/XDraw';
-import { LINE_TYPE } from '../../canvas/Line';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { BaseFont } from '../../draw/font/BaseFont';
+import { XDraw } from '../../draw/XDraw';
+import { LINE_TYPE } from '../../draw/Line';
+import { SheetUtils } from '../../utils/SheetUtils';
 import { ColorArray } from '../../module/colorpicker/colorarray/ColorArray';
 import { HexRgb, Theme, ThemeXml } from './XlsxTheme';
 import { WideUnit } from '../../core/xtable/tableunit/WideUnit';
-import { HeightUnit } from '../../core/xtable/tableunit/HeightUnit';
 import { Cell } from '../../core/xtable/tablecell/Cell';
+import { HeightUnit } from '../../core/xtable/tableunit/HeightUnit';
 
 /**
  * XLSX 文件导入
@@ -110,15 +110,15 @@ class XlsxImport {
           const { border, fill, font, alignment } = style;
           // 读取列编号
           const colNo = address.replace(number, '');
-          const colIndex = PlainUtils.indexAt(colNo);
+          const colIndex = SheetUtils.indexAt(colNo);
           // 创建新的XCell;
           const xCell = {
             background: null,
             text: value,
             fontAttr: {},
             borderAttr: {
-              top: {},
               right: {},
+              top: {},
               left: {},
               bottom: {},
             },
@@ -126,25 +126,25 @@ class XlsxImport {
           // 字体属性
           if (font) {
             const { name, bold, size, italic, underline, strike, color } = font;
-            xCell.fontAttr.name = name;
-            xCell.fontAttr.size = this.fontSize(size || 12);
             xCell.fontAttr.italic = italic;
+            xCell.fontAttr.name = name;
+            xCell.fontAttr.size = this.fontSize(size || 13);
             xCell.fontAttr.bold = bold;
             xCell.fontAttr.underline = underline;
             xCell.fontAttr.strikethrough = strike;
             if (color) {
               const { theme, tint, argb } = color;
-              if (PlainUtils.isNotUnDef(argb)) {
+              if (SheetUtils.isNotUnDef(argb)) {
                 const rgb = HexRgb(argb);
                 xCell.fontAttr.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-              } else if (PlainUtils.isNotUnDef(theme)) {
+              } else if (SheetUtils.isNotUnDef(theme)) {
                 xCell.fontAttr.color = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
               }
             }
           }
           // 富文本
           if (richText) {
-            const richFonts = { fonts: [] };
+            const rich = [];
             for (let i = 0, len = richText.length; i < len; i++) {
               const item = richText[i];
               const { font, text } = item;
@@ -152,7 +152,7 @@ class XlsxImport {
               if (font) {
                 const { size, name, italic, bold } = font;
                 const { underline, strike, color } = font;
-                richFont.size = this.fontSize(size || 12);
+                richFont.size = this.fontSize(size || 13);
                 richFont.bold = bold;
                 richFont.name = name;
                 richFont.italic = italic;
@@ -160,43 +160,115 @@ class XlsxImport {
                 richFont.strikethrough = strike;
                 if (color) {
                   const { theme, tint, argb } = color;
-                  if (PlainUtils.isNotUnDef(argb)) {
+                  if (SheetUtils.isNotUnDef(argb)) {
                     const rgb = HexRgb(argb);
                     richFont.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                  } else if (PlainUtils.isNotUnDef(theme)) {
+                  } else if (SheetUtils.isNotUnDef(theme)) {
                     richFont.color = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
                   }
                 }
-                richFonts.fonts.push(richFont);
+                rich.push(richFont);
               } else {
-                richFonts.fonts.push(richFont);
+                rich.push(richFont);
               }
             }
-            xCell.text = richFonts;
-            xCell.contentType = Cell.CONTENT_TYPE.RICH_TEXT;
+            xCell.rich = rich;
+            xCell.contentType = Cell.TYPE.RICH_TEXT;
           } else {
-            const type = PlainUtils.type(value);
+            const type = SheetUtils.type(value);
             switch (type) {
-              case PlainUtils.DATA_TYPE.Number:
-                xCell.contentType = Cell.CONTENT_TYPE.NUMBER;
+              case SheetUtils.DATA_TYPE.Date:
+                xCell.format = 'date1';
+                xCell.contentType = Cell.TYPE.DATE_TIME;
                 break;
-              case PlainUtils.DATA_TYPE.Date:
-                xCell.contentType = Cell.CONTENT_TYPE.DATE;
+              case SheetUtils.DATA_TYPE.Number:
+                xCell.contentType = Cell.TYPE.NUMBER;
                 break;
-              case PlainUtils.DATA_TYPE.String:
-                xCell.contentType = Cell.CONTENT_TYPE.STRING;
+              case SheetUtils.DATA_TYPE.String:
+                xCell.contentType = Cell.TYPE.STRING;
                 break;
+            }
+          }
+          // 单元格边框
+          if (border) {
+            if (border.right) {
+              const { style, color } = border.right;
+              const { widthType, type } = this.borderType(style);
+              xCell.borderAttr.right.widthType = widthType;
+              xCell.borderAttr.right.type = type;
+              xCell.borderAttr.right.display = true;
+              if (color) {
+                const { theme, tint, argb } = color;
+                if (SheetUtils.isNotUnDef(argb)) {
+                  const rgb = HexRgb(argb);
+                  xCell.borderAttr.right.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
+                } else if (SheetUtils.isNotUnDef(theme)) {
+                  xCell.borderAttr.right.color = themeXlsx.setTheme(theme).setTint(tint)
+                    .getThemeRgb();
+                }
+              }
+            }
+            if (border.top) {
+              const { style, color } = border.top;
+              const { widthType, type } = this.borderType(style);
+              xCell.borderAttr.top.display = true;
+              xCell.borderAttr.top.type = type;
+              xCell.borderAttr.top.widthType = widthType;
+              if (color) {
+                const { theme, tint, argb } = color;
+                if (SheetUtils.isNotUnDef(argb)) {
+                  const rgb = HexRgb(argb);
+                  xCell.borderAttr.top.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
+                } else if (SheetUtils.isNotUnDef(theme)) {
+                  xCell.borderAttr.top.color = themeXlsx.setTheme(theme).setTint(tint)
+                    .getThemeRgb();
+                }
+              }
+            }
+            if (border.left) {
+              const { style, color } = border.left;
+              const { widthType, type } = this.borderType(style);
+              xCell.borderAttr.left.display = true;
+              xCell.borderAttr.left.type = type;
+              xCell.borderAttr.left.widthType = widthType;
+              if (color) {
+                const { theme, tint, argb } = color;
+                if (SheetUtils.isNotUnDef(argb)) {
+                  const rgb = HexRgb(argb);
+                  xCell.borderAttr.left.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
+                } else if (SheetUtils.isNotUnDef(theme)) {
+                  xCell.borderAttr.left.color = themeXlsx.setTheme(theme).setTint(tint)
+                    .getThemeRgb();
+                }
+              }
+            }
+            if (border.bottom) {
+              const { style, color } = border.bottom;
+              const { widthType, type } = this.borderType(style);
+              xCell.borderAttr.bottom.display = true;
+              xCell.borderAttr.bottom.type = type;
+              xCell.borderAttr.bottom.widthType = widthType;
+              if (color) {
+                const { theme, tint, argb } = color;
+                if (SheetUtils.isNotUnDef(argb)) {
+                  const rgb = HexRgb(argb);
+                  xCell.borderAttr.bottom.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
+                } else if (SheetUtils.isNotUnDef(theme)) {
+                  xCell.borderAttr.bottom.color = themeXlsx.setTheme(theme).setTint(tint)
+                    .getThemeRgb();
+                }
+              }
             }
           }
           // 背景颜色
           if (fill) {
             const { fgColor } = fill;
-            if (PlainUtils.isNotUnDef(fgColor)) {
+            if (SheetUtils.isNotUnDef(fgColor)) {
               const { theme, tint, argb } = fgColor;
-              if (PlainUtils.isNotUnDef(argb)) {
+              if (SheetUtils.isNotUnDef(argb)) {
                 const rgb = HexRgb(argb);
                 xCell.background = ColorPicker.parseHexToRgb(rgb);
-              } else if (PlainUtils.isNotUnDef(theme)) {
+              } else if (SheetUtils.isNotUnDef(theme)) {
                 xCell.background = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
               }
             }
@@ -220,77 +292,6 @@ class XlsxImport {
             } else if (textRotation) {
               xCell.fontAttr.direction = BaseFont.TEXT_DIRECTION.ANGLE;
               xCell.fontAttr.angle = alignment.textRotation;
-            }
-          }
-          // 单元格边框
-          if (border) {
-            if (border.right) {
-              const { style, color } = border.right;
-              const { widthType, type } = this.borderType(style);
-              xCell.borderAttr.right.widthType = widthType;
-              xCell.borderAttr.right.type = type;
-              xCell.borderAttr.right.display = true;
-              if (color) {
-                const { theme, tint, argb } = color;
-                if (PlainUtils.isNotUnDef(argb)) {
-                  const rgb = HexRgb(argb);
-                  xCell.borderAttr.right.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (PlainUtils.isNotUnDef(theme)) {
-                  xCell.borderAttr.right.color = themeXlsx.setTheme(theme).setTint(tint)
-                    .getThemeRgb();
-                }
-              }
-            }
-            if (border.top) {
-              const { style, color } = border.top;
-              const { widthType, type } = this.borderType(style);
-              xCell.borderAttr.top.display = true;
-              xCell.borderAttr.top.type = type;
-              xCell.borderAttr.top.widthType = widthType;
-              if (color) {
-                const { theme, tint, argb } = color;
-                if (PlainUtils.isNotUnDef(argb)) {
-                  const rgb = HexRgb(argb);
-                  xCell.borderAttr.top.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (PlainUtils.isNotUnDef(theme)) {
-                  xCell.borderAttr.top.color = themeXlsx.setTheme(theme).setTint(tint)
-                    .getThemeRgb();
-                }
-              }
-            }
-            if (border.left) {
-              const { style, color } = border.left;
-              const { widthType, type } = this.borderType(style);
-              xCell.borderAttr.left.display = true;
-              xCell.borderAttr.left.type = type;
-              xCell.borderAttr.left.widthType = widthType;
-              if (color) {
-                const { theme, tint, argb } = color;
-                if (PlainUtils.isNotUnDef(argb)) {
-                  const rgb = HexRgb(argb);
-                  xCell.borderAttr.left.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (PlainUtils.isNotUnDef(theme)) {
-                  xCell.borderAttr.left.color = themeXlsx.setTheme(theme).setTint(tint)
-                    .getThemeRgb();
-                }
-              }
-            }
-            if (border.bottom) {
-              const { style, color } = border.bottom;
-              const { widthType, type } = this.borderType(style);
-              xCell.borderAttr.bottom.display = true;
-              xCell.borderAttr.bottom.type = type;
-              xCell.borderAttr.bottom.widthType = widthType;
-              if (color) {
-                const { theme, tint, argb } = color;
-                if (PlainUtils.isNotUnDef(argb)) {
-                  const rgb = HexRgb(argb);
-                  xCell.borderAttr.bottom.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (PlainUtils.isNotUnDef(theme)) {
-                  xCell.borderAttr.bottom.color = themeXlsx.setTheme(theme).setTint(tint)
-                    .getThemeRgb();
-                }
-              }
             }
           }
           // 添加单元格

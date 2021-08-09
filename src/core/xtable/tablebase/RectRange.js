@@ -1,4 +1,4 @@
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 class RectRange {
 
@@ -81,7 +81,7 @@ class RectRange {
   includes(...args) {
     let [ri, ci] = [0, 0];
     if (args.length === 1) {
-      [ci, ri] = PlainUtils.expr2xy(args[0]);
+      [ci, ri] = SheetUtils.expr2xy(args[0]);
     } else if (args.length === 2) {
       [ri, ci] = args;
     }
@@ -327,9 +327,9 @@ class RectRange {
     const {
       sri, sci, eri, eci,
     } = this;
-    let ref = PlainUtils.xy2expr(sci, sri);
+    let ref = SheetUtils.xy2expr(sci, sri);
     if (this.multiple()) {
-      ref = `${ref}:${PlainUtils.xy2expr(eci, eri)}`;
+      ref = `${ref}:${SheetUtils.xy2expr(eci, eri)}`;
     }
     return ref;
   }
@@ -341,10 +341,10 @@ class RectRange {
    */
   static valueOf(ref) {
     const refs = ref.split(':');
-    const [sci, sri] = PlainUtils.expr2xy(refs[0]);
+    const [sci, sri] = SheetUtils.expr2xy(refs[0]);
     let [eri, eci] = [sri, sci];
     if (refs.length > 1) {
-      [eci, eri] = PlainUtils.expr2xy(refs[1]);
+      [eci, eri] = SheetUtils.expr2xy(refs[1]);
     }
     return new RectRange(sri, sci, eri, eci);
   }

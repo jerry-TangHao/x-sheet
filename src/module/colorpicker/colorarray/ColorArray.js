@@ -1,14 +1,14 @@
-import { Widget } from '../../../libs/Widget';
+import { Widget } from '../../../lib/Widget';
 import { cssPrefix, Constant } from '../../../const/Constant';
 import { ColorItem } from './ColorItem';
-import { PlainUtils } from '../../../utils/PlainUtils';
-import { XEvent } from '../../../libs/XEvent';
+import { SheetUtils } from '../../../utils/SheetUtils';
+import { XEvent } from '../../../lib/XEvent';
 
 class ColorArray extends Widget {
 
   constructor(options) {
     super(`${cssPrefix}-color-array`);
-    this.options = PlainUtils.copy({
+    this.options = SheetUtils.copy({
       colors: [
         new ColorItem({ color: 'rgb(0, 0, 0)' }),
         new ColorItem({ color: 'rgb(67, 67, 67)' }),
@@ -135,12 +135,12 @@ class ColorArray extends Widget {
   }
 
   findItemByColor(color) {
-    color = PlainUtils.blankClear(color);
+    color = SheetUtils.blankClear(color);
     return this.colors.find(item => item.color === color);
   }
 
   setActiveByColor(color) {
-    color = PlainUtils.blankClear(color);
+    color = SheetUtils.blankClear(color);
     this.colors.forEach((item) => {
       if (item.color === color) {
         item.setActive(true);

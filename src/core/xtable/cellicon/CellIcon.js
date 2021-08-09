@@ -1,4 +1,4 @@
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 class CellIcon {
 
@@ -53,7 +53,7 @@ class CellIcon {
         xIcons = xIcons.filter(item => item !== xIcon);
         data[offset] = xIcons;
       } else {
-        data[offset] = PlainUtils.Undef;
+        data[offset] = SheetUtils.Undef;
       }
     }
   }

@@ -1,7 +1,7 @@
 /**
  * 数据快照
  */
-import { Listen } from '../../../libs/Listen';
+import { Listen } from '../../../lib/Listen';
 
 class Snapshot {
 

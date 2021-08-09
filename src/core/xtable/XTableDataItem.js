@@ -1,4 +1,4 @@
-import { PlainUtils } from '../../utils/PlainUtils';
+import { SheetUtils } from '../../utils/SheetUtils';
 import { Cell } from './tablecell/Cell';
 
 class XTableDataItem {
@@ -6,8 +6,8 @@ class XTableDataItem {
   constructor(options) {
     if (options) {
       const { cell, mergeId } = options;
-      this.cell = PlainUtils.safeValue(cell, options);
-      this.mergeId = PlainUtils.safeValue(mergeId, undefined);
+      this.cell = SheetUtils.safeValue(cell, options);
+      this.mergeId = SheetUtils.safeValue(mergeId, undefined);
     } else {
       this.cell = undefined;
       this.mergeId = undefined;
@@ -19,7 +19,7 @@ class XTableDataItem {
     if (cell instanceof Cell) {
       return cell;
     }
-    if (PlainUtils.isString(cell)) {
+    if (SheetUtils.isString(cell)) {
       this.cell = new Cell({
         text: cell,
       });

@@ -1,4 +1,4 @@
-import { Listen } from '../../libs/Listen';
+import { Listen } from '../../lib/Listen';
 
 class TaskManage {
 

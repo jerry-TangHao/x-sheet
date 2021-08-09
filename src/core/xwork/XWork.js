@@ -1,11 +1,11 @@
-import { Widget } from '../../libs/Widget';
+import { Widget } from '../../lib/Widget';
 import { cssPrefix } from '../../const/Constant';
-import { VerticalLayer } from '../../libs/layer/VerticalLayer';
-import { VerticalLayerElement } from '../../libs/layer/VerticalLayerElement';
-import { XWorkTop } from './top/XWorkTop';
+import { VerticalLayer } from '../../lib/layer/VerticalLayer';
+import { VerticalLayerElement } from '../../lib/layer/VerticalLayerElement';
+import { XWorkHead } from './head/XWorkHead';
 import { XWorkBody } from './body/XWorkBody';
-import { XWorkBottom } from './bottom/XWorkBottom';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { XWorkFoot } from './foot/XWorkFoot';
+import { SheetUtils } from '../../utils/SheetUtils';
 
 const settings = {
   created: new Date(),
@@ -24,6 +24,8 @@ const settings = {
     sheets: [{
       tableConfig: {},
     }],
+    tabConfig: {},
+    sheetConfig: {},
   },
   bottom: {
     show: true,
@@ -34,7 +36,7 @@ class XWork extends Widget {
 
   constructor(options) {
     super(`${cssPrefix}-work`);
-    this.options = PlainUtils.copy({}, settings, options);
+    this.options = SheetUtils.copy({}, settings, options);
     this.root = null;
     // 布局
     this.topLayer = new VerticalLayerElement();
@@ -55,9 +57,9 @@ class XWork extends Widget {
     const { options, bodyLayer, topLayer, bottomLayer } = this;
     this.root = element;
     // 组件
-    this.top = new XWorkTop(this, this.options.top);
+    this.top = new XWorkHead(this, this.options.top);
     this.body = new XWorkBody(this, this.options.body);
-    this.bottom = new XWorkBottom(this);
+    this.bottom = new XWorkFoot(this);
     topLayer.attach(this.top);
     if (options.bottom.show) {
       bottomLayer.attach(this.bottom);

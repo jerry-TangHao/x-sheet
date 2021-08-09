@@ -1,10 +1,10 @@
 import { Cell } from './Cell';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 import { XIteratorBuilder } from '../iterator/XIteratorBuilder';
 import { XTableDataItems } from '../XTableDataItems';
 import { XMerges } from '../xmerges/XMerges';
 import { Snapshot } from '../snapshot/Snapshot';
-import { Listen } from '../../../libs/Listen';
+import { Listen } from '../../../lib/Listen';
 
 class Cells {
 
@@ -25,7 +25,7 @@ class Cells {
     let empty = true;
     rectRange.each(this.xIteratorBuilder, (ri, ci) => {
       const cell = this.getCell(ri, ci);
-      if (PlainUtils.isNotEmptyObject(cell) && !cell.isEmpty()) {
+      if (SheetUtils.isNotEmptyObject(cell) && !cell.isEmpty()) {
         empty = false;
         return false;
       }
@@ -46,7 +46,7 @@ class Cells {
     if (find) {
       return find;
     }
-    const cell = new Cell({ text: PlainUtils.EMPTY });
+    const cell = new Cell({ text: SheetUtils.EMPTY });
     item.setCell(cell);
     return cell;
   }

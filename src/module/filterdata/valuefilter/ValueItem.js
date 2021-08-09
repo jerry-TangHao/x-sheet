@@ -1,12 +1,12 @@
-import { Widget } from '../../../libs/Widget';
+import { Widget } from '../../../lib/Widget';
 import { cssPrefix } from '../../../const/Constant';
-import { h } from '../../../libs/Element';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { h } from '../../../lib/Element';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 class ValueItem extends Widget {
 
   constructor({
-    text = PlainUtils.EMPTY,
+    text = SheetUtils.EMPTY,
     index = -1,
     status = false,
   }) {

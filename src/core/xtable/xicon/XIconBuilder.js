@@ -18,14 +18,7 @@ class XIconBuilder {
    * @param fy
    */
   xIconsEvent({
-    type,
-    native,
-    sx,
-    sy,
-    fx,
-    fy,
-    staticIcons = [],
-    fixedIcons = [],
+    type, native, sx, sy, fx, fy, staticIcons = [], fixedIcons = [],
   }) {
     if (staticIcons.length + fixedIcons.length === 0) {
       this.clearFocus();
@@ -47,10 +40,10 @@ class XIconBuilder {
    * 清空焦点元素
    */
   clearFocus() {
-    const { focus } = this;
-    const { activate } = focus;
+    const { iconFocus } = this;
+    const { activate } = iconFocus;
     if (activate) {
-      focus.setActivate(null);
+      iconFocus.setActivate(null);
       activate.onLeave();
     }
   }
@@ -60,9 +53,9 @@ class XIconBuilder {
    * @param focus
    */
   constructor({
-    focus = new XIconFocus(),
+    iconFocus = new XIconFocus(),
   } = {}) {
-    this.focus = focus;
+    this.iconFocus = iconFocus;
   }
 
   /**
@@ -71,9 +64,9 @@ class XIconBuilder {
    * @returns {XIcon}
    */
   build(options = {}) {
-    const { focus } = this;
+    const { iconFocus } = this;
     const xIcon = new XIcon(options);
-    xIcon.setFocus(focus);
+    xIcon.setFocus(iconFocus);
     return xIcon;
   }
 

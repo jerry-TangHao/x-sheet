@@ -3,10 +3,12 @@ const XSheetVersion = `${cssPrefix} 1.0.0-develop`;
 const Constant = {};
 Constant.WORK_BODY_EVENT_TYPE = {
   CHANGE_ACTIVE: 'changeactive',
+  REMOVE_SHEET: 'removesheet',
 };
 Constant.SYSTEM_EVENT_TYPE = {
   MOUSE_MOVE: 'mousemove',
   MOUSE_DOWN: 'mousedown',
+  CONTEXT_MENU: 'contextmenu',
   SCROLL: 'scroll',
   RESIZE: 'resize',
   MOUSE_UP: 'mouseup',
@@ -18,6 +20,7 @@ Constant.SYSTEM_EVENT_TYPE = {
   MOUSE_WHEEL: 'wheel',
   MOUSE_ENTER: 'mouseenter',
   CLICK: 'click',
+  FOCUS: 'focus',
   DRAG_START: 'dragstart',
   CHANGE: 'change',
   VISIBILITY_CHANGE: 'visibilitychange',

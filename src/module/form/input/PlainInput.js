@@ -1,7 +1,7 @@
-import { Widget } from '../../../libs/Widget';
+import { Widget } from '../../../lib/Widget';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { h } from '../../../libs/Element';
-import { XEvent } from '../../../libs/XEvent';
+import { h } from '../../../lib/Element';
+import { XEvent } from '../../../lib/XEvent';
 
 class PlainInput extends Widget {
 

@@ -1,6 +1,6 @@
 import { CommonOutRange } from './CommonOutRange';
-import { PlainUtils } from '../../../../../utils/PlainUtils';
-import { BaseFont } from '../../../../../canvas/font/BaseFont';
+import { SheetUtils } from '../../../../../utils/SheetUtils';
+import { BaseFont } from '../../../../../draw/font/BaseFont';
 import { LineIteratorFilter } from '../../LineIteratorFilter';
 
 class RContentOutRange extends CommonOutRange {
@@ -29,7 +29,7 @@ class RContentOutRange extends CommonOutRange {
     const master = cells.getCell(row, col);
 
     // 是否是空单元格
-    if (PlainUtils.isUnDef(master) || master.isEmpty()) {
+    if (SheetUtils.isUnDef(master) || master.isEmpty()) {
       return true;
     }
     // 文字属性检查
@@ -62,7 +62,7 @@ class RContentOutRange extends CommonOutRange {
       // 只有next单元格是空时
       // 才允许不绘制边框
       if (direction === BaseFont.TEXT_DIRECTION.ANGLE
-        || PlainUtils.isUnDef(next) || next.isEmpty()) {
+        || SheetUtils.isUnDef(next) || next.isEmpty()) {
         return false;
       }
     }
@@ -87,12 +87,12 @@ class RContentOutRange extends CommonOutRange {
         .setLoop((i) => {
           // 检查合并单元格
           const merge = merges.getFirstIncludes(row, i);
-          if (PlainUtils.isNotUnDef(merge)) {
+          if (SheetUtils.isNotUnDef(merge)) {
             return false;
           }
           // 检查空单元格
           const cell = cells.getCell(row, i);
-          if (PlainUtils.isUnDef(cell)) {
+          if (SheetUtils.isUnDef(cell)) {
             return true;
           }
           // 检查空文本单元格
@@ -152,12 +152,12 @@ class RContentOutRange extends CommonOutRange {
         .setLoop((i) => {
           // 检查合并单元格
           const merge = merges.getFirstIncludes(row, i);
-          if (PlainUtils.isNotUnDef(merge)) {
+          if (SheetUtils.isNotUnDef(merge)) {
             return false;
           }
           // 检查空单元格
           const cell = cells.getCell(row, i);
-          if (PlainUtils.isUnDef(cell)) {
+          if (SheetUtils.isUnDef(cell)) {
             return true;
           }
           // 检查空文本单元格
@@ -183,8 +183,8 @@ class RContentOutRange extends CommonOutRange {
             // 只有master单元格和
             // next单元格都是空时
             // 才允许不绘制边框
-            const masterBlank = PlainUtils.isUnDef(master) || master.isEmpty();
-            const nextBlank = PlainUtils.isUnDef(next) || next.isEmpty();
+            const masterBlank = SheetUtils.isUnDef(master) || master.isEmpty();
+            const nextBlank = SheetUtils.isUnDef(next) || next.isEmpty();
             if (masterBlank && nextBlank) {
               find = false;
             }
@@ -217,12 +217,12 @@ class RContentOutRange extends CommonOutRange {
         .setLoop((j) => {
           // 合并单元格检查
           const merge = merges.getFirstIncludes(row, j);
-          if (PlainUtils.isNotUnDef(merge)) {
+          if (SheetUtils.isNotUnDef(merge)) {
             return false;
           }
           // 空单元格检查
           const cell = cells.getCell(row, j);
-          if (PlainUtils.isUnDef(cell)) {
+          if (SheetUtils.isUnDef(cell)) {
             return true;
           }
           // 空文本单检查
@@ -282,12 +282,12 @@ class RContentOutRange extends CommonOutRange {
         .setLoop((j) => {
           // 合并单元格检查
           const merge = merges.getFirstIncludes(row, j);
-          if (PlainUtils.isNotUnDef(merge)) {
+          if (SheetUtils.isNotUnDef(merge)) {
             return false;
           }
           // 空单元格检查
           const cell = cells.getCell(row, j);
-          if (PlainUtils.isUnDef(cell)) {
+          if (SheetUtils.isUnDef(cell)) {
             return true;
           }
           // 空文本单检查
@@ -311,7 +311,7 @@ class RContentOutRange extends CommonOutRange {
           if (width > rightWidth) {
             // 只有master单元格为
             // 空时才允许不绘制边框
-            if (PlainUtils.isUnDef(master) || master.isEmpty()) {
+            if (SheetUtils.isUnDef(master) || master.isEmpty()) {
               find = false;
             }
           }

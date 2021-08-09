@@ -1,11 +1,11 @@
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 import { ScaleAdapter } from '../tablebase/Scale';
 import { RectRange } from '../tablebase/RectRange';
 import { Col } from './Col';
 import { CacheWidth } from './CacheWidth';
 import { XIteratorBuilder } from '../iterator/XIteratorBuilder';
 import { Snapshot } from '../snapshot/Snapshot';
-import { Listen } from '../../../libs/Listen';
+import { Listen } from '../../../lib/Listen';
 
 class Cols {
 
@@ -25,7 +25,7 @@ class Cols {
     this.min = 5;
     this.len = len;
     this.data = data;
-    this.width = PlainUtils.minIf(width, this.min);
+    this.width = SheetUtils.minIf(width, this.min);
     if (this.data.length > this.len) {
       this.len = this.data.length;
     }
@@ -49,7 +49,7 @@ class Cols {
         listen.execute('changeWidth', col);
       },
       redo: () => {
-        col.width = scaleAdapter.back(PlainUtils.minIf(width, this.min));
+        col.width = scaleAdapter.back(SheetUtils.minIf(width, this.min));
         listen.execute('changeWidth', col);
       },
     };
@@ -61,7 +61,7 @@ class Cols {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (PlainUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isNotUnDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci + 1, 1);
           }
@@ -70,7 +70,7 @@ class Cols {
         listen.execute('insertColAfter', ci);
       },
       redo: () => {
-        if (PlainUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isNotUnDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci + 1, 0, {});
           }
@@ -87,7 +87,7 @@ class Cols {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (PlainUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isNotUnDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci, 1);
           }
@@ -96,7 +96,7 @@ class Cols {
         listen.execute('insertColBefore', ci);
       },
       redo: () => {
-        if (PlainUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isNotUnDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci, 0, {});
           }
@@ -114,7 +114,7 @@ class Cols {
     let oldValue;
     let action = {
       undo: () => {
-        if (PlainUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isNotUnDef(ci)) {
           if (ci <= data.length || oldValue) {
             data.splice(ci, 0, oldValue);
           }
@@ -123,7 +123,7 @@ class Cols {
         listen.execute('removeCol', ci);
       },
       redo: () => {
-        if (PlainUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isNotUnDef(ci)) {
           if (ci <= data.length) {
             oldValue = data.splice(ci, 1);
           }

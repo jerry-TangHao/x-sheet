@@ -1,8 +1,8 @@
 import { ScaleAdapter } from './Scale';
-import { BaseFont } from '../../../canvas/font/BaseFont';
-import { DrawTextBuilder } from '../../../canvas/font/text/build/DrawTextBuilder';
+import { DrawTextBuilder } from '../../../draw/font/text/build/DrawTextBuilder';
+import { BaseFont } from '../../../draw/font/BaseFont';
 import { Cell } from '../tablecell/Cell';
-import { RichDrawTextBuilder } from '../../../canvas/font/rich/build/RichDrawTextBuilder';
+import { RichDrawTextBuilder } from '../../../draw/font/rich/build/RichDrawTextBuilder';
 
 class TextBuilder {
 
@@ -28,53 +28,47 @@ class TextBuilder {
   }
 
   build() {
-    const { rect, overflow, row, col, cell, draw, scaleAdapter, table } = this;
-    const { fontAttr, ruler } = cell;
-    const { contentType } = cell;
-    const size = scaleAdapter.goto(fontAttr.size);
-    const formatText = cell.getFormatText();
-    const padding = scaleAdapter.goto(fontAttr.padding);
+    let { rect, overflow, row, col } = this;
+    let { cell, draw, scaleAdapter, table } = this;
+    let { fontAttr, ruler, contentType } = cell;
+    let size = scaleAdapter.goto(fontAttr.size);
+    let padding = scaleAdapter.goto(fontAttr.padding);
+    let builder = null;
     switch (contentType) {
-      case Cell.CONTENT_TYPE.RICH_TEXT: {
-        const rich = formatText.plain((font) => {
+      case Cell.TYPE.STRING:
+      case Cell.TYPE.NUMBER:
+      case Cell.TYPE.DATE_TIME: {
+        let formatText = cell.getFormatText();
+        builder = new DrawTextBuilder({
+          text: `${formatText}`, attr: fontAttr, draw, rect, overflow,
+        });
+        break;
+      }
+      case Cell.TYPE.RICH_TEXT: {
+        let computeText = cell.getComputeText();
+        let result = computeText.plain((font) => {
           font.size = scaleAdapter.goto(font.size);
           return font;
         });
-        const builder = new RichDrawTextBuilder({
-          rich, draw, overflow, rect, attr: fontAttr,
+        builder = new RichDrawTextBuilder({
+          rich: result, draw, overflow, rect, attr: fontAttr,
         });
-        builder.setSize(size);
-        builder.setPadding(padding);
-        if (table.isAngleBarCell(row, col)) {
-          builder.setDirection(BaseFont.TEXT_DIRECTION.ANGLE_BAR);
-        }
-        const buildFont = builder.buildFont();
-        const buildRuler = builder.buildRuler();
-        const equals = buildRuler.equals(ruler);
-        const diffRuler = equals ? ruler : buildRuler;
-        cell.setRuler(diffRuler);
-        buildFont.setRuler(diffRuler);
-        return buildFont;
+        break;
       }
-      case Cell.CONTENT_TYPE.DATE:
-      case Cell.CONTENT_TYPE.STRING:
-      case Cell.CONTENT_TYPE.NUMBER: {
-        const builder = new DrawTextBuilder({
-          text: formatText, draw, overflow, rect, attr: fontAttr,
-        });
-        builder.setSize(size);
-        builder.setPadding(padding);
-        if (table.isAngleBarCell(row, col)) {
-          builder.setDirection(BaseFont.TEXT_DIRECTION.ANGLE_BAR);
-        }
-        const buildFont = builder.buildFont();
-        const buildRuler = builder.buildRuler();
-        const equals = buildRuler.equals(ruler);
-        const diffRuler = equals ? ruler : buildRuler;
-        cell.setRuler(diffRuler);
-        buildFont.setRuler(diffRuler);
-        return buildFont;
+    }
+    if (builder != null) {
+      builder.setPadding(padding);
+      builder.setSize(size);
+      if (table.isAngleBarCell(row, col)) {
+        builder.setDirection(BaseFont.TEXT_DIRECTION.ANGLE_BAR);
       }
+      const buildFont = builder.buildFont();
+      const buildRuler = builder.buildRuler();
+      const equals = buildRuler.equals(ruler);
+      const diffRuler = equals ? ruler : buildRuler;
+      cell.setRuler(diffRuler);
+      buildFont.setRuler(diffRuler);
+      return buildFont;
     }
     return null;
   }

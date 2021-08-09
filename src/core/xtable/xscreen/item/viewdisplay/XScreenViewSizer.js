@@ -1,6 +1,6 @@
 import { XScreenViewLocal } from './XScreenViewLocal';
 import { RectRange } from '../../../tablebase/RectRange';
-import { XDraw } from '../../../../../canvas/XDraw';
+import { XDraw } from '../../../../../draw/XDraw';
 
 class Sizer {
 

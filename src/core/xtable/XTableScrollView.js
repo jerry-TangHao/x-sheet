@@ -1,4 +1,4 @@
-import { PlainUtils } from '../../utils/PlainUtils';
+import { SheetUtils } from '../../utils/SheetUtils';
 import { RectRange } from './tablebase/RectRange';
 
 const VIEW_MODE = {
@@ -20,7 +20,7 @@ class XTableScrollView {
    * @return {symbol}
    */
   static viewMode(lastView, view) {
-    if (PlainUtils.isUnDef(lastView)) {
+    if (SheetUtils.isUnDef(lastView)) {
       return VIEW_MODE.CHANGE_NOT;
     }
     // 视图无变化

@@ -1,5 +1,5 @@
 import { Border } from './Border';
-import { LINE_TYPE } from '../../../canvas/Line';
+import { LINE_TYPE } from '../../../draw/Line';
 
 /**
  * CellBorder

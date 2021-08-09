@@ -1,16 +1,16 @@
 import { XSelectItem } from '../xselect/XSelectItem';
-import { PlainUtils } from '../../../../utils/PlainUtils';
+import { SheetUtils } from '../../../../utils/SheetUtils';
 import { RectRange } from '../../tablebase/RectRange';
-import { Widget } from '../../../../libs/Widget';
+import { Widget } from '../../../../lib/Widget';
 import { Constant, cssPrefix } from '../../../../const/Constant';
-import { XEvent } from '../../../../libs/XEvent';
+import { XEvent } from '../../../../lib/XEvent';
 import { Alert } from '../../../../module/alert/Alert';
 import { XScreenCssBorderItem } from '../../xscreen/item/viewborder/XScreenCssBorderItem';
 import darkFilter from '../../../../../assets/svg/filter-dark.svg';
-import { XTableMousePointer } from '../../XTableMousePointer';
+import { XTableMousePoint } from '../../XTableMousePoint';
 import { XIcon } from '../../xicon/XIcon';
 import { Mask } from '../../../../module/mask/Mask';
-import { XDraw } from '../../../../canvas/XDraw';
+import { XDraw } from '../../../../draw/XDraw';
 import { FilterData } from '../../../../module/filterdata/FilterData';
 import { ElPopUp } from '../../../../module/elpopup/ElPopUp';
 import { ValueItem } from '../../../../module/filterdata/valuefilter/ValueItem';
@@ -27,10 +27,10 @@ class XFilter extends XScreenCssBorderItem {
    */
   constructor(table) {
     super({ table });
-    this.display = false;
-    this.icons = [];
     this.selectRange = null;
     this.activeIcon = null;
+    this.icons = [];
+    this.display = false;
     this.mask = new Mask().setRoot(table);
     this.filter = new FilterData({
       el: this.mask,
@@ -48,15 +48,37 @@ class XFilter extends XScreenCssBorderItem {
         }).open();
       },
     });
-    this.flt = new Widget(`${cssPrefix}-x-filter ${cssPrefix}-x-filter-lt`);
     this.ft = new Widget(`${cssPrefix}-x-filter ${cssPrefix}-x-filter-t`);
-    this.fbr = new Widget(`${cssPrefix}-x-filter ${cssPrefix}-x-filter-br`);
     this.fl = new Widget(`${cssPrefix}-x-filter ${cssPrefix}-x-filter-l`);
-    this.blt.children(this.flt);
+    this.flt = new Widget(`${cssPrefix}-x-filter ${cssPrefix}-x-filter-lt`);
+    this.fbr = new Widget(`${cssPrefix}-x-filter ${cssPrefix}-x-filter-br`);
     this.bl.children(this.fl);
     this.bt.children(this.ft);
+    this.blt.children(this.flt);
     this.bbr.children(this.fbr);
     this.setBorderColor('rgb(0,113,207)');
+    this.tableMouseScroll = () => {
+      if (this.display) {
+        ElPopUp.closeAll();
+        this.xFilterOffset();
+      }
+    };
+    this.tableStyleRender = () => {
+      if (this.display) {
+        this.xFilterOffset();
+      }
+    };
+    this.tableResizeChange = () => {
+      if (this.display) {
+        this.xFilterOffset();
+      }
+    };
+    this.tableScaleChange = () => {
+      if (this.display) {
+        ElPopUp.closeAll();
+        this.xFilterOffset();
+      }
+    };
     this.bind();
   }
 
@@ -72,7 +94,14 @@ class XFilter extends XScreenCssBorderItem {
    */
   unbind() {
     const { table } = this;
-    XEvent.unbind(table);
+    const { tableMouseScroll } = this;
+    const { tableStyleRender } = this;
+    const { tableResizeChange } = this;
+    const { tableScaleChange } = this;
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableMouseScroll);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.RENDER, tableStyleRender);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, tableResizeChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, tableScaleChange);
   }
 
   /**
@@ -80,28 +109,14 @@ class XFilter extends XScreenCssBorderItem {
    */
   bind() {
     const { table } = this;
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, () => {
-      if (this.display) {
-        ElPopUp.closeAll();
-        this.xFilterOffset();
-      }
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RENDER, () => {
-      if (this.display) {
-        this.xFilterOffset();
-      }
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, () => {
-      if (this.display) {
-        this.xFilterOffset();
-      }
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, () => {
-      if (this.display) {
-        ElPopUp.closeAll();
-        this.xFilterOffset();
-      }
-    });
+    const { tableMouseScroll } = this;
+    const { tableStyleRender } = this;
+    const { tableResizeChange } = this;
+    const { tableScaleChange } = this;
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableMouseScroll);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RENDER, tableStyleRender);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, tableResizeChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, tableScaleChange);
   }
 
   /**
@@ -148,7 +163,7 @@ class XFilter extends XScreenCssBorderItem {
           native.stopPropagation();
         });
         icon.setOnMove(() => {
-          mousePointer.set(XTableMousePointer.KEYS.pointer, XFilter);
+          mousePointer.set(XTableMousePoint.KEYS.pointer, XFilter);
         });
         icon.setOnLeave(() => {
           this.mask.close();
@@ -235,7 +250,7 @@ class XFilter extends XScreenCssBorderItem {
         .setEnd(colLen)
         .setLoop((i) => {
           const cell = cells.getCellOrMergeCell(sri, i);
-          if (PlainUtils.isUnDef(cell) || cell.isEmpty()) {
+          if (SheetUtils.isUnDef(cell) || cell.isEmpty()) {
             return false;
           }
           targetRange = targetRange.union(new RectRange(sri, i, sri, i));
@@ -248,7 +263,7 @@ class XFilter extends XScreenCssBorderItem {
         .setEnd(0)
         .setLoop((i) => {
           const cell = cells.getCellOrMergeCell(sri, i);
-          if (PlainUtils.isUnDef(cell) || cell.isEmpty()) {
+          if (SheetUtils.isUnDef(cell) || cell.isEmpty()) {
             return false;
           }
           targetRange = targetRange.union(new RectRange(sri, i, sri, i));
@@ -261,7 +276,7 @@ class XFilter extends XScreenCssBorderItem {
         .setEnd(rowLen)
         .setLoop((i) => {
           const cell = cells.getCellOrMergeCell(i, sci);
-          if (PlainUtils.isUnDef(cell) || cell.isEmpty()) {
+          if (SheetUtils.isUnDef(cell) || cell.isEmpty()) {
             return false;
           }
           targetRange = targetRange.union(new RectRange(i, sci, i, sci));
@@ -274,7 +289,7 @@ class XFilter extends XScreenCssBorderItem {
         .setEnd(0)
         .setLoop((i) => {
           const cell = cells.getCellOrMergeCell(i, sci);
-          if (PlainUtils.isUnDef(cell) || cell.isEmpty()) {
+          if (SheetUtils.isUnDef(cell) || cell.isEmpty()) {
             return false;
           }
           targetRange = targetRange.union(new RectRange(i, sci, i, sci));
@@ -293,7 +308,7 @@ class XFilter extends XScreenCssBorderItem {
             .setEnd(eri)
             .setLoop((j) => {
               const cell = cells.getCellOrMergeCell(j, i);
-              if (!PlainUtils.isUnDef(cell) && !cell.isEmpty()) {
+              if (!SheetUtils.isUnDef(cell) && !cell.isEmpty()) {
                 targetRange = targetRange.union(new RectRange(j, i, j, i));
                 emptyCol = false;
               }
@@ -314,7 +329,7 @@ class XFilter extends XScreenCssBorderItem {
             .setEnd(eri)
             .setLoop((j) => {
               const cell = cells.getCellOrMergeCell(j, i);
-              if (!PlainUtils.isUnDef(cell) && !cell.isEmpty()) {
+              if (!SheetUtils.isUnDef(cell) && !cell.isEmpty()) {
                 targetRange = targetRange.union(new RectRange(j, i, j, i));
                 emptyCol = false;
               }
@@ -335,7 +350,7 @@ class XFilter extends XScreenCssBorderItem {
             .setEnd(eci)
             .setLoop((j) => {
               const cell = cells.getCellOrMergeCell(i, j);
-              if (!PlainUtils.isUnDef(cell) && !cell.isEmpty()) {
+              if (!SheetUtils.isUnDef(cell) && !cell.isEmpty()) {
                 targetRange = targetRange.union(new RectRange(i, j, i, j));
                 emptyRow = false;
               }
@@ -356,7 +371,7 @@ class XFilter extends XScreenCssBorderItem {
             .setEnd(eci)
             .setLoop((j) => {
               const cell = cells.getCellOrMergeCell(i, j);
-              if (!PlainUtils.isUnDef(cell) && !cell.isEmpty()) {
+              if (!SheetUtils.isUnDef(cell) && !cell.isEmpty()) {
                 targetRange = targetRange.union(new RectRange(i, j, i, j));
                 emptyRow = false;
               }
@@ -399,12 +414,12 @@ class XFilter extends XScreenCssBorderItem {
     const items = new Set();
     new RectRange(sri, sci, eri, eci).each(xIteratorBuilder, (ri, ci) => {
       const cell = cells.getCellOrMergeCell(ri, ci);
-      if (!PlainUtils.isUnDef(cell) && !cell.isEmpty()) {
+      if (!SheetUtils.isUnDef(cell) && !cell.isEmpty()) {
         switch (cell.contentType) {
-          case Cell.CONTENT_TYPE.STRING:
+          case Cell.TYPE.STRING:
             items.add(cell.toString());
             break;
-          case Cell.CONTENT_TYPE.NUMBER:
+          case Cell.TYPE.NUMBER:
             items.add(cell.toString());
             break;
         }
@@ -455,7 +470,7 @@ class XFilter extends XScreenCssBorderItem {
     for (let ri = sri; ri <= eri; ri++) {
       for (let ci = sci; ci <= eci; ci++) {
         const cell = cells.getCell(ri, ci);
-        if (PlainUtils.isEmptyObject(cell)) {
+        if (SheetUtils.isEmptyObject(cell)) {
           continue;
         }
         if (cell.isEmpty()) {

@@ -1,6 +1,6 @@
 import { BaseCellsHelper } from './BaseCellsHelper';
-import { Rect } from '../../../canvas/Rect';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { Rect } from '../../../draw/Rect';
+import { SheetUtils } from '../../../utils/SheetUtils';
 import { RectRange } from '../tablebase/RectRange';
 
 const TEXT_BREAK_LOOP = {
@@ -84,7 +84,7 @@ class TextCellsHelper extends BaseCellsHelper {
               x -= width;
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,
@@ -137,7 +137,7 @@ class TextCellsHelper extends BaseCellsHelper {
               newCol(col);
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,
@@ -191,7 +191,7 @@ class TextCellsHelper extends BaseCellsHelper {
               x -= width;
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,
@@ -244,7 +244,7 @@ class TextCellsHelper extends BaseCellsHelper {
               newCol(col);
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,

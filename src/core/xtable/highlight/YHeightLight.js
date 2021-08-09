@@ -1,7 +1,7 @@
-import { Widget } from '../../../libs/Widget';
+import { Widget } from '../../../lib/Widget';
 import { RANGE_OVER_GO } from '../xscreen/item/viewborder/XScreenStyleBorderItem';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { XEvent } from '../../../libs/XEvent';
+import { XEvent } from '../../../lib/XEvent';
 import { XSelectItem } from '../xscreenitems/xselect/XSelectItem';
 
 class YHeightLight extends Widget {
@@ -9,9 +9,27 @@ class YHeightLight extends Widget {
   constructor(table) {
     super(`${cssPrefix}-table-y-height-light`);
     this.table = table;
-    this.height = -1;
     this.top = -1;
+    this.height = -1;
     this.setSize();
+    this.tableScroll = () => {
+      this.offsetHandle();
+    };
+    this.tableFixedChange = () => {
+      this.offsetHandle();
+    };
+    this.tableSelectChange = () => {
+      this.offsetHandle();
+    };
+    this.tableResizeChange = () => {
+      this.offsetHandle();
+    };
+    this.tableWidthChange = () => {
+      this.offsetHandle();
+    };
+    this.tableHeightChange = () => {
+      this.offsetHandle();
+    };
   }
 
   onAttach() {
@@ -19,31 +37,36 @@ class YHeightLight extends Widget {
     this.hide();
   }
 
-  unbind() {
-    const { table } = this;
-    XEvent.unbind(table);
-  }
-
   bind() {
     const { table } = this;
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, () => {
-      this.offsetHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, () => {
-      this.offsetHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SELECT_CHANGE, () => {
-      this.offsetHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, () => {
-      this.offsetHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, () => {
-      this.offsetHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
-      this.offsetHandle();
-    });
+    const { tableScroll } = this;
+    const { tableFixedChange } = this;
+    const { tableSelectChange } = this;
+    const { tableResizeChange } = this;
+    const { tableWidthChange } = this;
+    const { tableHeightChange } = this;
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableScroll);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, tableFixedChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SELECT_CHANGE, tableSelectChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, tableResizeChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableWidthChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableHeightChange);
+  }
+
+  unbind() {
+    const { table } = this;
+    const { tableScroll } = this;
+    const { tableFixedChange } = this;
+    const { tableSelectChange } = this;
+    const { tableResizeChange } = this;
+    const { tableWidthChange } = this;
+    const { tableHeightChange } = this;
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableScroll);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, tableFixedChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.SELECT_CHANGE, tableSelectChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, tableResizeChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableWidthChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableHeightChange);
   }
 
   offsetHandle() {

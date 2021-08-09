@@ -1,9 +1,9 @@
 /* global Image console */
-import { PlainUtils } from '../../../utils/PlainUtils';
-import { XDraw } from '../../../canvas/XDraw';
-import { Rect } from '../../../canvas/Rect';
+import { SheetUtils } from '../../../utils/SheetUtils';
+import { XDraw } from '../../../draw/XDraw';
+import { Rect } from '../../../draw/Rect';
 import { XIconOffset } from './XIconOffset';
-import { Crop } from '../../../canvas/Crop';
+import { Crop } from '../../../draw/Crop';
 
 /**
  * XIcon
@@ -47,8 +47,8 @@ class XIcon {
     vertical = XIcon.ICON_VERTICAL.CENTER,
     horizontal = XIcon.ICON_HORIZONTAL.RIGHT,
     type = XIcon.ICON_TYPE.image,
-    image = PlainUtils.Nul,
-    focus = null,
+    image = SheetUtils.Nul,
+    iconFocus = null,
     height = 16,
     width = 16,
     color = 'rgb(255,255,255)',
@@ -66,7 +66,7 @@ class XIcon {
     this.type = type;
     this.image = image;
     this.color = color;
-    this.focus = focus;
+    this.iconFocus = iconFocus;
     this.offset = new XIconOffset(offset);
     this.onLeave = onLeave;
     this.onMove = onMove;
@@ -243,15 +243,15 @@ class XIcon {
   eventHandle({
     type, x, y, native,
   }) {
-    const { rect, focus } = this;
+    const { rect, iconFocus } = this;
     if (rect) {
       const position = this.position(rect);
       const location = position.inRectPosition(rect);
-      const { activate } = focus;
+      const { activate } = iconFocus;
       switch (type) {
         case XIcon.ICON_EVENT_TYPE.MOUSE_DOWN:
           if (location.includePoint(x, y)) {
-            focus.setActivate(this);
+            iconFocus.setActivate(this);
             this.onDown({
               native, position,
             });
@@ -264,12 +264,12 @@ class XIcon {
                 native, position,
               });
             }
-            focus.setActivate(this);
+            iconFocus.setActivate(this);
             this.onMove({
               native, position,
             });
           } else if (activate) {
-            focus.setActivate(null);
+            iconFocus.setActivate(null);
             this.onLeave({
               native, position,
             });
@@ -321,10 +321,10 @@ class XIcon {
 
   /**
    * 设置焦点元素
-   * @param focus
+   * @param iconFocus
    */
-  setFocus(focus) {
-    this.focus = focus;
+  setFocus(iconFocus) {
+    this.iconFocus = iconFocus;
   }
 
 }

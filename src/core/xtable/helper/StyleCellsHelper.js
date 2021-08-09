@@ -1,6 +1,6 @@
 import { BaseCellsHelper } from './BaseCellsHelper';
-import { Rect } from '../../../canvas/Rect';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { Rect } from '../../../draw/Rect';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 const STYLE_BREAK_LOOP = {
   CONTINUE: 3,
@@ -87,7 +87,7 @@ class StyleCellsHelper extends BaseCellsHelper {
               loopINCallback(row, col, rect);
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,
@@ -138,7 +138,7 @@ class StyleCellsHelper extends BaseCellsHelper {
               loopINCallback(row, col, rect);
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,
@@ -190,7 +190,7 @@ class StyleCellsHelper extends BaseCellsHelper {
               loopINCallback(row, col, rect);
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,
@@ -240,7 +240,7 @@ class StyleCellsHelper extends BaseCellsHelper {
               loopINCallback(row, col, rect);
               if (merge) {
                 const find = filter.find(i => i === merge);
-                if (PlainUtils.isUnDef(find)) {
+                if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
                     view, merge,

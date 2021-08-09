@@ -1,9 +1,9 @@
 /* global document */
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { Widget } from '../../../libs/Widget';
-import { h } from '../../../libs/Element';
-import { XEvent } from '../../../libs/XEvent';
-import { XTableMousePointer } from '../XTableMousePointer';
+import { Widget } from '../../../lib/Widget';
+import { h } from '../../../lib/Element';
+import { XEvent } from '../../../lib/XEvent';
+import { XTableMousePoint } from '../XTableMousePoint';
 
 class RowFixed extends Widget {
 
@@ -17,29 +17,36 @@ class RowFixed extends Widget {
     this.fxEri = fixedView.eri;
     this.block = block;
     this.children(this.block);
+    this.tableWidthChange = () => {
+      this.setSize();
+    };
+    this.tableHeightChange = () => {
+      this.setSize();
+    };
   }
 
-  unbind() {
+  onAttach() {
     const { table } = this;
-    XEvent.unbind(table);
+    // 初始化固定条大小
+    this.setSize();
+    // 绑定处理函数
+    this.bind();
+    // 注册焦点元素
+    table.widgetFocus.register({ target: this, stop: false });
   }
 
   bind() {
-    const { table } = this;
-    const {
-      mousePointer, dropRowFixed, xFixedView,
-    } = table;
+    let { table } = this;
+    let { tableWidthChange } = this;
+    let { tableHeightChange } = this;
+    let { xFixedView } = table;
+    let { mousePointer } = table;
+    let { dropRowFixed } = table;
     let moveOff = true;
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
-      this.setSize();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
-      this.setSize();
-    });
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_MOVE, () => {
       this.setActive(true);
       mousePointer.lock(RowFixed);
-      mousePointer.set(XTableMousePointer.KEYS.grab, RowFixed);
+      mousePointer.set(XTableMousePoint.KEYS.grab, RowFixed);
     });
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, () => {
       if (!moveOff) {
@@ -59,7 +66,7 @@ class RowFixed extends Widget {
       this.fxEri = fixedView.eri;
       // 锁定鼠标指针
       mousePointer.lock(RowFixed);
-      mousePointer.set(XTableMousePointer.KEYS.grab, RowFixed);
+      mousePointer.set(XTableMousePoint.KEYS.grab, RowFixed);
       // 推拽条移动位置
       const { y } = table.eventXy(e, table);
       dropRowFixed.offset({ top: y });
@@ -91,26 +98,17 @@ class RowFixed extends Widget {
         moveOff = true;
       });
     });
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableWidthChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableHeightChange);
   }
 
-  setActive(status) {
-    if (status) {
-      this.addClass('active');
-      this.block.addClass('active');
-    } else {
-      this.removeClass('active');
-      this.block.removeClass('active');
-    }
-  }
-
-  onAttach() {
+  unbind() {
     const { table } = this;
-    // 初始化固定条大小
-    this.setSize();
-    // 绑定处理函数
-    this.bind();
-    // 注册焦点元素
-    table.focus.register({ target: this, stop: false });
+    let { tableWidthChange } = this;
+    let { tableHeightChange } = this;
+    XEvent.unbind(this);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableWidthChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableHeightChange);
   }
 
   setSize() {
@@ -127,6 +125,16 @@ class RowFixed extends Widget {
     this.offset({
       height, width, left: 0, top,
     });
+  }
+
+  setActive(status) {
+    if (status) {
+      this.addClass('active');
+      this.block.addClass('active');
+    } else {
+      this.removeClass('active');
+      this.block.removeClass('active');
+    }
   }
 
   destroy() {

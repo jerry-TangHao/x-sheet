@@ -1,6 +1,6 @@
 import { ELContextMenuItem } from '../../contextmenu/ELContextMenuItem';
 import { cssPrefix } from '../../../const/Constant';
-import { h } from '../../../libs/Element';
+import { h } from '../../../lib/Element';
 
 class SelectContextMenuItem extends ELContextMenuItem {
 

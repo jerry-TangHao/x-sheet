@@ -1,17 +1,17 @@
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 import { LineIteratorFilter } from './LineIteratorFilter';
 
 class LineIteratorItem {
 
   constructor({
-    newRow = PlainUtils.noop,
-    endRow = PlainUtils.noop,
-    jump = PlainUtils.noop,
-    exec = PlainUtils.noop,
+    newRow = SheetUtils.noop,
+    endRow = SheetUtils.noop,
+    jump = SheetUtils.noop,
+    exec = SheetUtils.noop,
     filter = LineIteratorFilter.EMPTY,
-    newCol = PlainUtils.noop,
-    endCol = PlainUtils.noop,
-    complete = PlainUtils.noop,
+    newCol = SheetUtils.noop,
+    endCol = SheetUtils.noop,
+    complete = SheetUtils.noop,
   } = {}) {
     this.newRow = newRow;
     this.endRow = endRow;

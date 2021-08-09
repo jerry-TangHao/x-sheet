@@ -4,16 +4,16 @@ import { OrderAZ } from './OrderAZ';
 import { OrderZA } from './OrderZA';
 import { IFFilter } from './IFFilter';
 import { ValueFilter } from './valuefilter/ValueFilter';
-import { h } from '../../libs/Element';
+import { h } from '../../lib/Element';
 import { ELContextMenuDivider } from '../contextmenu/ELContextMenuDivider';
-import { XEvent } from '../../libs/XEvent';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { XEvent } from '../../lib/XEvent';
+import { SheetUtils } from '../../utils/SheetUtils';
 import { ElPopUp } from '../elpopup/ElPopUp';
 
 class FilterData extends ELContextMenu {
 
   constructor(options) {
-    super(`${cssPrefix}-filter-data-menu`, PlainUtils.copy({
+    super(`${cssPrefix}-filter-data-menu`, SheetUtils.copy({
       ok: () => {},
       no: () => {},
     }, options));

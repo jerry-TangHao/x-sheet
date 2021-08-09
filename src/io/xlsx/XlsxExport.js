@@ -1,12 +1,12 @@
 /* global Blob */
 import { Workbook } from 'exceljs';
-import { XDraw } from '../../canvas/XDraw';
+import { XDraw } from '../../draw/XDraw';
 import { ColorPicker } from '../../module/colorpicker/ColorPicker';
-import { BaseFont } from '../../canvas/font/BaseFont';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { BaseFont } from '../../draw/font/BaseFont';
+import { SheetUtils } from '../../utils/SheetUtils';
 import { Cell } from '../../core/xtable/tablecell/Cell';
-import { LINE_TYPE } from '../../canvas/Line';
-import { SelectFile } from '../../libs/SelectFile';
+import { LINE_TYPE } from '../../draw/Line';
+import { SelectFile } from '../../lib/SelectFile';
 import { HeightUnit } from '../../core/xtable/tableunit/HeightUnit';
 import { WideUnit } from '../../core/xtable/tableunit/WideUnit';
 import { XMerges } from '../../core/xtable/xmerges/XMerges';
@@ -117,7 +117,6 @@ class XlsxExport {
               const element = item.shift();
               const cell = element.getCell();
               if (cell) {
-                debugger;
                 const { contentType, background } = cell;
                 const { text, fontAttr, borderAttr } = cell;
                 const { top, right, left, bottom } = borderAttr;
@@ -125,10 +124,10 @@ class XlsxExport {
                 // 单元格文本
                 if (text) {
                   switch (contentType) {
-                    case Cell.CONTENT_TYPE.NUMBER:
-                      workCell.value = PlainUtils.parseFloat(text);
+                    case Cell.TYPE.NUMBER:
+                      workCell.value = SheetUtils.parseFloat(text);
                       break;
-                    case Cell.CONTENT_TYPE.STRING:
+                    case Cell.TYPE.STRING:
                       workCell.value = text;
                       break;
                   }

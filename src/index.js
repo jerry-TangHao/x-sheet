@@ -1,24 +1,24 @@
 /* global window, document */
 import { Constant, cssPrefix, XSheetVersion } from './const/Constant';
 import { XWork } from './core/xwork/XWork';
-import { Widget } from './libs/Widget';
-import { XDraw } from './canvas/XDraw';
-import { h } from './libs/Element';
+import { Widget } from './lib/Widget';
+import { XDraw } from './draw/XDraw';
+import { h } from './lib/Element';
 import { DragPanel } from './module/dragpanel/DragPanel';
 import { ElPopUp } from './module/elpopup/ElPopUp';
-import { PlainUtils } from './utils/PlainUtils';
+import { SheetUtils } from './utils/SheetUtils';
 import { RectRange } from './core/xtable/tablebase/RectRange';
-import { BaseFont } from './canvas/font/BaseFont';
+import { BaseFont } from './draw/font/BaseFont';
 import { XIcon } from './core/xtable/xicon/XIcon';
 import { XlsxExport } from './io/xlsx/XlsxExport';
 import { ColorPicker } from './module/colorpicker/ColorPicker';
-import FindDpi from './libs/finddpi/FindDpi';
+import FindDpi from './lib/finddpi/FindDpi';
 import { HeightUnit } from './core/xtable/tableunit/HeightUnit';
 import { WideUnit } from './core/xtable/tableunit/WideUnit';
-import './styles/base.less';
-import './styles/index.less';
-import { XTableFocus } from './core/xtable/XTableFocus';
-import { XEvent } from './libs/XEvent';
+import './style/base.less';
+import './style/index.less';
+import { XTableWidgetFocus } from './core/xtable/XTableWidgetFocus';
+import { XEvent } from './lib/XEvent';
 import { XlsxImport } from './io/xlsx/XlsxImport';
 
 const settings = {
@@ -33,9 +33,15 @@ const settings = {
       },
     },
     body: {
+      tabConfig: {
+        showMenu: true,
+      },
       sheets: [{
         tableConfig: {},
       }],
+      sheetConfig: {
+        showMenu: true,
+      },
     },
     bottom: {
       show: true,
@@ -55,23 +61,23 @@ class XSheet extends Widget {
    */
   constructor(selectors, options) {
     super(`${cssPrefix}`);
+    ElPopUp.setRoot(this);
+    DragPanel.setRoot(this);
+    XTableWidgetFocus.setRoot(this);
     let root = selectors;
     if (typeof selectors === 'string') {
       root = document.querySelector(selectors);
     }
     root = h(root);
     root.children(this);
-    this.options = PlainUtils.copy({}, settings, options);
+    this.options = SheetUtils.copy({}, settings, options);
     this.work = new XWork(this.options.workConfig);
     this.attach(this.work);
-    ElPopUp.setRoot(this);
-    DragPanel.setRoot(this);
-    XTableFocus.setRoot(this);
   }
 }
 
 XSheet.version = XSheetVersion;
-XSheet.PlainUtils = PlainUtils;
+XSheet.PlainUtils = SheetUtils;
 XSheet.XDraw = XDraw;
 XSheet.XIcon = XIcon;
 XSheet.RectRange = RectRange;

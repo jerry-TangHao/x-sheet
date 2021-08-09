@@ -1,10 +1,10 @@
 import { ELContextMenuItem } from '../../contextmenu/ELContextMenuItem';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { h } from '../../../libs/Element';
+import { h } from '../../../lib/Element';
 import { SearchInput } from '../../form/input/SearchInput';
-import { w } from '../../../libs/Widget';
-import { XEvent } from '../../../libs/XEvent';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { w } from '../../../lib/Widget';
+import { XEvent } from '../../../lib/XEvent';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 /**
  * ValueFilter
@@ -20,7 +20,7 @@ class ValueFilter extends ELContextMenuItem {
     this.items = [];
     this.filters = [];
     this.status = true;
-    this.value = PlainUtils.EMPTY;
+    this.value = SheetUtils.EMPTY;
     // 值过滤标题
     this.titleEle = h('div', `${cssPrefix}-value-filter-title`);
     this.titleTextEle = h('span', `${cssPrefix}-value-filter-title-text`);
@@ -98,7 +98,7 @@ class ValueFilter extends ELContextMenuItem {
     XEvent.bind(searchInput, Constant.FORM_EVENT_TYPE.SEARCH_INPUT_CHANGE, (e) => {
       const { detail } = e;
       const { value } = detail;
-      if (!PlainUtils.isBlank(value)) {
+      if (!SheetUtils.isBlank(value)) {
         this.filterExp = new RegExp(`.?${value}.?`);
       } else {
         this.filterExp = null;
@@ -151,8 +151,8 @@ class ValueFilter extends ELContextMenuItem {
    */
   setValue(value) {
     const { searchInput } = this;
-    if (PlainUtils.isBlank(value)) {
-      value = PlainUtils.EMPTY;
+    if (SheetUtils.isBlank(value)) {
+      value = SheetUtils.EMPTY;
     }
     searchInput.setValue(value);
   }

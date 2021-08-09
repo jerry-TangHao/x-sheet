@@ -1,6 +1,6 @@
-import { Widget } from '../../../../libs/Widget';
+import { Widget } from '../../../../lib/Widget';
 import { cssPrefix } from '../../../../const/Constant';
-import { h } from '../../../../libs/Element';
+import { h } from '../../../../lib/Element';
 
 class DropRowFixed extends Widget {
 

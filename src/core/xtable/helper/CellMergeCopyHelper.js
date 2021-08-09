@@ -1,6 +1,6 @@
 import { RectRange } from '../tablebase/RectRange';
 import { BaseCellsHelper } from './BaseCellsHelper';
-import { PlainUtils } from '../../../utils/PlainUtils';
+import { SheetUtils } from '../../../utils/SheetUtils';
 
 class CopyMerge {
 
@@ -237,14 +237,14 @@ class Serialize {
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((ri) => {
-        let start = PlainUtils.Nul;
+        let start = SheetUtils.Nul;
         this.xIteratorBuilder.getColIterator()
           .setBegin(sci)
           .setEnd(eci)
           .setLoop((ci) => {
-            if (start === PlainUtils.Nul) {
+            if (start === SheetUtils.Nul) {
               const index = getStartIndex(ri, ci);
-              if (!PlainUtils.isNumber(index)) {
+              if (!SheetUtils.isNumber(index)) {
                 ret = false;
               } else {
                 start = parseInt(index, 10);
@@ -269,14 +269,14 @@ class Serialize {
       .setBegin(sci)
       .setEnd(eci)
       .setLoop((ci) => {
-        let start = PlainUtils.Nul;
+        let start = SheetUtils.Nul;
         this.xIteratorBuilder.getRowIterator()
           .setBegin(sri)
           .setEnd(eri)
           .setLoop((ri) => {
-            if (start === PlainUtils.Nul) {
+            if (start === SheetUtils.Nul) {
               const index = getStartIndex(ri, ci);
-              if (!PlainUtils.isNumber(index)) {
+              if (!SheetUtils.isNumber(index)) {
                 ret = false;
               } else {
                 start = parseInt(index, 10);
@@ -301,14 +301,14 @@ class Serialize {
       .setBegin(sci)
       .setEnd(eci)
       .setLoop((ci) => {
-        let start = PlainUtils.Nul;
+        let start = SheetUtils.Nul;
         this.xIteratorBuilder.getRowIterator()
           .setBegin(eri)
           .setEnd(sri)
           .setLoop((ri) => {
-            if (start === PlainUtils.Nul) {
+            if (start === SheetUtils.Nul) {
               const index = getStartIndex(ri, ci);
-              if (!PlainUtils.isNumber(index)) {
+              if (!SheetUtils.isNumber(index)) {
                 ret = false;
               } else {
                 start = parseInt(index, 10);
@@ -333,14 +333,14 @@ class Serialize {
       .setBegin(sri)
       .setEnd(eri)
       .setLoop((ri) => {
-        let start = PlainUtils.Nul;
+        let start = SheetUtils.Nul;
         this.xIteratorBuilder.getColIterator()
           .setBegin(eci)
           .setEnd(sci)
           .setLoop((ci) => {
-            if (start === PlainUtils.Nul) {
+            if (start === SheetUtils.Nul) {
               const index = getStartIndex(ri, ci);
-              if (!PlainUtils.isNumber(index)) {
+              if (!SheetUtils.isNumber(index)) {
                 ret = false;
               } else {
                 start = parseInt(index, 10);
@@ -512,7 +512,7 @@ class CellMergeCopyHelper extends BaseCellsHelper {
         if (cell) {
           return cell.text;
         }
-        return PlainUtils.Nul;
+        return SheetUtils.Nul;
       },
       onSerialize: (ri, ci, index) => {
         const cell = cells.getCellOrNew(ri, ci);

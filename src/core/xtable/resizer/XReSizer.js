@@ -1,10 +1,10 @@
 /* global document */
-import { Widget } from '../../../libs/Widget';
+import { Widget } from '../../../lib/Widget';
 import { cssPrefix, Constant } from '../../../const/Constant';
-import { h } from '../../../libs/Element';
-import { XEvent } from '../../../libs/XEvent';
-import { PlainUtils } from '../../../utils/PlainUtils';
-import { XTableMousePointer } from '../XTableMousePointer';
+import { h } from '../../../lib/Element';
+import { XEvent } from '../../../lib/XEvent';
+import { SheetUtils } from '../../../utils/SheetUtils';
+import { XTableMousePoint } from '../XTableMousePoint';
 import { ColFixed } from '../tablefixed/ColFixed';
 
 class XReSizer extends Widget {
@@ -20,30 +20,70 @@ class XReSizer extends Widget {
       this.hoverEl,
       this.lineEl,
     ]);
+    this.tableMove = XEvent.WrapFuncion.mouseClick((event) => {
+      let { table } = this;
+      let { xFixedView } = table;
+      let { cols, index } = table;
+      let { left, ci } = this.getEventLeft(event);
+      let min = left - cols.getWidth(ci) + cols.min;
+      let visualWidth = table.visualWidth();
+      let fixedView = xFixedView.getFixedView();
+      if (left > visualWidth) {
+        left = visualWidth;
+      }
+      if (left === -1 || min > visualWidth || ci === -1) {
+        this.hide();
+      } else {
+        this.show();
+        if (ci === fixedView.eci) {
+          this.css('left', `${left - this.width - ColFixed.WIDTH / 2}px`);
+        } else {
+          this.css('left', `${left - this.width}px`);
+        }
+        this.hoverEl.css('width', `${this.width}px`);
+        this.hoverEl.css('height', `${index.getHeight()}px`);
+      }
+    });
+    this.tableDown = XEvent.WrapFuncion.mouseClick(() => {
+      const { table } = this;
+      const { widgetFocus } = table;
+      const { activate } = widgetFocus;
+      const { target } = activate;
+      if (target !== table && target !== this) {
+        this.hide();
+      }
+    });
+    this.tableLeave = XEvent.WrapFuncion.mouseClick(() => {
+      this.hide();
+    });
   }
 
   onAttach() {
     this.bind();
-    this.table.focus.register({ target: this });
+    this.table.widgetFocus.register({ target: this });
   }
 
   bind() {
     const { table } = this;
-    const {
-      scale, cols, mousePointer, focus, xFixedView,
-    } = table;
+    const { tableDown } = this;
+    const { tableMove } = this;
+    const { tableLeave } = this;
+    const { mousePointer } = table;
     const { snapshot } = table;
-    const { index } = table;
-    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+    const { scale, cols } = table;
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, tableDown);
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_MOVE, tableMove);
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, tableLeave);
+    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (event) => {
       mousePointer.lock(XReSizer);
-      mousePointer.set(XTableMousePointer.KEYS.colResize, XReSizer);
-      const { left, ci } = this.getEventLeft(e);
+      mousePointer.set(XTableMousePoint.KEYS.colResize, XReSizer);
+      const { left, ci } = this.getEventLeft(event);
       const min = left - cols.getWidth(ci) + cols.min;
-      let { x: mx } = table.eventXy(e);
+      let { x: mx } = table.eventXy(event);
       XEvent.mouseMoveUp(document, (e) => {
         ({ x: mx } = table.eventXy(e));
         mx -= this.width / 2;
-        mx = Math.ceil(PlainUtils.minIf(mx, min));
+        mx = Math.ceil(SheetUtils.minIf(mx, min));
         this.css('left', `${mx}px`);
         this.lineEl.css('height', `${table.visualHeight()}px`);
         this.lineEl.show();
@@ -63,50 +103,24 @@ class XReSizer extends Widget {
         });
       });
     });
-    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, () => {
-      mousePointer.free(XReSizer);
-    });
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_MOVE, () => {
       mousePointer.lock(XReSizer);
-      mousePointer.set(XTableMousePointer.KEYS.colResize, XReSizer);
+      mousePointer.set(XTableMousePoint.KEYS.colResize, XReSizer);
     });
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, () => {
-      const { activate } = focus;
-      const { target } = activate;
-      if (target !== table && target !== this) {
-        this.hide();
-      }
-    });
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_MOVE, (e) => {
-      // eslint-disable-next-line prefer-const
-      let { left, ci } = this.getEventLeft(e);
-      const min = left - cols.getWidth(ci) + cols.min;
-      const visualWidth = table.visualWidth();
-      const fixedView = xFixedView.getFixedView();
-      if (left > visualWidth) {
-        left = visualWidth;
-      }
-      if (left === -1 || min > visualWidth || ci === -1) {
-        this.hide();
-      } else {
-        this.show();
-        if (ci === fixedView.eci) {
-          this.css('left', `${left - this.width - ColFixed.WIDTH / 2}px`);
-        } else {
-          this.css('left', `${left - this.width}px`);
-        }
-        this.hoverEl.css('width', `${this.width}px`);
-        this.hoverEl.css('height', `${index.getHeight()}px`);
-      }
-    });
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, () => {
-      this.hide();
+    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, () => {
+      mousePointer.free(XReSizer);
     });
   }
 
   unbind() {
     const { table } = this;
-    XEvent.unbind(table);
+    const { tableDown } = this;
+    const { tableMove } = this;
+    const { tableLeave } = this;
+    XEvent.unbind(this);
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, tableDown);
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_MOVE, tableMove);
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_LEAVE, tableLeave);
   }
 
   getEventLeft(event) {

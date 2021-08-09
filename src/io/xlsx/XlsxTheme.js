@@ -3,8 +3,8 @@
  */
 import * as tXml from 'txml';
 import { ColorPicker } from '../../module/colorpicker/ColorPicker';
-import { XDraw } from '../../canvas/XDraw';
-import { PlainUtils } from '../../utils/PlainUtils';
+import { XDraw } from '../../draw/XDraw';
+import { SheetUtils } from '../../utils/SheetUtils';
 import { ColorArray } from '../../module/colorpicker/colorarray/ColorArray';
 
 function HexRgb(argb) {
@@ -134,7 +134,7 @@ class Theme {
       return this.cacheTheme[key];
     }
     const hex = this.colorPallate[this.theme];
-    if (PlainUtils.isUnDef(hex)) {
+    if (SheetUtils.isUnDef(hex)) {
       return ColorArray.BLACK;
     }
     const rgb = ColorPicker.hexToRgb(hex);

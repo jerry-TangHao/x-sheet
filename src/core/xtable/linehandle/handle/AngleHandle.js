@@ -16,8 +16,8 @@ import { RBorderRequire } from '../filter/borderrequire/RBorderRequire';
 import { LAngleBarRequire } from '../filter/anglebarrequire/LAngleBarRequire';
 import { LBorderRequire } from '../filter/borderrequire/LBorderRequire';
 import { OAngleBarRequire } from '../filter/anglebarrequire/OAngleBarRequire';
-import { Rect } from '../../../../canvas/Rect';
-import { Sdist } from '../../../../canvas/Sdist';
+import { Rect } from '../../../../draw/Rect';
+import { Sdist } from '../../../../draw/Sdist';
 
 class AngleHandle {
 

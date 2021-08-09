@@ -1,10 +1,10 @@
 /* global document */
 import { XScreenCssBorderItem } from '../../xscreen/item/viewborder/XScreenCssBorderItem';
-import { XEvent } from '../../../../libs/XEvent';
+import { XEvent } from '../../../../lib/XEvent';
 import { Constant, cssPrefix } from '../../../../const/Constant';
 import { RectRange } from '../../tablebase/RectRange';
-import { Widget } from '../../../../libs/Widget';
-import { XTableMousePointer } from '../../XTableMousePointer';
+import { Widget } from '../../../../lib/Widget';
+import { XTableMousePoint } from '../../XTableMousePoint';
 import { RANGE_OVER_GO } from '../../xscreen/item/viewborder/XScreenStyleBorderItem';
 import { XSelectPath } from './XSelectPath';
 
@@ -69,6 +69,83 @@ class XSelectItem extends XScreenCssBorderItem {
     this.bbr.after(this.brCorner);
     // 设置边框类型
     this.setBorderType('solid');
+    // 事件类型处理
+    this.tableMouseScroll = () => {
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+    };
+    this.tableMouseDown = (e1) => {
+      const { table } = this;
+      const { mousePointer, widgetFocus } = table;
+      if (e1.button !== 0) {
+        return;
+      }
+      const { activate } = widgetFocus;
+      const { target } = activate;
+      if (target !== table) {
+        return;
+      }
+      const { x, y } = table.eventXy(e1);
+      this.downHandle(x, y);
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+      const { selectLocal } = this;
+      switch (selectLocal) {
+        case SELECT_LOCAL.L:
+          mousePointer.lock(XSelectItem);
+          mousePointer.set(XTableMousePoint.KEYS.eResize, XSelectItem);
+          break;
+        case SELECT_LOCAL.T:
+          mousePointer.lock(XSelectItem);
+          mousePointer.set(XTableMousePoint.KEYS.sResize, XSelectItem);
+          break;
+      }
+      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_DOWN);
+      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE);
+      XEvent.mouseMoveUp(document, (e2) => {
+        const { x, y } = table.eventXy(e2);
+        this.moveHandle(x, y);
+        this.offsetHandle();
+        this.borderHandle();
+        this.cornerHandle();
+        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE);
+      }, () => {
+        switch (selectLocal) {
+          case SELECT_LOCAL.L:
+          case SELECT_LOCAL.T:
+            mousePointer.free(XSelectItem);
+            break;
+        }
+        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_OVER);
+      });
+    };
+    this.tableChangeHeight = () => {
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+    };
+    this.tableChangeWidth = () => {
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+    };
+    this.tableScaleChange = () => {
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+    };
+    this.tableFixedChange = () => {
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+    };
+    this.tableResizeChange = () => {
+      this.offsetHandle();
+      this.borderHandle();
+      this.cornerHandle();
+    };
   }
 
   /**
@@ -165,10 +242,10 @@ class XSelectItem extends XScreenCssBorderItem {
     const { table } = this;
     this.bind();
     this.hide();
-    table.focus.register({ target: this.ltCorner });
-    table.focus.register({ target: this.lCorner });
-    table.focus.register({ target: this.tCorner });
-    table.focus.register({ target: this.brCorner });
+    table.widgetFocus.register({ target: this.ltCorner });
+    table.widgetFocus.register({ target: this.lCorner });
+    table.widgetFocus.register({ target: this.tCorner });
+    table.widgetFocus.register({ target: this.brCorner });
   }
 
   /**
@@ -176,7 +253,20 @@ class XSelectItem extends XScreenCssBorderItem {
    */
   unbind() {
     const { table } = this;
-    XEvent.unbind(table);
+    const { tableMouseScroll } = this;
+    const { tableMouseDown } = this;
+    const { tableChangeHeight } = this;
+    const { tableChangeWidth } = this;
+    const { tableScaleChange } = this;
+    const { tableFixedChange } = this;
+    const { tableResizeChange } = this;
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, tableMouseDown);
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableMouseScroll);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, tableResizeChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, tableScaleChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, tableFixedChange);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableChangeHeight);
+    XEvent.unbind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableChangeWidth);
   }
 
   /**
@@ -184,81 +274,20 @@ class XSelectItem extends XScreenCssBorderItem {
    */
   bind() {
     const { table } = this;
-    const { mousePointer, focus } = table;
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, () => {
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, () => {
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, () => {
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-    });
-    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, () => {
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-    });
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e1) => {
-      if (e1.button !== 0) {
-        return;
-      }
-      const { activate } = focus;
-      const { target } = activate;
-      if (target !== table) {
-        return;
-      }
-      const { x, y } = table.eventXy(e1);
-      this.downHandle(x, y);
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-      const { selectLocal } = this;
-      switch (selectLocal) {
-        case SELECT_LOCAL.L:
-          mousePointer.lock(XSelectItem);
-          mousePointer.set(XTableMousePointer.KEYS.eResize, XSelectItem);
-          break;
-        case SELECT_LOCAL.T:
-          mousePointer.lock(XSelectItem);
-          mousePointer.set(XTableMousePointer.KEYS.sResize, XSelectItem);
-          break;
-      }
-      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_DOWN);
-      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE);
-      XEvent.mouseMoveUp(document, (e2) => {
-        const { x, y } = table.eventXy(e2);
-        this.moveHandle(x, y);
-        this.offsetHandle();
-        this.borderHandle();
-        this.cornerHandle();
-        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE);
-      }, () => {
-        switch (selectLocal) {
-          case SELECT_LOCAL.L:
-          case SELECT_LOCAL.T:
-            mousePointer.free(XSelectItem);
-            break;
-        }
-        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_OVER);
-      });
-    });
-    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, () => {
-      this.offsetHandle();
-      this.borderHandle();
-      this.cornerHandle();
-    });
+    const { tableMouseScroll } = this;
+    const { tableMouseDown } = this;
+    const { tableChangeHeight } = this;
+    const { tableChangeWidth } = this;
+    const { tableScaleChange } = this;
+    const { tableFixedChange } = this;
+    const { tableResizeChange } = this;
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, tableMouseDown);
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableMouseScroll);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.RESIZE_CHANGE, tableResizeChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, tableScaleChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, tableFixedChange);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, tableChangeHeight);
+    XEvent.bind(table, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, tableChangeWidth);
   }
 
   /**
