@@ -211,8 +211,8 @@ class RichEdit extends StyleEdit {
     });
     if (!rich.equals(activeCell.rich)) {
       snapshot.open();
-      cloneCell.setContentType(Cell.TYPE.RICH_TEXT);
       cloneCell.setRichText(collect);
+      cloneCell.setContentType(Cell.TYPE.RICH_TEXT);
       cells.setCellOrNew(sri, sci, cloneCell);
       snapshot.close({
         type: Constant.TABLE_EVENT_TYPE.DATA_CHANGE,

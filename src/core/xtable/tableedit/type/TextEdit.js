@@ -3,8 +3,6 @@ import { BaseFont } from '../../../../draw/font/BaseFont';
 import { SheetUtils } from '../../../../utils/SheetUtils';
 import { ExprEdit } from './ExprEdit';
 import { Constant } from '../../../../const/Constant';
-import { Cell } from '../../tablecell/Cell';
-import { DateUtils } from '../../../../utils/DateUtils';
 
 class TextEdit extends ExprEdit {
 
@@ -56,35 +54,8 @@ class TextEdit extends ExprEdit {
     if (text !== activeCell.getFormatText()) {
       const cloneCell = activeCell.clone();
       snapshot.open();
-      switch (contentType) {
-        case Cell.TYPE.NUMBER: {
-          if (SheetUtils.isNumber(text)) {
-            cloneCell.setText(SheetUtils.parseFloat(text));
-          } else {
-            cloneCell.setContentType(Cell.TYPE.STRING);
-            cloneCell.setText(text);
-          }
-          break;
-        }
-        case Cell.TYPE.STRING: {
-          cloneCell.setText(text);
-          break;
-        }
-        case Cell.TYPE.DATE_TIME: {
-          const parse = DateUtils.parse(text);
-          if (SheetUtils.isDate(parse)) {
-            cloneCell.setText(parse);
-          } else {
-            cloneCell.setContentType(Cell.TYPE.STRING);
-            cloneCell.setText(text);
-          }
-          break;
-        }
-        default: {
-          cloneCell.setContentType(Cell.TYPE.STRING);
-          cloneCell.setText(text);
-        }
-      }
+      cloneCell.setText(text);
+      cloneCell.setContentType(contentType);
       cells.setCellOrNew(sri, sci, cloneCell);
       snapshot.close({
         type: Constant.TABLE_EVENT_TYPE.DATA_CHANGE,

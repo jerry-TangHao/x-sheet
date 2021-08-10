@@ -5,6 +5,7 @@ import { XIcon } from '../xicon/XIcon';
 import XTableFormat from '../XTableTextFormat';
 import { RichFonts } from './RichFonts';
 import { Formula } from '../../../formula/Formula';
+import { DateUtils } from '../../../utils/DateUtils';
 
 /**
  * 单元格
@@ -48,8 +49,6 @@ class Cell {
     this.background = background;
     // 单元格图标
     this.icons = XIcon.newInstances(icons);
-    // 内容类型
-    this.contentType = contentType;
     // 自定义属性
     this.custom = custom;
     // 字体测量尺子
@@ -74,6 +73,8 @@ class Cell {
     this.fontAttr = new CellFont(fontAttr);
     // 边框属性
     this.borderAttr = new CellBorder(borderAttr);
+    // 内容类型
+    this.setContentType(contentType);
   }
 
   /**
@@ -82,6 +83,7 @@ class Cell {
    */
   setIcons(icons) {
     this.icons = icons;
+    return this;
   }
 
   /**
@@ -94,6 +96,7 @@ class Cell {
     this.formula.setExpr(null);
     this.richText.setRich([]);
     this.setContentWidth(0);
+    return this;
   }
 
   /**
@@ -105,6 +108,7 @@ class Cell {
     this.formula.setExpr(null);
     this.richText.setRich(rich);
     this.setContentWidth(0);
+    return this;
   }
 
   /**
@@ -116,6 +120,7 @@ class Cell {
     this.formula.setExpr(expr);
     this.richText.setRich([]);
     this.setContentWidth(0);
+    return this;
   }
 
   /**
@@ -129,10 +134,11 @@ class Cell {
    * 设置格式化类型
    * @param format
    */
-  setFormat(format) {
+  setFormat(format = 'default') {
     this.format = format;
     this.formatText = null;
     this.setContentWidth(0);
+    return this;
   }
 
   /**
@@ -141,14 +147,48 @@ class Cell {
    */
   setRuler(ruler) {
     this.ruler = ruler;
+    return this;
   }
 
   /**
    * 设置内容类型
    * @param type
    */
-  setContentType(type = 'default') {
-    this.contentType = type;
+  setContentType(type = Cell.TYPE.STRING) {
+    const { text } = this;
+    switch (type) {
+      case Cell.TYPE.STRING: {
+        this.contentType = Cell.TYPE.STRING;
+        break;
+      }
+      case Cell.TYPE.NUMBER: {
+        this.contentType = type;
+        if (SheetUtils.isNumber(text)) {
+          this.contentType = Cell.TYPE.NUMBER;
+          this.text = SheetUtils.parseFloat(text);
+        } else {
+          this.contentType = Cell.TYPE.STRING;
+          this.text = `${text}`;
+        }
+        break;
+      }
+      case Cell.TYPE.DATE_TIME: {
+        const parse = DateUtils.parse(text);
+        if (SheetUtils.isDate(parse)) {
+          this.contentType = Cell.TYPE.DATE_TIME;
+          this.text = SheetUtils.parseFloat(text);
+        } else {
+          this.contentType = Cell.TYPE.STRING;
+          this.text = `${text}`;
+        }
+        break;
+      }
+      case Cell.TYPE.RICH_TEXT: {
+        this.contentType = Cell.TYPE.RICH_TEXT;
+        break;
+      }
+    }
+    return this;
   }
 
   /**
@@ -244,6 +284,7 @@ class Cell {
    */
   setFontAttr(attr) {
     this.fontAttr = attr;
+    return this;
   }
 
   /**
@@ -252,6 +293,7 @@ class Cell {
    */
   setBorderAttr(attr) {
     this.borderAttr = attr;
+    return this;
   }
 
   /**
@@ -311,6 +353,7 @@ class Cell {
    */
   setContentWidth(width) {
     this.contentWidth = width;
+    return this;
   }
 
   /**
@@ -319,6 +362,7 @@ class Cell {
    */
   setContentHeight(height) {
     this.contentHeight = height;
+    return this;
   }
 
 }
