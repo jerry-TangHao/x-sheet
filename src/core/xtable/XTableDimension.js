@@ -13,33 +13,34 @@ import { XReSizer } from './resizer/XReSizer';
 import { YReSizer } from './resizer/YReSizer';
 import { XHeightLight } from './highlight/XHeightLight';
 import { YHeightLight } from './highlight/YHeightLight';
-import { XTableWidgetFocus } from './XTableWidgetFocus';
 import { XDraw } from '../../draw/XDraw';
 import { RectRange } from './tablebase/RectRange';
 import { XTableScrollView } from './XTableScrollView';
 import { XTableAreaView } from './XTableAreaView';
 import { XTableDrawStyle } from './XTableDrawStyle';
-import { XScreen } from './xscreen/XScreen';
-import { XSelectItem } from './xscreenitems/xselect/XSelectItem';
-import { XAutoFillItem } from './xscreenitems/xautofill/XAutoFillItem';
-import { XCopyStyle } from './xscreenitems/xcopystyle/XCopyStyle';
+import { XScreen } from './screen/XScreen';
+import { XSelectItem } from './screenitems/xselect/XSelectItem';
+import { XAutoFillItem } from './screenitems/xautofill/XAutoFillItem';
+import { XCopyStyle } from './screenitems/xcopystyle/XCopyStyle';
 import { RowFixed } from './tablefixed/RowFixed';
 import { ColFixed } from './tablefixed/ColFixed';
 import { DropRowFixed } from './tablefixed/drop/DropRowFixed';
 import { DropColFixed } from './tablefixed/drop/DropColFixed';
 import { XFixedMeasure } from './tablebase/XFixedMeasure';
 import { XFixedView } from './tablebase/XFixedView';
-import { XFilter } from './xscreenitems/xfilter/XFilter';
-import { CellMergeCopyHelper } from './helper/CellMergeCopyHelper';
+import { XFilter } from './screenitems/xfilter/XFilter';
+import { CellMergeCopyHelper } from './helper/dimension/CellMergeCopyHelper';
 import { Clipboard } from '../../lib/Clipboard';
-import { XIcon } from './xicon/XIcon';
-import { XIconBuilder } from './xicon/XIconBuilder';
+import { XIcon } from './tableicon/XIcon';
+import { XIconBuilder } from './tableicon/XIconBuilder';
 import { BaseFont } from '../../draw/font/BaseFont';
 import { XIteratorBuilder } from './iterator/XIteratorBuilder';
 import { RowHeightGroupIndex } from './tablebase/RowHeightGroupIndex';
 import { Alert } from '../../module/alert/Alert';
 import { Snapshot } from './snapshot/Snapshot';
 import { TableEdit } from './tableedit/TableEdit';
+import { Protection } from './protection/Protection';
+import { DateCellsHelper } from './helper/dimension/DateCellsHelper';
 
 class Dimensions {
 
@@ -127,7 +128,7 @@ class XTableFrozenContent extends Dimensions {
   }
 
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { table } = this;
@@ -191,7 +192,7 @@ class XTableTop extends Dimensions {
   }
 
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { table } = this;
@@ -258,7 +259,7 @@ class XTableLeft extends Dimensions {
   }
 
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { table } = this;
@@ -323,7 +324,7 @@ class XTableLeftIndex extends Dimensions {
   }
 
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { table } = this;
@@ -390,7 +391,7 @@ class XTableContent extends Dimensions {
   }
 
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { table } = this;
@@ -449,7 +450,7 @@ class XTableTopIndex extends Dimensions {
   }
 
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { table } = this;
@@ -503,10 +504,13 @@ const settings = {
     buttonColor: 'rgb(193,193,193)',
   },
   data: [],
+  protection: {
+    protections: [],
+  },
   merge: {
     merges: [],
   },
-  readOnly: false,
+  sheetProtection: false,
 };
 
 /**
@@ -520,11 +524,16 @@ class XTableDimension extends Widget {
    */
   constructor(options) {
     super(`${cssPrefix}-table`);
-    // 表格设置
     this.settings = SheetUtils.copy({}, settings, options);
-    // 视口区域大小
-    this.visualHeightCache = null;
-    this.visualWidthCache = null;
+  }
+
+  /**
+   * onAttach
+   */
+  onAttach() {
+    this.rootWidget = this.getRootWidget();
+    // 焦点元素管理
+    this.focusManage = this.rootWidget.focusManage;
     // 图标创建器
     this.xIconBuilder = new XIconBuilder();
     // 行列迭代器
@@ -555,6 +564,11 @@ class XTableDimension extends Widget {
       ...this.settings.rows,
     });
     this.scale = new Scale();
+    // 保护区域
+    this.protection = new Protection({
+      snapshot: this.snapshot,
+      ...settings.protection,
+    });
     // 冻结视图坐标
     this.xFixedView = new XFixedView(this.settings.xFixedView);
     this.xFixedMeasure = new XFixedMeasure({
@@ -591,6 +605,8 @@ class XTableDimension extends Widget {
       settings: this.settings,
       xFixedView: this.xFixedView,
     });
+    // 数据操作帮助类
+    this.dateCellsHelper = new DateCellsHelper(this);
     // table区域
     this.xTableFrozenContent = new XTableFrozenContent(this);
     this.xLeftIndex = new XTableLeftIndex(this);
@@ -599,7 +615,9 @@ class XTableDimension extends Widget {
     this.xTop = new XTableTop(this);
     this.xContent = new XTableContent(this);
     // table组件
-    this.widgetFocus = XTableWidgetFocus.getInstance();
+    this.readOnlyAlert = new Alert({
+      closeDestroy: false,
+    }).parentWidget(this);
     this.keyboard = new XTableKeyboard(this);
     this.mousePointer = new XTableMousePoint(this);
     this.xScreen = new XScreen(this);
@@ -612,9 +630,6 @@ class XTableDimension extends Widget {
     this.colFixed = new ColFixed(this);
     this.dropColFixed = new DropColFixed(this);
     this.dropRowFixed = new DropRowFixed(this);
-    this.readOnlyAlert = new Alert({
-      closeDestroy: false,
-    });
     // 粘贴板
     this.clipboard = new Clipboard({
       filter: () => {},
@@ -630,23 +645,29 @@ class XTableDimension extends Widget {
     });
     // 数据变更监听
     this.snapshot.listen.registerListen('change', (event) => {
+      this.cols.syncColsLen(this.xTableStyle.cols);
+      this.rows.syncRowsLen(this.xTableStyle.rows);
       if (event) {
         const { type } = event;
         switch (type) {
-          case Constant.TABLE_EVENT_TYPE.DATA_CHANGE:
-            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
-            break;
-          case Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW:
-            this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW);
-            break;
           case Constant.TABLE_EVENT_TYPE.REMOVE_ROW:
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
             this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_ROW);
             break;
+          case Constant.TABLE_EVENT_TYPE.REMOVE_COL:
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
+            this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_COL);
+            break;
+          case Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW:
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
+            this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW);
+            break;
           case Constant.TABLE_EVENT_TYPE.ADD_NEW_COL:
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
             this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_COL);
             break;
-          case Constant.TABLE_EVENT_TYPE.REMOVE_COL:
-            this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_COL);
+          case Constant.TABLE_EVENT_TYPE.DATA_CHANGE:
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
             break;
           case Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH:
             this.trigger(Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH);
@@ -658,6 +679,41 @@ class XTableDimension extends Widget {
       }
       this.trigger(Constant.TABLE_EVENT_TYPE.SNAPSHOT_CHANGE);
     });
+    // 表格事件绑定
+    this.bindTableEvent();
+    // 图标事件绑定
+    this.bindIconEvent();
+    // 初始化
+    this.initialize();
+  }
+
+  /**
+   * 初始化
+   */
+  initialize() {
+    // 注册焦点元素
+    this.focusManage.register({
+      target: this,
+    });
+    // 表格渲染组件
+    const { xTableStyle } = this;
+    this.attach(xTableStyle);
+    // 添加屏幕组件
+    this.attach(this.xScreen);
+    this.xScreen.addItem(new XFilter(this));
+    this.xScreen.addItem(new XSelectItem(this));
+    this.xScreen.addItem(new XCopyStyle(this));
+    this.xScreen.addItem(new XAutoFillItem(this));
+    // 添加表格组件
+    this.attach(this.xHeightLight);
+    this.attach(this.yHeightLight);
+    this.attach(this.edit);
+    this.attach(this.rowFixed);
+    this.attach(this.colFixed);
+    this.attach(this.xReSizer);
+    this.attach(this.yReSizer);
+    this.attach(this.dropRowFixed);
+    this.attach(this.dropColFixed);
   }
 
   /**
@@ -726,12 +782,28 @@ class XTableDimension extends Widget {
 
   /**
    * 单元辅助实例
+   * @returns {TextCellsHelper}
+   */
+  getTextCellsHelper() {
+    const { xTableStyle } = this;
+    return xTableStyle.getTextCellsHelper();
+  }
+
+  /**
+   * 数据操作帮助类
+   * @returns {DateCellsHelper}
+   */
+  getDateCellsHelper() {
+    return this.dateCellsHelper;
+  }
+
+  /**
+   * 单元辅助实例
    * @returns {StyleCellsHelper}
    */
   getStyleCellsHelper() {
     const { xTableStyle } = this;
-    const { styleCellsHelper } = xTableStyle;
-    return styleCellsHelper;
+    return xTableStyle.getStyleCellsHelper();
   }
 
   /**
@@ -740,8 +812,7 @@ class XTableDimension extends Widget {
    */
   getOperateCellsHelper() {
     const { xTableStyle } = this;
-    const { operateCellsHelper } = xTableStyle;
-    return operateCellsHelper;
+    return xTableStyle.getOperateCellsHelper();
   }
 
   /**
@@ -817,41 +888,6 @@ class XTableDimension extends Widget {
   }
 
   /**
-   * 获取单元格CSS样式
-   * @param row
-   * @param col
-   */
-  getCellCssStyle(row, col) {
-    const cells = this.getTableCells();
-    const cell = cells.getCell(row, col);
-    const { fontAttr, background } = cell;
-    const { align, size, color, bold, italic, name } = fontAttr;
-    const fontSize = XDraw.cssPx(this.scale.goto(size));
-    let textAlign = 'left';
-    switch (align) {
-      case BaseFont.ALIGN.left:
-        textAlign = 'left';
-        break;
-      case BaseFont.ALIGN.center:
-        textAlign = 'center';
-        break;
-      case BaseFont.ALIGN.right:
-        textAlign = 'right';
-        break;
-    }
-    const css = `
-      text-align:${textAlign};
-      color: ${color};
-      background:${background};
-      font-style: ${italic ? 'italic' : 'initial'};
-      font-weight: ${bold ? 'bold' : 'initial'};
-      font-size: ${XDraw.cssPx(fontSize)}px;
-      font-family: ${name};
-    `;
-    return css.replace(/\s/g, '');
-  }
-
-  /**
    * 索引栏高度
    * @returns {*}
    */
@@ -907,12 +943,7 @@ class XTableDimension extends Widget {
    * @return {*}
    */
   visualWidth() {
-    if (SheetUtils.isNumber(this.visualWidthCache)) {
-      return this.visualWidthCache;
-    }
-    const width = this.box().width;
-    this.visualWidthCache = width;
-    return width;
+    return this.box().width;
   }
 
   /**
@@ -920,12 +951,21 @@ class XTableDimension extends Widget {
    * @return {*}
    */
   visualHeight() {
-    if (SheetUtils.isNumber(this.visualHeightCache)) {
-      return this.visualHeightCache;
-    }
-    const height = this.box().height;
-    this.visualHeightCache = height;
-    return height;
+    return this.box().height;
+  }
+
+  /**
+   * 隐藏编辑器
+   */
+  hideEditor() {
+    this.edit.hide();
+  }
+
+  /**
+   * 显示编辑器
+   */
+  showEditor() {
+    this.edit.show();
   }
 
   /**
@@ -1005,9 +1045,8 @@ class XTableDimension extends Widget {
    * @returns {{ci: number, ri: number}}
    */
   getRiCiByXy(x, y) {
-    const {
-      xFixedView, rows, cols,
-    } = this;
+    const { xFixedView } = this;
+    const { rows, cols } = this;
 
     const { index } = this;
     const fixedView = xFixedView.getFixedView();
@@ -1080,7 +1119,7 @@ class XTableDimension extends Widget {
       fy = (total - rows.getHeight(ri) - top) * -1;
     }
 
-    const merge = merges.getFirstIncludes(ri, ci);
+    const merge = merges.getFirstInclude(ri, ci);
     let mci = ci;
     let mri = ri;
     let sx = fx;
@@ -1101,68 +1140,11 @@ class XTableDimension extends Widget {
   }
 
   /**
-   * onAttach
-   */
-  onAttach() {
-    // 绑定表格事件
-    this.bindCacheClear();
-    // 注册焦点元素
-    this.widgetFocus.register({ target: this });
-    // 表格渲染组件
-    const { xTableStyle } = this;
-    this.attach(xTableStyle);
-    // 添加屏幕组件
-    this.attach(this.xScreen);
-    this.xScreen.addItem(new XFilter(this));
-    this.xScreen.addItem(new XSelectItem(this));
-    this.xScreen.addItem(new XCopyStyle(this));
-    this.xScreen.addItem(new XAutoFillItem(this));
-    // 添加表格组件
-    this.attach(this.xHeightLight);
-    this.attach(this.yHeightLight);
-    this.attach(this.edit);
-    this.attach(this.rowFixed);
-    this.attach(this.colFixed);
-    this.attach(this.xReSizer);
-    this.attach(this.yReSizer);
-    this.attach(this.dropRowFixed);
-    this.attach(this.dropColFixed);
-    // 图标事件绑定
-    this.bindIconEvent();
-    // 表格事件绑定
-    this.bindTableEvent();
-  }
-
-  /**
    * 移除事件绑定
    */
   unbind() {
-    this.widgetFocus.remove(this);
+    this.focusManage.remove(this);
     XEvent.unbind(this);
-  }
-
-  /**
-   * 清理缓存
-   */
-  bindCacheClear() {
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_COL_CHANGE, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.ADD_NEW_COL, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, () => {
-      this.resize();
-    });
   }
 
   /**
@@ -1176,7 +1158,7 @@ class XTableDimension extends Widget {
       this.xIconsEvent(XIcon.ICON_EVENT_TYPE.MOUSE_MOVE, info, e);
     });
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
-      const { activate } = this.widgetFocus;
+      const { activate } = this.focusManage;
       const { target } = activate;
       if (target === this) {
         const { x, y } = this.eventXy(e);
@@ -1190,6 +1172,30 @@ class XTableDimension extends Widget {
    * 表格事件
    */
   bindTableEvent() {
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.ADD_NEW_COL, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.REMOVE_COL, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.REMOVE_ROW, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_COL_CHANGE, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, () => {
+      this.resize();
+    });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.SNAPSHOT_CHANGE, () => {
       this.render();
     });
@@ -1395,8 +1401,6 @@ class XTableDimension extends Widget {
     const { xLeft } = this;
     const { xTop } = this;
     const { xContent } = this;
-    this.visualHeightCache = null;
-    this.visualWidthCache = null;
     xTableAreaView.reset();
     xTableFrozenContent.reset();
     xLeftIndex.reset();
@@ -1421,9 +1425,8 @@ class XTableDimension extends Widget {
    * 重置界面大小
    */
   resize() {
-    const {
-      xTableStyle, xScreen, rowFixed, colFixed,
-    } = this;
+    const { rowFixed, colFixed } = this;
+    const { xTableStyle, xScreen } = this;
     this.recache();
     this.reset();
     xScreen.setZone();
@@ -1482,15 +1485,12 @@ class XTableDimension extends Widget {
    * 表格是否只读
    * @returns {boolean}
    */
-  isReadOnly({
-    tips = true,
-    view = null,
-  } = {}) {
-    let { readOnlyAlert, settings, xScreen } = this;
-    let helper = this.getOperateCellsHelper();
+  isProtection({ tips = true, view = null } = {}) {
+    let { settings, readOnlyAlert } = this;
+    let { xScreen, protection } = this;
+    let { sheetProtection } = settings;
     // 表格是否只读
-    let { readOnly } = settings;
-    if (readOnly) {
+    if (sheetProtection) {
       if (tips) {
         readOnlyAlert.setMessage('只读模式无法编辑').open();
       }
@@ -1501,38 +1501,22 @@ class XTableDimension extends Widget {
       let xSelect = xScreen.findType(XSelectItem);
       let { selectRange } = xSelect;
       if (selectRange) {
-        helper.getCellByViewRange({
-          rectRange: selectRange,
-          callback: (r, c, cell) => {
-            if (cell) {
-              if (cell.isReadOnly()) {
-                readOnly = true;
-                return false;
-              }
-            }
-            return true;
-          },
-        });
-      }
-    } else {
-      helper.getCellByViewRange({
-        rectRange: view,
-        callback: (r, c, cell) => {
-          if (cell) {
-            if (cell.isReadOnly()) {
-              readOnly = true;
-              return false;
-            }
+        let includes = protection.getIntersects(selectRange);
+        if (includes.length) {
+          if (tips) {
+            readOnlyAlert.setMessage('只读模式无法编辑').open();
           }
           return true;
-        },
-      });
-    }
-    if (readOnly) {
-      if (tips) {
-        readOnlyAlert.setMessage('只读模式无法编辑').open();
+        }
       }
-      return true;
+    } else {
+      let includes = protection.getIntersects(view);
+      if (includes.length) {
+        if (tips) {
+          readOnlyAlert.setMessage('只读模式无法编辑').open();
+        }
+        return true;
+      }
     }
     return false;
   }
@@ -1543,12 +1527,12 @@ class XTableDimension extends Widget {
    * @param number
    */
   removeRow(ri, number = 1) {
-    const { snapshot, rows, xTableStyle } = this;
+    const { xTableStyle } = this;
+    const { snapshot } = this;
+    const { protection } = this;
     snapshot.open();
-    for (let i = 0; i < number; i++) {
-      xTableStyle.removeRow(ri);
-      rows.removeRow();
-    }
+    xTableStyle.removeRow(ri, number);
+    protection.removeRow(ri, number);
     snapshot.close({
       type: Constant.TABLE_EVENT_TYPE.REMOVE_ROW,
     });
@@ -1561,32 +1545,14 @@ class XTableDimension extends Widget {
    * @param number
    */
   removeCol(ci, number = 1) {
-    const { snapshot, cols, xTableStyle } = this;
+    const { xTableStyle } = this;
+    const { snapshot } = this;
+    const { protection } = this;
     snapshot.open();
-    for (let i = 0; i < number; i++) {
-      xTableStyle.removeCol(ci);
-      cols.removeCol();
-    }
+    xTableStyle.removeCol(ci, number);
+    protection.removeCol(ci, number);
     snapshot.close({
       type: Constant.TABLE_EVENT_TYPE.REMOVE_COL,
-    });
-    this.resize();
-  }
-
-  /**
-   * 插入到指定列之后
-   * @param ci
-   * @param number
-   */
-  insertColAfter(ci, number = 1) {
-    const { snapshot, cols, xTableStyle } = this;
-    snapshot.open();
-    for (let i = 0; i < number; i++) {
-      xTableStyle.insertColAfter(ci);
-      cols.insertColAfter();
-    }
-    snapshot.close({
-      type: Constant.TABLE_EVENT_TYPE.ADD_NEW_COL,
     });
     this.resize();
   }
@@ -1597,12 +1563,48 @@ class XTableDimension extends Widget {
    * @param number
    */
   insertRowAfter(ri, number = 1) {
-    const { snapshot, rows, xTableStyle } = this;
+    const { xTableStyle } = this;
+    const { snapshot } = this;
+    const { protection } = this;
     snapshot.open();
-    for (let i = 0; i < number; i++) {
-      xTableStyle.insertRowAfter(ri);
-      rows.insertRowAfter();
-    }
+    xTableStyle.insertRowAfter(ri, number);
+    protection.insertRowAfter(ri, number);
+    snapshot.close({
+      type: Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW,
+    });
+    this.resize();
+  }
+
+  /**
+   * 插入到指定行之前
+   * @param ri
+   * @param number
+   */
+  insertRowBefore(ri, number = 1) {
+    const { xTableStyle } = this;
+    const { snapshot } = this;
+    const { protection } = this;
+    snapshot.open();
+    xTableStyle.insertRowBefore(ri, number);
+    protection.insertRowBefore(ri, number);
+    snapshot.close({
+      type: Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW,
+    });
+    this.resize();
+  }
+
+  /**
+   * 插入到指定列之后
+   * @param ci
+   * @param number
+   */
+  insertColAfter(ci, number = 1) {
+    const { xTableStyle } = this;
+    const { snapshot } = this;
+    const { protection } = this;
+    snapshot.open();
+    xTableStyle.insertColAfter(ci, number);
+    protection.insertColAfter(ci, number);
     snapshot.close({
       type: Constant.TABLE_EVENT_TYPE.ADD_NEW_COL,
     });
@@ -1615,30 +1617,12 @@ class XTableDimension extends Widget {
    * @param number
    */
   insertColBefore(ci, number = 1) {
-    const { snapshot, cols, xTableStyle } = this;
+    const { xTableStyle } = this;
+    const { snapshot } = this;
+    const { protection } = this;
     snapshot.open();
-    for (let i = 0; i < number; i++) {
-      xTableStyle.insertColBefore(ci);
-      cols.insertColBefore();
-    }
-    snapshot.close({
-      type: Constant.TABLE_EVENT_TYPE.ADD_NEW_COL,
-    });
-    this.resize();
-  }
-
-  /**
-   * 插入到指定行之前
-   * @param ri
-   * @param number
-   */
-  insertRowBefore(ri, number = 1) {
-    const { snapshot, rows, xTableStyle } = this;
-    snapshot.open();
-    for (let i = 0; i < number; i++) {
-      xTableStyle.insertRowBefore(ri);
-      rows.insertRowBefore();
-    }
+    xTableStyle.insertColBefore(ci, number);
+    protection.insertColBefore(ci, number);
     snapshot.close({
       type: Constant.TABLE_EVENT_TYPE.ADD_NEW_COL,
     });

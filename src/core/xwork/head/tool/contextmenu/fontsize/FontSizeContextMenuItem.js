@@ -10,7 +10,7 @@ class FontSizeContextMenuItem extends ELContextMenuItem {
     this.titleElement = h('div', `${cssPrefix}-font-size-context-menu-item-title`);
     this.titleElement.text(size);
     this.titleElement.css('text-align', 'center');
-    this.children(this.titleElement);
+    this.childrenNodes(this.titleElement);
   }
 
 }

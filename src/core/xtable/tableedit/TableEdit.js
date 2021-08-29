@@ -1,4 +1,4 @@
-import { XSelectItem } from '../xscreenitems/xselect/XSelectItem';
+import { XSelectItem } from '../screenitems/xselect/XSelectItem';
 import { Cell } from '../tablecell/Cell';
 import { TextEdit } from './type/TextEdit';
 import { SheetUtils } from '../../../utils/SheetUtils';
@@ -7,9 +7,6 @@ import { BaseEdit } from './base/BaseEdit';
 import { Constant } from '../../../const/Constant';
 import { BaseFont } from '../../../draw/font/BaseFont';
 
-/**
- * TableEdit
- */
 class TableEdit extends TextEdit {
 
   /**
@@ -18,33 +15,64 @@ class TableEdit extends TextEdit {
    */
   constructor(table) {
     super(table);
-    this.closeClickHandle = XEvent.WrapFuncion.mouseClick((event) => {
-      if (this.mode === BaseEdit.MODE.SHOW) {
-        this.close(event);
-      }
-    });
     this.openClickHandle = XEvent.WrapFuncion.doubleClick((event) => {
       const { xScreen } = table;
       const xSelect = xScreen.findType(XSelectItem);
       const merges = table.getTableMerges();
       const { selectRange } = xSelect;
       const { sri, sci } = selectRange;
-      if (!selectRange.multiple() || merges.getFirstIncludes(sri, sci)) {
+      if (!selectRange.multiple() || merges.getFirstInclude(sri, sci)) {
         this.open(event);
       }
     });
-    this.tableScrollHandle = XEvent.WrapFuncion.mouseClick((event) => {
+    this.closeClickHandle = (event) => {
       if (this.mode === BaseEdit.MODE.SHOW) {
         this.close(event);
       }
-    });
+    };
+    this.userInputHandle = () => {
+      this.defaultWrap();
+    };
+    this.tableScrollHandle = (event) => {
+      if (this.mode === BaseEdit.MODE.SHOW) {
+        this.close(event);
+      }
+    };
     this.enterResponse = {
       keyCode: keyCode => keyCode === 13,
       handle: (event) => {
         const { table } = this;
-        const { widgetFocus } = table;
+        const { focusManage } = table;
         const { keyboard } = table;
-        widgetFocus.forward({ target: table });
+        focusManage.forward({ target: table });
+        keyboard.forward({
+          target: table, event,
+        });
+      },
+    };
+    this.tabResponse = {
+      keyCode: keyCode => keyCode === 9,
+      handle: (event) => {
+        const { table } = this;
+        const { focusManage } = table;
+        const { keyboard } = table;
+        focusManage.forward({
+          target: table,
+        });
+        keyboard.forward({
+          target: table, event,
+        });
+      },
+    };
+    this.escResponse = {
+      keyCode: keyCode => keyCode === 27,
+      handle: (event) => {
+        const { table } = this;
+        const { focusManage } = table;
+        const { keyboard } = table;
+        focusManage.forward({
+          target: table,
+        });
         keyboard.forward({
           target: table, event,
         });
@@ -64,22 +92,28 @@ class TableEdit extends TextEdit {
    * 绑定事件处理
    */
   bind() {
+    super.bind();
     const { altEnterResponse } = this;
+    const { tabResponse } = this;
     const { enterResponse } = this;
+    const { escResponse } = this;
     const { openClickHandle } = this;
+    const { userInputHandle } = this;
     const { closeClickHandle } = this;
     const { tableScrollHandle } = this;
     const { table } = this;
     const { keyboard } = table;
-    const { widgetFocus } = table;
+    const { focusManage } = table;
     keyboard.register({
       target: this,
       response: [
         enterResponse,
+        tabResponse,
         altEnterResponse,
+        escResponse,
       ],
     });
-    widgetFocus.register({
+    focusManage.register({
       target: this,
     });
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (event) => {
@@ -102,6 +136,7 @@ class TableEdit extends TextEdit {
       event.stopPropagation();
     });
     XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableScrollHandle);
+    XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.INPUT, userInputHandle);
     XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, closeClickHandle);
     XEvent.bind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, openClickHandle);
   }
@@ -110,18 +145,36 @@ class TableEdit extends TextEdit {
    * 解绑事件处理
    */
   unbind() {
+    super.unbind();
     const { openClickHandle } = this;
     const { closeClickHandle } = this;
+    const { userInputHandle } = this;
     const { tableScrollHandle } = this;
     const { table } = this;
     const { keyboard } = table;
-    const { widgetFocus } = table;
+    const { focusManage } = table;
     keyboard.remove(this);
-    widgetFocus.remove(this);
+    focusManage.remove(this);
     XEvent.unbind(this);
+    XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.INPUT, userInputHandle);
     XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.SCROLL, tableScrollHandle);
     XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, openClickHandle);
     XEvent.unbind(table, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, closeClickHandle);
+  }
+
+  /**
+   * 写内容
+   */
+  write() {
+    if (this.checkedRichText()) {
+      this.htmlToRichText();
+      return;
+    }
+    if (this.checkedFormulaText()) {
+      this.htmlToFormulaText();
+      return;
+    }
+    this.textToCellText();
   }
 
   /**
@@ -132,7 +185,7 @@ class TableEdit extends TextEdit {
     let { throttle, table } = this;
     let cells = table.getTableCells();
     let { xScreen } = table;
-    if (table.isReadOnly()) {
+    if (table.isProtection()) {
       return this;
     }
     let xSelect = xScreen.findType(XSelectItem);
@@ -174,13 +227,7 @@ class TableEdit extends TextEdit {
    */
   close(event) {
     let { table } = this;
-    if (this.checkedFormulaText()) {
-      this.htmlToFormulaText();
-    } else if (this.checkedRichText()) {
-      this.htmlToRichText();
-    } else {
-      this.textToCellText();
-    }
+    this.write();
     this.blur();
     super.close({
       edit: this, table, native: event,
@@ -194,8 +241,8 @@ class TableEdit extends TextEdit {
    * 销毁编辑器
    */
   destroy() {
-    super.destroy();
     this.unbind();
+    super.destroy();
   }
 
 }

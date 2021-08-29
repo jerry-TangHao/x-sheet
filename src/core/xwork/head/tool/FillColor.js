@@ -14,7 +14,7 @@ class FillColor extends DropDownItem {
     this.fillColorContextMenu = new FillColorContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
     this.fillColorContextMenu.setActiveByColor('rgb(255, 255, 255)');
   }
 

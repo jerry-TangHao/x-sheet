@@ -32,7 +32,7 @@ class SelectContextMenu extends ELContextMenu {
   addItem(item) {
     this.bind(item);
     this.items.push(item);
-    this.children(item);
+    this.childrenNodes(item);
   }
 
   destroy() {

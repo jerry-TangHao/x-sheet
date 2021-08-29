@@ -23,7 +23,7 @@ class WideUnit {
     fontBold = false,
     fontItalic = false,
   } = {}) {
-    if (SheetUtils.isNotUnDef(unit)) {
+    if (SheetUtils.isDef(unit)) {
       this.unit = unit;
     } else {
       const { draw, heightUnit } = table;

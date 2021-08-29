@@ -15,7 +15,7 @@ class Fixed extends DropDownItem {
     this.fixedContextMenu = new FixedContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   setFixedColStatus(status) {

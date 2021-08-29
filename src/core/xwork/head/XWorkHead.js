@@ -1,7 +1,7 @@
 import { Widget } from '../../../lib/Widget';
 import { cssPrefix } from '../../../const/Constant';
 import { XWorkHeadMenu } from './XWorkHeadMenu';
-import { XBookTopOption } from './XWorkHeadOption';
+import { XWorkHeadOption } from './XWorkHeadOption';
 import { SheetUtils } from '../../../utils/SheetUtils';
 
 const settings = {
@@ -19,7 +19,7 @@ class XWorkHead extends Widget {
   }
 
   onAttach() {
-    this.option = new XBookTopOption(this, this.options.option);
+    this.option = new XWorkHeadOption(this, this.options.option);
     this.toolsMenu = new XWorkHeadMenu(this, this.options.menu);
     if (this.options.option.show) {
       this.attach(this.option);

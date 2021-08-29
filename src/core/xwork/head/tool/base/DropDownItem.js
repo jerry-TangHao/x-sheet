@@ -9,9 +9,9 @@ class DropDownItem extends Item {
     super(`${cssPrefix}-tools-drop-down-item ${className}`);
     this.drop = h('div', `${cssPrefix}-tools-drop-down-item-mark`);
     this.title = h('div', `${cssPrefix}-tools-drop-down-item-title`);
-    this.drop.children(new Icon('arrow-down'));
-    this.children(this.title);
-    this.children(this.drop);
+    this.drop.childrenNodes(new Icon('arrow-down'));
+    this.childrenNodes(this.title);
+    this.childrenNodes(this.drop);
   }
 
   setTitle(text) {
@@ -20,7 +20,7 @@ class DropDownItem extends Item {
 
   setIcon(icon) {
     this.title.html('');
-    this.title.children(icon);
+    this.title.childrenNodes(icon);
   }
 
   setWidth(px) {

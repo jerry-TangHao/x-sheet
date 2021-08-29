@@ -19,12 +19,12 @@ class TextWrappingContextMenu extends ELContextMenu {
     this.textWrappingIcon2 = new TextWrappingIcon2();
     this.textWrappingIcon3 = new TextWrappingIcon3();
     const div2 = h('div', `${cssPrefix}-text-wrapping-context-menu-type-icon-line`);
-    div2.children(this.textWrappingIcon1);
-    div2.children(this.textWrappingIcon2);
-    div2.children(this.textWrappingIcon3);
+    div2.childrenNodes(this.textWrappingIcon1);
+    div2.childrenNodes(this.textWrappingIcon2);
+    div2.childrenNodes(this.textWrappingIcon3);
     this.textWrappingIcons = new TextWrappingContextMenuItem();
     this.textWrappingIcons.removeClass('hover');
-    this.textWrappingIcons.children(div2);
+    this.textWrappingIcons.childrenNodes(div2);
     this.addItem(this.textWrappingIcons);
     this.bind();
   }

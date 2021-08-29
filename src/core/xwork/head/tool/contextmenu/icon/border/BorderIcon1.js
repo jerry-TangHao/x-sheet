@@ -6,7 +6,7 @@ class BorderIcon1 extends Item {
   constructor() {
     super(`${cssPrefix}-tools-border1`);
     this.icon = new Icon('border1');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 }
 

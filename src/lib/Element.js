@@ -1,4 +1,4 @@
-/* global document MouseEvent CustomEvent window */
+/* global document MouseEvent CustomEvent window NodeList HTMLCollection DocumentFragment */
 import { SheetUtils } from '../utils/SheetUtils';
 
 /**
@@ -9,8 +9,12 @@ class Element {
   /**
    * 包装元素
    */
-  static wrap(object) {
-    if (SheetUtils.isArray(object) || SheetUtils.isLikeArray(object)) {
+  static wrapElement(object) {
+    if ([
+      SheetUtils.isArray(object),
+      object instanceof HTMLCollection,
+      object instanceof NodeList,
+    ].includes(true)) {
       let elements = [];
       for (let i = 0; i < object.length; i++) {
         const item = object[i];
@@ -25,6 +29,22 @@ class Element {
     return new Element(object);
   }
 
+  static createText(text) {
+    return new Element(document.createTextNode(text));
+  }
+
+  /**
+   * 驼峰转连字符
+   * @param value
+   * @returns {string|null}
+   */
+  static hyphenateRE(value) {
+    if (value) {
+      return value.replace(/([A-Z])/g, '-$1').toLowerCase();
+    }
+    return null;
+  }
+
   /**
    * Element
    * @param tag
@@ -33,7 +53,9 @@ class Element {
   constructor(tag, className = '') {
     if (typeof tag === 'string') {
       this.el = document.createElement(tag);
-      this.el.className = className;
+      if (className) {
+        this.el.className = className;
+      }
     } else {
       this.el = tag;
     }
@@ -55,15 +77,52 @@ class Element {
   }
 
   /**
-   * 空参数时返回子节点, 有参数时插入子节点
+   * 空参数时返回子元素,
+   * 有参数时插入子节点
    * @param args
-   * @returns {Element|NodeListOf<ChildNode>|ActiveX.IXMLDOMNodeList}
+   * @returns {*[]|Element}
    */
   children(...args) {
     if (arguments.length === 0) {
-      return Element.wrap(this.el.childNodes);
+      return Element.wrapElement(this.el.children);
     }
     args.forEach(ele => this.append(ele));
+    return this;
+  }
+
+  /**
+   * 空参数时返回子节点,
+   * 有参数时插入子节点
+   * @param args
+   * @returns {*[]|Element}
+   */
+  childrenNodes(...args) {
+    if (arguments.length === 0) {
+      return Element.wrapElement(this.el.childNodes);
+    }
+    args.forEach(ele => this.append(ele));
+    return this;
+  }
+
+  /**
+   * 将目标节点添加到当前元素中
+   * @param ele
+   */
+  childrenNodesAppend(ele) {
+    if (!this.isTextNode()) {
+      ele.childrenNodes().forEach(i => this.append(i));
+    }
+    return this;
+  }
+
+  /**
+   * 将目标节点添加到当前元素中
+   * @param ele
+   */
+  childrenNodesPrepend(ele) {
+    if (!this.isTextNode()) {
+      ele.childrenNodes().forEach(i => this.prepend(i));
+    }
     return this;
   }
 
@@ -72,7 +131,25 @@ class Element {
    * @param ele
    */
   append(ele) {
-    this.el.appendChild(ele.el);
+    if (!this.isTextNode()) {
+      if (ele && ele.el) {
+        this.el.append(ele.el);
+      }
+    }
+    return this;
+  }
+
+  /**
+   * 在当前元素中插入指定节点
+   * @param ele
+   */
+  prepend(ele) {
+    if (!this.isTextNode()) {
+      if (ele && ele.el) {
+        this.el.prepend(ele.el);
+      }
+    }
+    return this;
   }
 
   /**
@@ -87,9 +164,8 @@ class Element {
       });
       return this;
     }
-    const {
-      offsetTop, offsetLeft, offsetHeight, offsetWidth,
-    } = this.el;
+    const { offsetTop, offsetLeft } = this.el;
+    const { offsetHeight, offsetWidth } = this.el;
     return {
       top: offsetTop,
       left: offsetLeft,
@@ -103,7 +179,8 @@ class Element {
    * @returns {Element}
    */
   parent() {
-    return new Element(this.el.parentNode);
+    return this.el.parentNode
+      ? new Element(this.el.parentNode) : null;
   }
 
   /**
@@ -112,7 +189,9 @@ class Element {
    * @returns {Element}
    */
   addClass(name) {
-    this.el.classList.add(name);
+    if (!this.isTextNode()) {
+      this.el.classList.add(name);
+    }
     return this;
   }
 
@@ -122,7 +201,26 @@ class Element {
    * @returns {boolean}
    */
   hasClass(name) {
-    return this.el.classList.contains(name);
+    if (!this.isTextNode()) {
+      return this.el.classList.contains(name);
+    }
+    return false;
+  }
+
+  /**
+   * 是否有子元素
+   * @returns {boolean}
+   */
+  hasChildElement() {
+    return this.children().length > 0;
+  }
+
+  /**
+   * 是否有子节点
+   * @returns {boolean}
+   */
+  hasChild() {
+    return this.childrenNodes().length > 0;
   }
 
   /**
@@ -131,7 +229,9 @@ class Element {
    * @returns {Element}
    */
   removeClass(name) {
-    this.el.classList.remove(name);
+    if (!this.isTextNode()) {
+      this.el.classList.remove(name);
+    }
     return this;
   }
 
@@ -141,7 +241,10 @@ class Element {
    * @returns {DOMRect}
    */
   box() {
-    return this.el.getBoundingClientRect();
+    if (!this.isTextNode()) {
+      return this.el.getBoundingClientRect();
+    }
+    return null;
   }
 
   /**
@@ -149,7 +252,10 @@ class Element {
    * @returns {*}
    */
   first() {
-    return Element.wrap(this.el.firstChild);
+    if (!this.isTextNode()) {
+      return Element.wrapElement(this.el.firstChild);
+    }
+    return null;
   }
 
   /**
@@ -157,27 +263,79 @@ class Element {
    * @returns {*}
    */
   last() {
-    return Element.wrap(this.el.lastChild);
+    if (!this.isTextNode()) {
+      return Element.wrapElement(this.el.lastChild);
+    }
+    return null;
+  }
+
+  /**
+   * 获取第一个文本节点
+   */
+  firstTextNode() {
+    if (this.isTextNode()) {
+      return this;
+    }
+    let find = null;
+    let handle = (elem) => {
+      if (elem.hasChild()) {
+        elem.childrenNodes().forEach((elem) => {
+          if (find === null) {
+            handle(elem);
+          }
+        });
+      }
+      if (find === null) {
+        if (elem.isTextNode()) {
+          find = elem;
+        }
+      }
+    };
+    handle(this);
+    return find;
+  }
+
+  /**
+   * 获取最后一个文本节点
+   */
+  lastTextNode() {
+    if (this.isTextNode()) {
+      return this;
+    }
+    let find = null;
+    let handle = (elem) => {
+      if (elem.hasChild()) {
+        elem.childrenNodes().reverse().forEach((elem) => {
+          if (find === null) {
+            handle(elem);
+          }
+        });
+      }
+      if (find === null) {
+        if (elem.isTextNode()) {
+          find = elem;
+        }
+      }
+    };
+    handle(this);
+    return find;
   }
 
   /**
    * 删除当前元素下的子元素
-   * @param ele
+   * @param target
    * @returns {boolean|ActiveX.IXMLDOMNode|*}
    */
-  remove(ele) {
-    this.el.removeChild(ele.el || ele);
-    return this;
-  }
-
-  /**
-   * 删除当前元素
-   * @returns {boolean|ActiveX.IXMLDOMNode|*}
-   */
-  removeSelf() {
-    const parent = this.el.parentNode;
-    if (parent) {
-      parent.removeChild(this.el);
+  remove(target = null) {
+    if (target) {
+      if (!this.isTextNode()) {
+        this.el.removeChild(target.el || target);
+      }
+    } else {
+      const parent = this.parent();
+      if (parent) {
+        this.parent().remove(this);
+      }
     }
     return this;
   }
@@ -188,6 +346,9 @@ class Element {
    * @returns {boolean|*}
    */
   contains(ele) {
+    if (this.isTextNode()) {
+      return false;
+    }
     return this.el.contains(ele.el);
   }
 
@@ -196,7 +357,8 @@ class Element {
    * @returns {*}
    */
   prev() {
-    return Element.wrap(this.el.previousSibling);
+    return this.el.previousSibling
+      ? Element.wrapElement(this.el.previousSibling) : null;
   }
 
   /**
@@ -204,7 +366,8 @@ class Element {
    * @returns {*}
    */
   next() {
-    return Element.wrap(this.el.nextSibling);
+    return this.el.nextSibling
+      ? Element.wrapElement(this.el.nextSibling) : null;
   }
 
   /**
@@ -214,8 +377,10 @@ class Element {
    * @returns {Element}
    */
   active(flag = true, cls = 'active') {
-    if (flag) this.addClass(cls);
-    else this.removeClass(cls);
+    if (!this.isTextNode()) {
+      if (flag) this.addClass(cls);
+      else this.removeClass(cls);
+    }
     return this;
   }
 
@@ -225,6 +390,9 @@ class Element {
    * @returns {string|Element}
    */
   text(text) {
+    if (this.isTextNode()) {
+      return this.nodeValue();
+    }
     if (text !== undefined) {
       this.el.innerText = text;
       return this;
@@ -238,6 +406,9 @@ class Element {
    * @returns {Element|*}
    */
   html(html) {
+    if (this.isTextNode()) {
+      return this.nodeValue();
+    }
     if (html !== undefined) {
       this.el.innerHTML = html;
       return this;
@@ -249,14 +420,20 @@ class Element {
    * 当前元素设置焦点
    */
   focus() {
-    this.el.focus();
+    if (!this.isTextNode()) {
+      this.el.focus();
+    }
+    return this;
   }
 
   /**
    * 移除焦点
    */
   blur() {
-    this.el.blur();
+    if (!this.isTextNode()) {
+      this.el.blur();
+    }
+    return this;
   }
 
   /**
@@ -265,7 +442,9 @@ class Element {
    * @returns {Element}
    */
   removeAttr(key) {
-    this.el.removeAttribute(key);
+    if (!this.isTextNode()) {
+      this.el.removeAttribute(key);
+    }
     return this;
   }
 
@@ -274,7 +453,9 @@ class Element {
    * @param style
    */
   style(style) {
-    this.attr('style', style);
+    if (!this.isTextNode()) {
+      this.attr('style', style);
+    }
     return this;
   }
 
@@ -285,15 +466,24 @@ class Element {
    * @returns {string|Element}
    */
   attr(key, value) {
-    if (value !== undefined) {
-      this.el.setAttribute(key, value);
-    } else {
-      if (typeof key === 'string') {
-        return this.el.getAttribute(key);
+    if (!this.isTextNode()) {
+      if (value !== undefined) {
+        if (this.el.setAttribute) {
+          this.el.setAttribute(key, value);
+        }
+      } else {
+        if (typeof key === 'string') {
+          if (this.el.setAttribute) {
+            return this.el.getAttribute(key);
+          }
+          return null;
+        }
+        if (this.el.setAttribute) {
+          Object.keys(key).forEach((k) => {
+            this.el.setAttribute(k, key[k]);
+          });
+        }
       }
-      Object.keys(key).forEach((k) => {
-        this.el.setAttribute(k, key[k]);
-      });
     }
     return this;
   }
@@ -304,11 +494,25 @@ class Element {
    * @returns {Element|*}
    */
   val(v) {
-    if (v !== undefined) {
-      this.el.value = v;
-      return this;
+    if (!this.isTextNode()) {
+      if (v !== undefined) {
+        this.el.value = v;
+        return this;
+      }
+      return this.el.value;
     }
-    return this.el.value;
+    if (v === undefined) {
+      return this.nodeValue();
+    }
+    return this;
+  }
+
+  /**
+   * 获取原始节点
+   * @returns {*}
+   */
+  get() {
+    return this.el;
   }
 
   /**
@@ -317,7 +521,33 @@ class Element {
    * @returns {Element}
    */
   cssRemoveKeys(...keys) {
-    keys.forEach(k => this.el.style.removeProperty(k));
+    if (!this.isTextNode()) {
+      if (this.el.style) {
+        keys.forEach((k) => {
+          if (this.el.style) {
+            this.el.style.removeProperty(Element.hyphenateRE(k));
+          }
+        });
+      }
+    }
+    return this;
+  }
+
+  /**
+   * 删除元素style属性
+   * @param key
+   * @param value
+   * @returns {Element}
+   */
+  cssRemoveVal(key, value) {
+    if (!this.isTextNode()) {
+      if (this.el.style) {
+        const property = Element.hyphenateRE(key);
+        const propertyValue = this.el.style.getPropertyValue(property);
+        const newValue = propertyValue.replace(value, '');
+        this.css(key, newValue);
+      }
+    }
     return this;
   }
 
@@ -328,17 +558,25 @@ class Element {
    * @returns {Element|*}
    */
   css(name, value) {
-    if (value === undefined && typeof name !== 'string') {
-      Object.keys(name).forEach((k) => {
-        this.el.style[k] = name[k];
-      });
-      return this;
+    if (!this.isTextNode()) {
+      if (this.el.style) {
+        if (value === undefined && typeof name !== 'string') {
+          Object.keys(name).forEach((key) => {
+            const property = Element.hyphenateRE(key);
+            this.el.style.setProperty(property, name[key]);
+          });
+          return this;
+        }
+        if (value !== undefined) {
+          const property = Element.hyphenateRE(name);
+          this.el.style.setProperty(property, value);
+          return this;
+        }
+        const property = Element.hyphenateRE(name);
+        return this.el.style.getPropertyValue(property);
+      }
     }
-    if (value !== undefined) {
-      this.el.style[name] = value;
-      return this;
-    }
-    return this.el.style[name];
+    return null;
   }
 
   /**
@@ -346,7 +584,10 @@ class Element {
    * @returns {CSSStyleDeclaration}
    */
   computedStyle() {
-    return window.getComputedStyle(this.el, null);
+    if (!this.isTextNode()) {
+      return window.getComputedStyle(this.el, null);
+    }
+    return null;
   }
 
   /**
@@ -354,9 +595,11 @@ class Element {
    * @returns {Element}
    */
   show() {
-    const style = this.computedStyle();
-    if (style && style.display !== 'block') {
-      this.css('display', 'block');
+    if (!this.isTextNode()) {
+      const style = this.computedStyle();
+      if (style && style.display !== 'block') {
+        this.css('display', 'block');
+      }
     }
     return this;
   }
@@ -366,9 +609,11 @@ class Element {
    * @returns {Element}
    */
   hide() {
-    const style = this.computedStyle();
-    if (style && style.display !== 'none') {
-      this.css('display', 'none');
+    if (!this.isTextNode()) {
+      const style = this.computedStyle();
+      if (style && style.display !== 'none') {
+        this.css('display', 'none');
+      }
     }
     return this;
   }
@@ -379,25 +624,27 @@ class Element {
    * @param message
    */
   trigger(type, message) {
-    switch (type) {
-      case 'click': {
-        const evt = new MouseEvent(type, {
-          detail: message,
-          bubbles: true,
-          cancelable: false,
-        });
-        evt.initEvent('click', true, true);
-        this.el.dispatchEvent(evt);
-        break;
-      }
-      default: {
-        const evt = new CustomEvent(type, {
-          detail: message,
-          bubbles: true,
-          cancelable: false,
-        });
-        this.el.dispatchEvent(evt);
-        break;
+    if (!this.isTextNode()) {
+      switch (type) {
+        case 'click': {
+          const evt = new MouseEvent(type, {
+            detail: message,
+            bubbles: true,
+            cancelable: false,
+          });
+          evt.initEvent('click', true, true);
+          this.el.dispatchEvent(evt);
+          break;
+        }
+        default: {
+          const evt = new CustomEvent(type, {
+            detail: message,
+            bubbles: true,
+            cancelable: false,
+          });
+          this.el.dispatchEvent(evt);
+          break;
+        }
       }
     }
   }
@@ -408,18 +655,39 @@ class Element {
    * @returns {[]|Element}
    */
   find(select) {
-    const result = this.el.querySelectorAll(select);
-    if (result && result.length === 1) {
-      return new Element(result[0]);
-    }
-    const eleArray = [];
-    if (result) {
-      // eslint-disable-next-line no-restricted-syntax
-      for (const item of result) {
-        eleArray.push(new Element(item));
+    if (!this.isTextNode()) {
+      const result = this.el.querySelectorAll(select);
+      if (result && result.length === 1) {
+        return new Element(result[0]);
       }
+      const array = [];
+      if (result) {
+        for (const item of result) {
+          array.push(new Element(item));
+        }
+      }
+      return array;
     }
-    return eleArray;
+    return [];
+  }
+
+  /**
+   * 查找子元素
+   * @param select
+   * @returns {[]|Element}
+   */
+  finds(select) {
+    if (!this.isTextNode()) {
+      const result = this.el.querySelectorAll(select);
+      const array = [];
+      if (result) {
+        for (const item of result) {
+          array.push(new Element(item));
+        }
+      }
+      return array;
+    }
+    return [];
   }
 
   /**
@@ -435,15 +703,6 @@ class Element {
     // eslint-disable-next-line no-cond-assign
     while ((sibling = sibling.nextElementSibling) !== null) result.push(new Element(sibling));
     return result;
-  }
-
-  /**
-   * 比较dom是否相同
-   * @param ele
-   * @returns {boolean}
-   */
-  is(ele) {
-    return this.el === ele.el;
   }
 
   /**
@@ -471,6 +730,79 @@ class Element {
   }
 
   /**
+   * 在当前元素之后插入新元素
+   * @param ele
+   */
+  after(ele) {
+    if (this.el && ele && ele.el) {
+      this.el.after(ele.el);
+    }
+    return this;
+  }
+
+  /**
+   * 在当前元素之前插入新元素
+   * @param ele
+   */
+  before(ele) {
+    if (this.el && ele && ele.el) {
+      this.el.before(ele.el);
+    }
+    return this;
+  }
+
+  /**
+   * 复制
+   */
+  clone() {
+    return new Element(this.el.cloneNode(true));
+  }
+
+  /**
+   * 清空元素中的所有内容
+   */
+  empty() {
+    if (!this.isTextNode()) {
+      this.html('');
+    }
+    return this;
+  }
+
+  /**
+   * 相等比较
+   * @param other
+   * @returns {boolean}
+   */
+  equals(other) {
+    return this.el === other.el;
+  }
+
+  /**
+   * 获取当前元素在父元素中的索引
+   * @returns {number}
+   */
+  index() {
+    let parent = this.parent();
+    let index = -1;
+    parent.childrenNodes()
+      .forEach((v, i) => {
+        if (v.equals(this)) {
+          index = i;
+        }
+      });
+    return index;
+  }
+
+  /**
+   * 比较dom是否相同
+   * @param ele
+   * @returns {boolean}
+   */
+  is(ele) {
+    return this.el === ele.el;
+  }
+
+  /**
    * 是否文本节点
    * @returns {boolean}
    */
@@ -487,50 +819,21 @@ class Element {
   }
 
   /**
-   * 在当前元素之后插入新元素
-   * @param ele
-   */
-  after(ele) {
-    this.el.after(ele.el);
-  }
-
-  /**
-   * 在当前元素之前插入新元素
-   * @param ele
-   */
-  before(ele) {
-    this.el.before(ele.el);
-  }
-
-  /**
-   * 复制
-   */
-  clone() {
-    return new Element(this.el.cloneNode(true));
-  }
-
-  /**
-   * 清空元素中的所有内容
-   */
-  empty() {
-    this.html('');
-    return this;
-  }
-
-  /**
-   * 相等比较
-   * @param other
+   * 是否文档碎片
    * @returns {boolean}
    */
-  equals(other) {
-    return this.el === other.el;
+  isDocumentFragment() {
+    return this.el instanceof DocumentFragment;
   }
 
 }
 
 const h = (tag, className = '') => new Element(tag, className);
 
+const TextNode = text => Element.createText(text);
+
 export {
   Element,
+  TextNode,
   h,
 };

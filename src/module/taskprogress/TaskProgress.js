@@ -9,10 +9,14 @@ class TaskProgress extends Widget {
     this.progress = h('div', `${cssPrefix}-xwork-task-progress-bar`);
     this.items = [];
     this.taskManage = taskManage;
-    this.begin = () => this.show();
+    this.begin = () => {
+      this.show();
+    };
     this.end = () => {};
-    this.finish = () => this.hide();
-    this.children(this.progress);
+    this.finish = () => {
+      this.hide();
+    };
+    this.childrenNodes(this.progress);
     this.bind();
     this.hide();
   }

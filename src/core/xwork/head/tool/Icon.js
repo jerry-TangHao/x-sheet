@@ -7,7 +7,7 @@ class Icon extends Widget {
   constructor(className = '') {
     super(`${cssPrefix}-icon`);
     this.iconNameEl = h('div', `${cssPrefix}-icon-img ${className}`);
-    this.children(this.iconNameEl);
+    this.childrenNodes(this.iconNameEl);
   }
 
   setWidth(width) {

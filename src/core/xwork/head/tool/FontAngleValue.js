@@ -19,7 +19,7 @@ class FontAngleValue extends DropInputItem {
         this.onChange(angleValue);
       },
       el: this,
-    });
+    }).parentWidget(this);
     this.input.val(this.value);
     this.input.attr('type', 'number');
     this.bind();

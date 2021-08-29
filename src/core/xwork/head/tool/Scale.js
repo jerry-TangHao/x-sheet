@@ -13,7 +13,7 @@ class Scale extends DropDownItem {
     this.scaleContextMenu = new ScaleContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

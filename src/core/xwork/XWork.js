@@ -37,7 +37,10 @@ class XWork extends Widget {
   constructor(options) {
     super(`${cssPrefix}-work`);
     this.options = SheetUtils.copy({}, settings, options);
-    this.root = null;
+    // 组件
+    this.top = new XWorkHead(this, this.options.top);
+    this.body = new XWorkBody(this, this.options.body);
+    this.bottom = new XWorkFoot(this);
     // 布局
     this.topLayer = new VerticalLayerElement();
     this.bodyLayer = new VerticalLayerElement({
@@ -47,19 +50,15 @@ class XWork extends Widget {
     });
     this.bottomLayer = new VerticalLayerElement();
     this.verticalLayer = new VerticalLayer();
-    this.verticalLayer.children(this.topLayer);
-    this.verticalLayer.children(this.bodyLayer);
-    this.verticalLayer.children(this.bottomLayer);
-    this.children(this.verticalLayer);
+    this.verticalLayer.attach(this.topLayer);
+    this.verticalLayer.attach(this.bodyLayer);
+    this.verticalLayer.attach(this.bottomLayer);
+    this.attach(this.verticalLayer);
   }
 
-  onAttach(element) {
-    const { options, bodyLayer, topLayer, bottomLayer } = this;
-    this.root = element;
-    // 组件
-    this.top = new XWorkHead(this, this.options.top);
-    this.body = new XWorkBody(this, this.options.body);
-    this.bottom = new XWorkFoot(this);
+  onAttach() {
+    const { options, bodyLayer } = this;
+    const { topLayer, bottomLayer } = this;
     topLayer.attach(this.top);
     if (options.bottom.show) {
       bottomLayer.attach(this.bottom);

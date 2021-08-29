@@ -8,7 +8,7 @@ class PaintFormat extends Item {
     super(`${cssPrefix}-tools-point-format`);
     this.icon = new Icon('point-format');
     this.sheets = [];
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
   addSheet(sheet) {

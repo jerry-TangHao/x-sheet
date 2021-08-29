@@ -10,9 +10,9 @@ class PlainInput extends Widget {
     this.inputWrapEle = h('div', `${cssPrefix}-form-input-wrap`);
     this.inputInnerEle = h('div', `${cssPrefix}-form-input-inner`);
     this.inputEle = h('input', `${cssPrefix}-form-input-source`);
-    this.inputInnerEle.children(this.inputEle);
-    this.inputWrapEle.children(this.inputInnerEle);
-    this.children(this.inputWrapEle);
+    this.inputInnerEle.childrenNodes(this.inputEle);
+    this.inputWrapEle.childrenNodes(this.inputInnerEle);
+    this.childrenNodes(this.inputWrapEle);
     this.bind();
   }
 

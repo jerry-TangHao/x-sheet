@@ -10,8 +10,8 @@ class LContentOutRange extends CommonOutRange {
   }) {
     const { table } = this;
     const { merges } = table;
-    const lastMerge = merges.getFirstIncludes(row, col - 1);
-    const masterMerge = merges.getFirstIncludes(row, col);
+    const lastMerge = merges.getFirstInclude(row, col - 1);
+    const masterMerge = merges.getFirstInclude(row, col);
     if (masterMerge || lastMerge) {
       return LineIteratorFilter.RETURN_TYPE.EXEC;
     }
@@ -84,8 +84,8 @@ class LContentOutRange extends CommonOutRange {
         .setEnd(0)
         .setLoop((i) => {
           // 是否是合并单元格
-          const merge = merges.getFirstIncludes(row, i);
-          if (SheetUtils.isNotUnDef(merge)) {
+          const merge = merges.getFirstInclude(row, i);
+          if (SheetUtils.isDef(merge)) {
             return false;
           }
           // 是否是空单元格
@@ -149,8 +149,8 @@ class LContentOutRange extends CommonOutRange {
         .setEnd(0)
         .setLoop((i) => {
           // 是否是合并单元格
-          const merge = merges.getFirstIncludes(row, i);
-          if (SheetUtils.isNotUnDef(merge)) {
+          const merge = merges.getFirstInclude(row, i);
+          if (SheetUtils.isDef(merge)) {
             return false;
           }
           // 是否是空单元格
@@ -211,8 +211,8 @@ class LContentOutRange extends CommonOutRange {
         .setEnd(len)
         .setLoop((j) => {
           // 合并单元格检查
-          const merge = merges.getFirstIncludes(row, j);
-          if (SheetUtils.isNotUnDef(merge)) {
+          const merge = merges.getFirstInclude(row, j);
+          if (SheetUtils.isDef(merge)) {
             return false;
           }
           // 空单元格检查
@@ -276,8 +276,8 @@ class LContentOutRange extends CommonOutRange {
         .setEnd(len)
         .setLoop((j) => {
           // 合并单元格检查
-          const merge = merges.getFirstIncludes(row, j);
-          if (SheetUtils.isNotUnDef(merge)) {
+          const merge = merges.getFirstInclude(row, j);
+          if (SheetUtils.isDef(merge)) {
             return false;
           }
           // 空单元格检查

@@ -16,7 +16,7 @@ class RowFixed extends Widget {
     this.fxSri = fixedView.sri;
     this.fxEri = fixedView.eri;
     this.block = block;
-    this.children(this.block);
+    this.childrenNodes(this.block);
     this.tableWidthChange = () => {
       this.setSize();
     };
@@ -32,7 +32,7 @@ class RowFixed extends Widget {
     // 绑定处理函数
     this.bind();
     // 注册焦点元素
-    table.widgetFocus.register({ target: this, stop: false });
+    table.focusManage.register({ target: this, stop: false });
   }
 
   bind() {

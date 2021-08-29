@@ -6,7 +6,7 @@ class HorizontalIcon3 extends Item {
   constructor() {
     super(`${cssPrefix}-tools-horizontal3`);
     this.icon = new Icon('align-right');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 }
 

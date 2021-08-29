@@ -14,7 +14,7 @@ class FontColor extends DropDownItem {
     this.fontColorContextMenu = new FontColorContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
     this.fontColorContextMenu.setActiveByColor('rgb(0,0,0)');
   }
 

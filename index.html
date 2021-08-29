@@ -14,18 +14,10 @@
         }
     </style>
 </head>
-<body id="dome"></body>
+<body id="dome">
+</body>
 <script>
-  const dome = document.getElementById('dome');
-  const xSheet = new XSheet(dome);
-  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_START, (e) => {
-    // console.log("开始编辑", e);
-  });
-  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_INPUT, () => {
-    // console.log("编辑中");
-  });
-  XSheet.XEvent.bind(xSheet, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_FINISH, () => {
-    // console.log("编辑结束");
-  });
+    const dome = document.getElementById('dome');
+    const sheet = new XSheet(dome);
 </script>
 </html>

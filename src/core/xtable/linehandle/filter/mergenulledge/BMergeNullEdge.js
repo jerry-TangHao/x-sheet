@@ -11,7 +11,7 @@ class BMergeNullEdge {
   }) {
     const { table } = this;
     const { merges } = table;
-    const merge = merges.getFirstIncludes(row, col);
+    const merge = merges.getFirstInclude(row, col);
     if (merge) {
       return merge.eri === row
         ? LineIteratorFilter.RETURN_TYPE.EXEC

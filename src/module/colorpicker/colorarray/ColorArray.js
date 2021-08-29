@@ -114,7 +114,7 @@ class ColorArray extends Widget {
     if (find === -1) {
       const { colors } = this;
       colors.push(item);
-      this.children(item);
+      this.childrenNodes(item);
       this.bind(item);
     }
   }

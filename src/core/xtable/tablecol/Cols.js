@@ -61,7 +61,7 @@ class Cols {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (SheetUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci + 1, 1);
           }
@@ -70,7 +70,7 @@ class Cols {
         listen.execute('insertColAfter', ci);
       },
       redo: () => {
-        if (SheetUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci + 1, 0, {});
           }
@@ -87,7 +87,7 @@ class Cols {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (SheetUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci, 1);
           }
@@ -96,7 +96,7 @@ class Cols {
         listen.execute('insertColBefore', ci);
       },
       redo: () => {
-        if (SheetUtils.isNotUnDef(ci)) {
+        if (SheetUtils.isDef(ci)) {
           if (ci <= data.length) {
             data.splice(ci, 0, {});
           }
@@ -114,8 +114,8 @@ class Cols {
     let oldValue;
     let action = {
       undo: () => {
-        if (SheetUtils.isNotUnDef(ci)) {
-          if (ci <= data.length || oldValue) {
+        if (SheetUtils.isDef(ci)) {
+          if (oldValue) {
             data.splice(ci, 0, oldValue);
           }
         }
@@ -123,9 +123,10 @@ class Cols {
         listen.execute('removeCol', ci);
       },
       redo: () => {
-        if (SheetUtils.isNotUnDef(ci)) {
+        oldValue = SheetUtils.Undef;
+        if (SheetUtils.isDef(ci)) {
           if (ci <= data.length) {
-            oldValue = data.splice(ci, 1);
+            oldValue = data.splice(ci, 1)[0];
           }
         }
         this.len--;
@@ -262,6 +263,12 @@ class Cols {
       data: this.data,
       width: this.width,
     };
+  }
+
+  syncColsLen(cols) {
+    if (cols) {
+      this.len = cols.len;
+    }
   }
 
 }

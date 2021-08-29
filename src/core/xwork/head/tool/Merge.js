@@ -7,7 +7,7 @@ class Merge extends Item {
   constructor() {
     super(`${cssPrefix}-tools-merge`);
     this.icon = new Icon('merge');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
 }

@@ -7,7 +7,7 @@ class Redo extends Item {
   constructor() {
     super(`${cssPrefix}-tools-redo`);
     this.icon = new Icon('redo');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
 }

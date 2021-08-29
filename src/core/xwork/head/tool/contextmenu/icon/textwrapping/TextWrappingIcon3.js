@@ -6,7 +6,7 @@ class TextWrappingIcon3 extends Item {
   constructor() {
     super(`${cssPrefix}-tools-text-wrapping3`);
     this.icon = new Icon('wrap');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 }
 

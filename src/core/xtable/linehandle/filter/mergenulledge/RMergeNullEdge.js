@@ -11,7 +11,7 @@ class RMergeNullEdge {
   }) {
     const { table } = this;
     const { merges } = table;
-    const merge = merges.getFirstIncludes(row, col);
+    const merge = merges.getFirstInclude(row, col);
     if (merge) {
       return merge.eci === col
         ? LineIteratorFilter.RETURN_TYPE.EXEC

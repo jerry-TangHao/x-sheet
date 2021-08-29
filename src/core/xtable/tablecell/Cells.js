@@ -1,37 +1,21 @@
 import { Cell } from './Cell';
 import { SheetUtils } from '../../../utils/SheetUtils';
-import { XIteratorBuilder } from '../iterator/XIteratorBuilder';
 import { XTableDataItems } from '../XTableDataItems';
-import { XMerges } from '../xmerges/XMerges';
-import { Snapshot } from '../snapshot/Snapshot';
 import { Listen } from '../../../lib/Listen';
+import { Merges } from '../merges/Merges';
+import { Snapshot } from '../snapshot/Snapshot';
 
 class Cells {
 
   constructor({
-    xIteratorBuilder = new XIteratorBuilder(),
     xTableData = new XTableDataItems(),
-    merges = new XMerges(),
+    merges = new Merges(),
     snapshot = new Snapshot(),
   } = {}) {
     this.xTableData = xTableData;
-    this.listen = new Listen();
     this.merges = merges;
     this.snapshot = snapshot;
-    this.xIteratorBuilder = xIteratorBuilder;
-  }
-
-  emptyRectRange(rectRange) {
-    let empty = true;
-    rectRange.each(this.xIteratorBuilder, (ri, ci) => {
-      const cell = this.getCell(ri, ci);
-      if (SheetUtils.isNotEmptyObject(cell) && !cell.isEmpty()) {
-        empty = false;
-        return false;
-      }
-      return true;
-    });
-    return empty;
+    this.listen = new Listen();
   }
 
   getCellOrNew(ri, ci) {
@@ -53,7 +37,7 @@ class Cells {
 
   getCellOrMergeCell(ri, ci) {
     const { merges } = this;
-    const merge = merges.getFirstIncludes(ri, ci);
+    const merge = merges.getFirstInclude(ri, ci);
     if (merge) {
       return this.getCell(merge.sri, merge.sci);
     }

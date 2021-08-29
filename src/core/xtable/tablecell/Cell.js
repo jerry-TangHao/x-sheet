@@ -1,7 +1,7 @@
 import { SheetUtils } from '../../../utils/SheetUtils';
 import { CellFont } from './CellFont';
 import { CellBorder } from './CellBorder';
-import { XIcon } from '../xicon/XIcon';
+import { XIcon } from '../tableicon/XIcon';
 import XTableFormat from '../XTableTextFormat';
 import { RichFonts } from './RichFonts';
 import { Formula } from '../../../formula/Formula';
@@ -15,7 +15,6 @@ class Cell {
   /**
    * Cell
    * @param background
-   * @param readOnly
    * @param format
    * @param text
    * @param richText
@@ -24,23 +23,22 @@ class Cell {
    * @param icons
    * @param borderAttr
    * @param fontAttr
-   * @param expr
+   * @param formula
    * @param contentWidth
    * @param contentHeight
    * @param contentType
    */
   constructor({
-    background = SheetUtils.Undef,
-    expr = SheetUtils.Undef,
     ruler = SheetUtils.Undef,
-    rich = SheetUtils.Undef,
-    text = SheetUtils.EMPTY,
     format = 'default',
-    readOnly = false,
     icons = [],
+    fontAttr = {},
     custom = {},
     borderAttr = {},
-    fontAttr = {},
+    formula = {},
+    richText = {},
+    background = SheetUtils.Undef,
+    text = SheetUtils.EMPTY,
     contentWidth = 0,
     contentHeight = 0,
     contentType = Cell.TYPE.STRING,
@@ -53,16 +51,14 @@ class Cell {
     this.custom = custom;
     // 字体测量尺子
     this.ruler = ruler;
-    // 单元格是否只读
-    this.readOnly = readOnly;
     // 格式化类型
     this.format = format;
     // 单元格公式
-    this.formula = new Formula({ expr });
+    this.formula = new Formula(formula);
     // 文本内容
     this.text = text;
     // 富文本内容
-    this.richText = new RichFonts({ rich });
+    this.richText = new RichFonts(richText);
     // 格式化后的内容
     this.formatText = SheetUtils.EMPTY;
     // 内容的高度
@@ -207,14 +203,6 @@ class Cell {
   }
 
   /**
-   * 是否只读
-   * @returns {boolean}
-   */
-  isReadOnly() {
-    return this.readOnly;
-  }
-
-  /**
    * 获取格式后的文本
    * @returns {string|*}
    */
@@ -239,7 +227,7 @@ class Cell {
       case Cell.TYPE.NUMBER:
       case Cell.TYPE.DATE_TIME: {
         if (format) {
-          if (!formatText) {
+          if (SheetUtils.isBlank(formatText)) {
             this.formatText = XTableFormat(format, text);
             return this.formatText;
           }
@@ -306,15 +294,15 @@ class Cell {
     const { richText, fontAttr, borderAttr } = this;
     return new Cell({
       background,
-      format,
       text,
       custom,
-      expr: formula.getExpr(),
-      rich: richText.getRich(),
+      contentType,
+      format,
       fontAttr,
       borderAttr,
       icons,
-      contentType,
+      formula,
+      richText,
     });
   }
 

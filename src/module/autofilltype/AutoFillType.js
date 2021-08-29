@@ -16,7 +16,7 @@ class AutoFillType extends ELContextMenu {
         this.autoFillTypeMenu.close();
         this.close();
       },
-    });
+    }).parentWidget(this);
     this.bind();
   }
 

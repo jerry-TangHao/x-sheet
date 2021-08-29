@@ -11,7 +11,7 @@ class FixedContextMenuItem extends ELContextMenuItem {
     this.title = title;
     this.titleElement = h('div', `${cssPrefix}-fixed-context-menu-item-title`);
     this.titleElement.text(title);
-    this.children(this.titleElement);
+    this.childrenNodes(this.titleElement);
     pool.push(this);
   }
 

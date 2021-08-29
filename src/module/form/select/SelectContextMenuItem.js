@@ -12,7 +12,7 @@ class SelectContextMenuItem extends ELContextMenuItem {
     this.text = text;
     this.textEle = h('div', `${cssPrefix}-form-select-menu-item-title`);
     this.textEle.text(text);
-    this.children(this.textEle);
+    this.childrenNodes(this.textEle);
   }
 
 }

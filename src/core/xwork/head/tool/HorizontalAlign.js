@@ -13,7 +13,7 @@ class HorizontalAlign extends DropDownItem {
     this.horizontalContextMenu = new HorizontalContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

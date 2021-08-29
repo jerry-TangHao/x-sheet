@@ -1,157 +1,39 @@
-// download.js v4.2, by dandavis; 2008-2016. [CCBY2] see http://danml.com/download.html for tests/usage
-// v1 landed a FF+Chrome compat way of downloading strings to local un-named files, upgraded to use a hidden frame and optional mime
-// v2 added named files via a[download], msSaveBlob, IE (10+) support, and window.URL support for larger+faster saves than dataURLs
-// v3 added dataURL and Blob Input, bind-toggle arity, and legacy dataURL fallback was improved with force-download mime and base64 support. 3.1 improved safari handling.
-// v4 adds AMD/UMD, commonJS, and plain browser support
-// v4.1 adds url download capability via solo URL argument (same domain/CORS only)
-// v4.2 adds semantic variable names, long (over 2MB) dataURL support, and hidden by default temp anchors
-// https://github.com/rndme/download
-
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define([], factory);
-  } else if (typeof exports === 'object') {
-    // Node. Does not workbook with strict CommonJS, but
-    // only CommonJS-like environments that support module.exports,
-    // like Node.
-    module.exports = factory();
+/* global window Blob document */
+function Download(data, filename, mime, bom) {
+  let blobData = (typeof bom !== 'undefined') ? [bom, data] : [data];
+  let blob = new Blob(blobData, { type: mime || 'application/octet-stream' });
+  if (typeof window.navigator.msSaveBlob !== 'undefined') {
+    // IE workaround for "HTML7007: One or more blob URLs were
+    // revoked by closing the blob for which they were created.
+    // These URLs will no longer resolve as the data backing
+    // the URL has been freed."
+    window.navigator.msSaveBlob(blob, filename);
   } else {
-    // Browser globals (root is window)
-    root.download = factory();
-  }
-}(this, () => function download(data, strFileName, strMimeType) {
+    let blobURL = (window.URL && window.URL.createObjectURL) ? window.URL.createObjectURL(blob) : window.webkitURL.createObjectURL(blob);
+    let tempLink = document.createElement('a');
+    tempLink.style.display = 'none';
+    tempLink.href = blobURL;
+    tempLink.setAttribute('download', filename);
 
-  let self = window; // this script is only for browsers anyway...
-  let defaultMime = 'application/octet-stream'; // this default mime also triggers iframe downloads
-  let mimeType = strMimeType || defaultMime;
-  let payload = data;
-  let url = !strFileName && !strMimeType && payload;
-  let anchor = document.createElement('a');
-  let toString = function (a) { return String(a); };
-  let myBlob = (self.Blob || self.MozBlob || self.WebKitBlob || toString);
-  let fileName = strFileName || 'download';
-  let blob;
-  let reader;
-  myBlob = myBlob.call ? myBlob.bind(self) : Blob;
-
-  if (String(this) === 'true') { // reverse arguments, allowing download.bind(true, "text/xml", "export.xml") to act as a callback
-    payload = [payload, mimeType];
-    mimeType = payload[0];
-    payload = payload[1];
-  }
-
-
-  if (url && url.length < 2048) { // if no filename and no mime, assume a url was passed as the only argument
-    fileName = url.split('/').pop().split('?')[0];
-    anchor.href = url; // assign href prop to temp anchor
-    if (anchor.href.indexOf(url) !== -1) { // if the browser determines that it's a potentially valid url path:
-      let ajax = new XMLHttpRequest();
-      ajax.open('GET', url, true);
-      ajax.responseType = 'blob';
-      ajax.onload = function (e) {
-        download(e.target.response, fileName, defaultMime);
-      };
-      setTimeout(() => { ajax.send(); }, 0); // allows setting custom ajax headers using the return:
-      return ajax;
-    } // end if valid url?
-  } // end if url?
-
-
-  // go ahead and download dataURLs right away
-  if (/^data\:[\w+\-]+\/[\w+\-]+[,;]/.test(payload)) {
-
-    if (payload.length > (1024 * 1024 * 1.999) && myBlob !== toString) {
-      payload = dataUrlToBlob(payload);
-      mimeType = payload.type || defaultMime;
-    } else {
-      return navigator.msSaveBlob // IE10 can't do a[download], only Blobs:
-        ? navigator.msSaveBlob(dataUrlToBlob(payload), fileName)
-        : saver(payload); // everyone else can save dataURLs un-processed
+    // Safari thinks _blank anchor are pop ups. We only want to set _blank
+    // target if the browser does not support the HTML5 download attribute.
+    // This allows you to download files in desktop safari if pop up blocking
+    // is enabled.
+    if (typeof tempLink.download === 'undefined') {
+      tempLink.setAttribute('target', '_blank');
     }
 
-  }// end if dataURL passed?
+    document.body.appendChild(tempLink);
+    tempLink.click();
 
-  blob = payload instanceof myBlob
-    ? payload
-    : new myBlob([payload], { type: mimeType });
-
-
-  function dataUrlToBlob(strUrl) {
-    let parts = strUrl.split(/[:;,]/);
-    let type = parts[1];
-    let decoder = parts[2] == 'base64' ? atob : decodeURIComponent;
-    let binData = decoder(parts.pop());
-    let mx = binData.length;
-    let i = 0;
-    let uiArr = new Uint8Array(mx);
-
-    for (i; i < mx; ++i) uiArr[i] = binData.charCodeAt(i);
-
-    return new myBlob([uiArr], { type });
+    // Fixes "webkit blob resource error 1"
+    setTimeout(() => {
+      document.body.removeChild(tempLink);
+      window.URL.revokeObjectURL(blobURL);
+    }, 200);
   }
+}
 
-  function saver(url, winMode) {
-
-    if ('download' in anchor) { // html5 A[download]
-      anchor.href = url;
-      anchor.setAttribute('download', fileName);
-      anchor.className = 'download-js-link';
-      anchor.innerHTML = 'downloading...';
-      anchor.style.display = 'none';
-      document.body.appendChild(anchor);
-      setTimeout(() => {
-        anchor.click();
-        document.body.removeChild(anchor);
-        if (winMode === true) { setTimeout(() => { self.URL.revokeObjectURL(anchor.href); }, 250); }
-      }, 66);
-      return true;
-    }
-
-    // handle non-a[download] safari as best we can:
-    if (/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//.test(navigator.userAgent)) {
-      url = url.replace(/^data:([\w\/\-\+]+)/, defaultMime);
-      if (!window.open(url)) { // popup blocked, offer direct download:
-        if (confirm('Displaying New Document\n\nUse Save As... to download, then click back to return to this page.')) { location.href = url; }
-      }
-      return true;
-    }
-
-    // do iframe dataURL download (old ch+FF):
-    let f = document.createElement('iframe');
-    document.body.appendChild(f);
-
-    if (!winMode) { // force a mime that will download:
-      url = `data:${url.replace(/^data:([\w\/\-\+]+)/, defaultMime)}`;
-    }
-    f.src = url;
-    setTimeout(() => { document.body.removeChild(f); }, 333);
-
-  }// end saver
-
-
-  if (navigator.msSaveBlob) { // IE10+ : (has Blob, but not a[download] or URL)
-    return navigator.msSaveBlob(blob, fileName);
-  }
-
-  if (self.URL) { // simple fast and modern way using Blob and URL:
-    saver(self.URL.createObjectURL(blob), true);
-  } else {
-    // handle non-Blob()+non-URL browsers:
-    if (typeof blob === 'string' || blob.constructor === toString) {
-      try {
-        return saver(`data:${mimeType};base64,${self.btoa(blob)}`);
-      } catch (y) {
-        return saver(`data:${mimeType},${encodeURIComponent(blob)}`);
-      }
-    }
-
-    // Blob but not URL support:
-    reader = new FileReader();
-    reader.onload = function (e) {
-      saver(this.result);
-    };
-    reader.readAsDataURL(blob);
-  }
-  return true;
-} /* end download() */));
+export {
+  Download,
+};

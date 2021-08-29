@@ -20,8 +20,8 @@ class ScrollBarX extends Widget {
     this.nextBut = h('div', `${cssPrefix}-scroll-bar-x-next-but`);
     this.content = h('div', `${cssPrefix}-scroll-bar-x-content`);
     this.block = h('div', `${cssPrefix}-scroll-bar-x-block`);
-    this.content.children(this.block);
-    this.children(...[
+    this.content.childrenNodes(this.block);
+    this.childrenNodes(...[
       this.lastBut,
       this.nextBut,
       this.content,

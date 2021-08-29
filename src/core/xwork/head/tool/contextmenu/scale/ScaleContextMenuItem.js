@@ -9,7 +9,7 @@ class ScaleContextMenuItem extends ELContextMenuItem {
     this.scale = scale;
     this.titleElement = h('div', `${cssPrefix}-scale-context-menu-item-title`);
     this.titleElement.text(`${scale}%`);
-    this.children(this.titleElement);
+    this.childrenNodes(this.titleElement);
   }
 
 }

@@ -40,7 +40,7 @@ class Mask extends Widget {
 
   open() {
     if (this.status === false) {
-      this.root.children(this);
+      this.root.childrenNodes(this);
       this.status = true;
     }
     return this;

@@ -7,7 +7,7 @@ class Filter extends Item {
   constructor() {
     super(`${cssPrefix}-tools-filter`);
     this.icon = new Icon('filter');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
 }

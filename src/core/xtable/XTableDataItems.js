@@ -11,29 +11,6 @@ class XTableDataItems {
     this.snapshot = snapshot;
   }
 
-  split(sri, eri, sci, eci) {
-    const rows = this.items.slice(sri, eri + 1);
-    return rows.map((row) => {
-      if (row) {
-        return row.slice(sci, eci + 1);
-      }
-      return row;
-    });
-  }
-
-  set(ri, ci, item) {
-    const line = this.items[ri] || [];
-    line[ci] = item;
-    this.items[ri] = line;
-  }
-
-  setOrNew(ri, ci, item) {
-    const line = this.items[ri];
-    if (line) {
-      line[ci] = item;
-    }
-  }
-
   getOrNew(ri, ci) {
     const find = this.get(ri, ci);
     if (find) {
@@ -48,11 +25,27 @@ class XTableDataItems {
     return this.items;
   }
 
+  slice(sri, sci, eri, eci) {
+    const rows = this.items.slice(sri, eri + 1);
+    return rows.map((row) => {
+      if (row) {
+        return row.slice(sci, eci + 1);
+      }
+      return row;
+    });
+  }
+
   get(ri, ci) {
     const line = this.items[ri];
     return line && line[ci]
       ? this.wrap(line, ci)
       : undefined;
+  }
+
+  set(ri, ci, item) {
+    const line = this.items[ri] || [];
+    line[ci] = item;
+    this.items[ri] = line;
   }
 
   wrap(line, ci) {
@@ -66,6 +59,102 @@ class XTableDataItems {
     return item;
   }
 
+  each(callback) {
+    const { items } = this;
+    const { length } = items;
+    for (let i = 0; i < length; i++) {
+      let item = items[i];
+      if (item) {
+        const { length } = item;
+        for (let j = 0; j < length; j++) {
+          let cell = this.get(i, j);
+          callback(cell);
+        }
+      }
+    }
+  }
+
+  clear(rectRange, {
+    ignoreCorner = false,
+  } = {}) {
+    let { sri, eri } = rectRange;
+    let { sci, eci } = rectRange;
+    let { items } = this;
+    let { snapshot } = this;
+    let { length } = items;
+    let oldItems = [];
+    let effRiLength = eri - sri + 1;
+    let effCiLength = eci - sci + 1;
+    let action = {
+      undo: () => {
+        for (let ri = sri; ri <= eri; ri++) {
+          if (ri >= length) {
+            break;
+          }
+          let oldRowItem = oldItems[ri];
+          let rowItem = items[ri];
+          if (rowItem) {
+            for (let ci = sci; ci <= eci; ci++) {
+              if (ci >= length) {
+                break;
+              }
+              if (ignoreCorner) {
+                let firstRi = ri === sri;
+                let firstCi = ci === sci;
+                if (firstRi && firstCi) {
+                  continue;
+                }
+                rowItem[ci] = oldRowItem[ci];
+              } else {
+                rowItem[ci] = oldRowItem[ci];
+              }
+            }
+          }
+        }
+      },
+      redo: () => {
+        oldItems = new Array(effRiLength);
+        for (let ri = sri; ri <= eri; ri++) {
+          if (ri >= length) {
+            break;
+          }
+          let rowItem = items[ri];
+          if (rowItem) {
+            let oldRowItem = new Array(effCiLength);
+            let { length } = rowItem;
+            for (let ci = sci; ci <= eci; ci++) {
+              if (ci >= length) {
+                break;
+              }
+              if (ignoreCorner) {
+                let firstRi = ri === sri;
+                let firstCi = ci === sci;
+                if (firstRi && firstCi) {
+                  continue;
+                }
+                oldRowItem[ci] = rowItem[ci];
+                rowItem[ci] = undefined;
+              } else {
+                oldRowItem[ci] = rowItem[ci];
+                rowItem[ci] = undefined;
+              }
+            }
+            oldItems[ri] = oldRowItem;
+          }
+        }
+      },
+    };
+    snapshot.addAction(action);
+    action.redo();
+  }
+
+  setOrNew(ri, ci, item) {
+    const line = this.items[ri];
+    if (line) {
+      line[ci] = item;
+    }
+  }
+
   removeRow(ri) {
     let { snapshot } = this;
     let orderValue;
@@ -76,7 +165,7 @@ class XTableDataItems {
         }
       },
       redo: () => {
-        orderValue = this.items.splice(ri, 1);
+        orderValue = this.items.splice(ri, 1)[0];
       },
     };
     snapshot.addAction(action);
@@ -88,19 +177,24 @@ class XTableDataItems {
     let orderValue = [];
     let action = {
       undo: () => {
-        for (let i = 0, len = this.items.length; i < len; i++) {
-          const subItems = this.items[i];
-          if (subItems) {
-            subItems.splice(ci, 0, orderValue[i]);
-          }
+        let { length } = orderValue;
+        for (let i = 0; i < length; i++) {
+          const value = orderValue[i];
+          const { ri, item } = value;
+          const subItems = this.items[ri];
+          subItems.splice(ci, 0, item);
         }
       },
       redo: () => {
-        for (let i = 0, len = this.items.length; i < len; i++) {
-          const subItems = this.items[i];
+        let { length } = this.items;
+        orderValue = [];
+        for (let ri = 0; ri < length; ri++) {
+          const subItems = this.items[ri];
           if (subItems) {
-            const item = subItems.splice(ci, 1);
-            orderValue.push(item);
+            const item = subItems.splice(ci, 1)[0];
+            orderValue.push({
+              ri, item,
+            });
           }
         }
       },

@@ -5,12 +5,10 @@ class XTableDataItem {
 
   constructor(options) {
     if (options) {
-      const { cell, mergeId } = options;
+      const { cell } = options;
       this.cell = SheetUtils.safeValue(cell, options);
-      this.mergeId = SheetUtils.safeValue(mergeId, undefined);
     } else {
       this.cell = undefined;
-      this.mergeId = undefined;
     }
   }
 
@@ -29,17 +27,8 @@ class XTableDataItem {
     return this.cell;
   }
 
-  getMergeId() {
-    return this.mergeId;
-  }
-
   setCell(cell) {
     this.cell = cell;
-    return this;
-  }
-
-  setMergeId(mergeId) {
-    this.mergeId = mergeId;
     return this;
   }
 

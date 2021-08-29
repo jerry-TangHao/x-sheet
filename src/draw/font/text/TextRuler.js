@@ -14,8 +14,7 @@ class TextRuler extends BaseRuler {
 
   isBlank() {
     const { text } = this;
-    return text === null || text === undefined
-        || text.toString().trim() === '';
+    return text === null || text === undefined || text.toString() === '';
   }
 
   hasBreak() {

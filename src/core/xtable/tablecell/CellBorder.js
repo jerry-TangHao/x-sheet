@@ -147,11 +147,12 @@ class CellBorder {
   }
 
   clone() {
-    const {
-      left, top, right, bottom,
-    } = this;
+    const { left, top, right, bottom } = this;
     return new CellBorder({
-      left, top, right, bottom,
+      left: left.clone(),
+      top: top.clone(),
+      right: right.clone(),
+      bottom: bottom.clone(),
     });
   }
 

@@ -61,7 +61,7 @@ class Rows {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (SheetUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri + 1, 1);
           }
@@ -70,7 +70,7 @@ class Rows {
         listen.execute('insertRowAfter', ri);
       },
       redo: () => {
-        if (SheetUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri + 1, 0, {});
           }
@@ -87,7 +87,7 @@ class Rows {
     let { listen, data, snapshot } = this;
     let action = {
       undo: () => {
-        if (SheetUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri, 1);
           }
@@ -96,7 +96,7 @@ class Rows {
         listen.execute('insertRowBefore', ri);
       },
       redo: () => {
-        if (SheetUtils.isNotUnDef(ri)) {
+        if (SheetUtils.isDef(ri)) {
           if (ri <= data.length) {
             data.splice(ri, 0, {});
           }
@@ -114,8 +114,8 @@ class Rows {
     let oldValue;
     let action = {
       undo: () => {
-        if (SheetUtils.isNotUnDef(ri)) {
-          if (ri <= data.length || oldValue) {
+        if (SheetUtils.isDef(ri)) {
+          if (oldValue) {
             data.splice(ri, 0, oldValue);
           }
         }
@@ -123,9 +123,10 @@ class Rows {
         listen.execute('removeRow', ri);
       },
       redo: () => {
-        if (SheetUtils.isNotUnDef(ri)) {
+        oldValue = SheetUtils.Undef;
+        if (SheetUtils.isDef(ri)) {
           if (ri <= data.length) {
-            oldValue = data.splice(ri, 1);
+            oldValue = data.splice(ri, 1)[0];
           }
         }
         this.len--;
@@ -262,6 +263,12 @@ class Rows {
       data: this.data,
       height: this.height,
     };
+  }
+
+  syncRowsLen(rows) {
+    if (rows) {
+      this.len = rows.len;
+    }
   }
 
 }

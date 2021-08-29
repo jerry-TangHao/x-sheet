@@ -15,7 +15,7 @@ class FontAngle extends DropDownItem {
     this.fontAngleContextMenu = new FontAngleContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   setValue(value) {

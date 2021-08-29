@@ -16,7 +16,7 @@ import { SheetUtils } from '../../../utils/SheetUtils';
 import { XEvent } from '../../../lib/XEvent';
 import { XWorkTab } from './tab/XWorkTab';
 import { XWorkSheet } from './sheet/XWorkSheet';
-import Download from '../../../lib/donwload/Download';
+import { Download } from '../../../lib/donwload/Download';
 import { Throttle } from '../../../lib/Throttle';
 import { XDraw } from '../../../draw/XDraw';
 import { XWorkBodyKeyHandle } from './XWorkBodyKeyHandle';
@@ -46,7 +46,7 @@ class XWorkBody extends Widget {
     // 版本标识
     this.version = h('div', `${cssPrefix}-version-tips`);
     this.version.html(`<a target="_blank" href="https://gitee.com/eigi/x-sheet">${XSheetVersion}</a>`);
-    this.children(this.version);
+    this.childrenNodes(this.version);
     // 组件
     this.sheetView = new XWorkSheetView({
       ...this.options.sheetConfig,
@@ -69,7 +69,7 @@ class XWorkBody extends Widget {
           ok: () => {
             this.removeByIndex(index);
           },
-        }).open();
+        }).parentWidget(this).open();
       },
     });
     this.scrollBarY = new ScrollBarY({
@@ -148,8 +148,8 @@ class XWorkBody extends Widget {
         flexGrow: 2,
       },
     });
-    this.scrollBarXVerticalCenter.children(this.scrollBarXLayer);
-    this.scrollBarXHorizontalLayer.children(this.scrollBarXVerticalCenter);
+    this.scrollBarXVerticalCenter.attach(this.scrollBarXLayer);
+    this.scrollBarXHorizontalLayer.attach(this.scrollBarXVerticalCenter);
     // 选项卡
     this.sheetSwitchTabLayer = new HorizontalLayerElement({
       style: {
@@ -159,10 +159,10 @@ class XWorkBody extends Widget {
     // 水平布局
     this.horizontalLayer1 = new HorizontalLayer();
     this.horizontalLayer2 = new HorizontalLayer();
-    this.horizontalLayer1.children(this.sheetViewLayer);
-    this.horizontalLayer1.children(this.scrollBarYLayer);
-    this.horizontalLayer2.children(this.sheetSwitchTabLayer);
-    this.horizontalLayer2.children(this.scrollBarXHorizontalLayer);
+    this.horizontalLayer1.attach(this.sheetViewLayer);
+    this.horizontalLayer1.attach(this.scrollBarYLayer);
+    this.horizontalLayer2.attach(this.sheetSwitchTabLayer);
+    this.horizontalLayer2.attach(this.scrollBarXHorizontalLayer);
     // 根布局
     this.horizontalLayer1Layer = new VerticalLayerElement({
       style: {
@@ -171,24 +171,11 @@ class XWorkBody extends Widget {
     });
     this.horizontalLayer2Layer = new VerticalLayerElement();
     this.layerVerticalLayer = new VerticalLayer();
-    this.horizontalLayer1Layer.children(this.horizontalLayer1);
-    this.horizontalLayer2Layer.children(this.horizontalLayer2);
-    this.layerVerticalLayer.children(this.horizontalLayer1Layer);
-    this.layerVerticalLayer.children(this.horizontalLayer2Layer);
-    this.children(this.layerVerticalLayer);
-  }
-
-  /**
-   * 初始化Sheet
-   */
-  initializeSheet() {
-    for (const item of this.sheets) {
-      const { name } = item;
-      const tab = new XWorkTab(name);
-      const sheet = new XWorkSheet(tab, item);
-      this.addTabSheet(tab, sheet);
-    }
-    this.setActiveByIndex();
+    this.horizontalLayer1Layer.attach(this.horizontalLayer1);
+    this.horizontalLayer2Layer.attach(this.horizontalLayer2);
+    this.layerVerticalLayer.attach(this.horizontalLayer1Layer);
+    this.layerVerticalLayer.attach(this.horizontalLayer2Layer);
+    this.attach(this.layerVerticalLayer);
   }
 
   /**
@@ -203,6 +190,19 @@ class XWorkBody extends Widget {
     sheetViewLayer.attach(this.sheetView);
     this.bind();
     this.initializeSheet();
+    this.setActiveByIndex();
+  }
+
+  /**
+   * 初始化Sheet
+   */
+  initializeSheet() {
+    for (const item of this.sheets) {
+      const { name } = item;
+      const tab = new XWorkTab(name);
+      const sheet = new XWorkSheet(tab, item);
+      this.addTabSheet(tab, sheet);
+    }
   }
 
   /**
@@ -333,8 +333,8 @@ class XWorkBody extends Widget {
     const { tabView } = this;
     tabView.setActiveByIndex(index);
     sheetView.setActiveByIndex(index);
-    this.refreshActiveTable();
     this.trigger(Constant.WORK_BODY_EVENT_TYPE.CHANGE_ACTIVE);
+    this.refreshActiveTable();
   }
 
   /**
@@ -469,10 +469,9 @@ class XWorkBody extends Widget {
    * 刷新滚动条大小
    */
   refreshScrollBarSize() {
+    const { scrollBarXHorizontalLayer } = this;
+    const { scrollBarY, scrollBarX } = this;
     const table = this.getActiveTable();
-    const {
-      scrollBarXHorizontalLayer, scrollBarY, scrollBarX,
-    } = this;
     // 获取表格大小
     const totalHeight = table.getScrollTotalHeight();
     const totalWidth = table.getScrollTotalWidth();

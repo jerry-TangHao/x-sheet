@@ -7,7 +7,7 @@ class Undo extends Item {
   constructor() {
     super(`${cssPrefix}-tools-undo`);
     this.icon = new Icon('undo');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
 }

@@ -743,6 +743,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   user-select: auto;
+  padding: 2px;
 }
 .x-sheet-table-y-height-light {
   width: 100px;
@@ -1761,17 +1762,85 @@
 .x-sheet-option-item:hover {
   background: #e8e8e8;
 }
-.x-sheet-file-context-menu {
+.x-sheet-option-file-context-menu {
   background: #ffffff;
 }
-.x-sheet-file-context-menu-item {
+.x-sheet-option-file-context-menu-item {
   overflow: hidden;
   margin-top: 2px;
   margin-bottom: 2px;
   font-size: 13px;
   padding: 5px;
 }
-.x-sheet-file-context-menu-item-title {
+.x-sheet-option-file-context-menu-item-title {
+  float: left;
+  line-height: 20px;
+  margin-right: 20px;
+  font-size: 15px;
+  width: 100%;
+}
+.x-sheet-option-format-context-menu {
+  background: #ffffff;
+}
+.x-sheet-option-format-context-menu-item {
+  overflow: hidden;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 13px;
+  padding: 5px;
+}
+.x-sheet-option-format-context-menu-item-title {
+  float: left;
+  line-height: 20px;
+  margin-right: 20px;
+  font-size: 15px;
+  width: 100%;
+}
+.x-sheet-option-insert-context-menu {
+  background: #ffffff;
+}
+.x-sheet-option-insert-context-menu-item {
+  overflow: hidden;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 13px;
+  padding: 5px;
+}
+.x-sheet-option-insert-context-menu-item-title {
+  float: left;
+  line-height: 20px;
+  margin-right: 20px;
+  font-size: 15px;
+  width: 100%;
+}
+.x-sheet-option-look-context-menu {
+  background: #ffffff;
+}
+.x-sheet-option-look-context-menu-item {
+  overflow: hidden;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 13px;
+  padding: 5px;
+}
+.x-sheet-option-look-context-menu-item-title {
+  float: left;
+  line-height: 20px;
+  margin-right: 20px;
+  font-size: 15px;
+  width: 100%;
+}
+.x-sheet-option-update-context-menu {
+  background: #ffffff;
+}
+.x-sheet-option-update-context-menu-item {
+  overflow: hidden;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 13px;
+  padding: 5px;
+}
+.x-sheet-option-update-context-menu-item-title {
   float: left;
   line-height: 20px;
   margin-right: 20px;

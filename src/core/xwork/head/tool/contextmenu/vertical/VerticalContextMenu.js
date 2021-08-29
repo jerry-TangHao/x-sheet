@@ -19,12 +19,12 @@ class VerticalContextMenu extends ELContextMenu {
     this.verticalIcon2 = new VerticalIcon2();
     this.verticalIcon3 = new VerticalIcon3();
     const div2 = h('div', `${cssPrefix}-vertical-type-context-menu-type-icon-line`);
-    div2.children(this.verticalIcon1);
-    div2.children(this.verticalIcon2);
-    div2.children(this.verticalIcon3);
+    div2.childrenNodes(this.verticalIcon1);
+    div2.childrenNodes(this.verticalIcon2);
+    div2.childrenNodes(this.verticalIcon3);
     this.verticalIcons = new VerticalContextMenuItem();
     this.verticalIcons.removeClass('hover');
-    this.verticalIcons.children(div2);
+    this.verticalIcons.childrenNodes(div2);
     this.addItem(this.verticalIcons);
     this.bind();
   }

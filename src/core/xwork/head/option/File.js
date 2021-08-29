@@ -11,7 +11,7 @@ class File extends Item {
     this.fileContextMenu = new FileContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

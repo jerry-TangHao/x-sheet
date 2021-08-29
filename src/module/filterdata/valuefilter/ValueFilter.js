@@ -26,9 +26,9 @@ class ValueFilter extends ELContextMenuItem {
     this.titleTextEle = h('span', `${cssPrefix}-value-filter-title-text`);
     this.titleIconEle = h('span', `${cssPrefix}-value-filter-title-icon`);
     this.titleTextEle.text('按值过滤');
-    this.titleEle.children(this.titleIconEle);
-    this.titleEle.children(this.titleTextEle);
-    this.children(this.titleEle);
+    this.titleEle.childrenNodes(this.titleIconEle);
+    this.titleEle.childrenNodes(this.titleTextEle);
+    this.childrenNodes(this.titleEle);
     // 操作按钮
     this.optionBoxEle = h('div', `${cssPrefix}-value-filter-option-box`);
     this.selectEle = h('div', `${cssPrefix}-value-filter-option-select`);
@@ -37,18 +37,18 @@ class ValueFilter extends ELContextMenuItem {
     this.clearEle.text('清空');
     this.flagEle.html('&nbsp;-&nbsp;');
     this.selectEle.text('全选');
-    this.optionBoxEle.children(this.selectEle);
-    this.optionBoxEle.children(this.flagEle);
-    this.optionBoxEle.children(this.clearEle);
-    this.children(this.optionBoxEle);
+    this.optionBoxEle.childrenNodes(this.selectEle);
+    this.optionBoxEle.childrenNodes(this.flagEle);
+    this.optionBoxEle.childrenNodes(this.clearEle);
+    this.childrenNodes(this.optionBoxEle);
     // 搜索框
     this.searchBoxEle = h('div', `${cssPrefix}-value-filter-input-box`);
     this.searchInput = new SearchInput();
-    this.searchBoxEle.children(this.searchInput);
-    this.children(this.searchBoxEle);
+    this.searchBoxEle.childrenNodes(this.searchInput);
+    this.childrenNodes(this.searchBoxEle);
     // 条目盒子
     this.itemsBox = h('div', `${cssPrefix}-value-filter-items-box`);
-    this.children(this.itemsBox);
+    this.childrenNodes(this.itemsBox);
     // 事件处理
     this.hide();
     this.bind();
@@ -115,7 +115,7 @@ class ValueFilter extends ELContextMenuItem {
   addItem(valueItem) {
     valueItem.setIndex(this.items.length);
     this.items.push(valueItem);
-    this.itemsBox.children(valueItem);
+    this.itemsBox.childrenNodes(valueItem);
   }
 
   /**
@@ -135,11 +135,11 @@ class ValueFilter extends ELContextMenuItem {
       });
       // 显示筛选内容
       filters.forEach((item) => {
-        itemsBox.children(item);
+        itemsBox.childrenNodes(item);
       });
     } else {
       items.forEach((item) => {
-        itemsBox.children(item);
+        itemsBox.childrenNodes(item);
       });
     }
     this.filters = filters;

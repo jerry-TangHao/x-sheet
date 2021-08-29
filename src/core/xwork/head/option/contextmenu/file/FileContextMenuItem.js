@@ -5,12 +5,12 @@ import { h } from '../../../../../../lib/Element';
 class FileContextMenuItem extends ELContextMenuItem {
 
   constructor(text, type) {
-    super(`${cssPrefix}-file-context-menu-item`);
+    super(`${cssPrefix}-option-file-context-menu-item`);
     this.text = text;
     this.type = type;
-    this.titleElement = h('div', `${cssPrefix}-file-context-menu-item-title`);
+    this.titleElement = h('div', `${cssPrefix}-option-file-context-menu-item-title`);
     this.titleElement.text(`${text}`);
-    this.children(this.titleElement);
+    this.childrenNodes(this.titleElement);
   }
 
 }

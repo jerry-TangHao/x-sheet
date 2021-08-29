@@ -7,7 +7,7 @@ class DropRowFixed extends Widget {
   constructor(table) {
     super(`${cssPrefix}-table-drop-row-fixed-bar`);
     this.block = h('div', `${cssPrefix}-table-drop-row-fixed-block`);
-    this.children(this.block);
+    this.childrenNodes(this.block);
     this.table = table;
   }
 

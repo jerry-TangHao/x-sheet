@@ -14,10 +14,10 @@ class LineTypeContextMenuItem extends ELContextMenuItem {
     this.typeIcon.setWidth(50);
     this.iconElement = h('div', `${cssPrefix}-font-context-menu-item-icon`);
     this.titleElement = h('div', `${cssPrefix}-font-context-menu-item-title`);
-    this.iconElement.children(this.icon);
-    this.titleElement.children(this.typeIcon);
-    this.children(this.iconElement);
-    this.children(this.titleElement);
+    this.iconElement.childrenNodes(this.icon);
+    this.titleElement.childrenNodes(this.typeIcon);
+    this.childrenNodes(this.iconElement);
+    this.childrenNodes(this.titleElement);
     pool.push(this);
   }
 

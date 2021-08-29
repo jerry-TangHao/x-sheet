@@ -10,7 +10,7 @@ class FontAngleValueContextMenuItem extends ELContextMenuItem {
     this.titleElement = h('div', `${cssPrefix}-font-angle-value-context-menu-item-title`);
     this.titleElement.text(angleValue);
     this.titleElement.css('text-align', 'center');
-    this.children(this.titleElement);
+    this.childrenNodes(this.titleElement);
   }
 
 }

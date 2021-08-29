@@ -6,7 +6,7 @@ class VerticalIcon2 extends Item {
   constructor() {
     super(`${cssPrefix}-tools-verticalIcon2`);
     this.icon = new Icon('align-middle');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 }
 

@@ -19,12 +19,12 @@ class HorizontalContextMenu extends ELContextMenu {
     this.horizontalIcon2 = new HorizontalIcon2();
     this.horizontalIcon3 = new HorizontalIcon3();
     const div2 = h('div', `${cssPrefix}-horizontal-type-context-menu-type-icon-line`);
-    div2.children(this.horizontalIcon1);
-    div2.children(this.horizontalIcon2);
-    div2.children(this.horizontalIcon3);
+    div2.childrenNodes(this.horizontalIcon1);
+    div2.childrenNodes(this.horizontalIcon2);
+    div2.childrenNodes(this.horizontalIcon3);
     this.horizontalIcons = new HorizontalContextMenuItem();
     this.horizontalIcons.removeClass('hover');
-    this.horizontalIcons.children(div2);
+    this.horizontalIcons.childrenNodes(div2);
     this.addItem(this.horizontalIcons);
     this.bind();
   }

@@ -199,9 +199,7 @@ class RectRange {
     const addRet = (sri, sci, eri, eci) => {
       ret.push(new RectRange(sri, sci, eri, eci));
     };
-    const {
-      sri, sci, eri, eci,
-    } = this;
+    const { sri, sci, eri, eci } = this;
     const dsr = other.sri - sri;
     const dsc = other.sci - sci;
     const der = eri - other.eri;

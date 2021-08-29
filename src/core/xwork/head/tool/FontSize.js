@@ -13,7 +13,7 @@ class FontSize extends DropDownItem {
     this.fontSizeContextMenu = new FontSizeContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

@@ -6,7 +6,7 @@ class FontAngle4 extends Item {
   constructor() {
     super(`${cssPrefix}-tools-font-angle4`);
     this.icon = new Icon('font-angle4');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 }
 export {

@@ -23,14 +23,14 @@ class FilterData extends ELContextMenu {
     this.orderZa = new OrderZA();
     this.okEle = h('div', `${cssPrefix}-filter-data-menu-button ${cssPrefix}-filter-data-menu-ok`);
     this.noEle = h('div', `${cssPrefix}-filter-data-menu-button ${cssPrefix}-filter-data-menu-no`);
-    this.children(this.orderAz);
-    this.children(this.orderZa);
-    this.children(new ELContextMenuDivider());
-    this.children(this.ifFilter);
-    this.children(this.valueFilter);
-    this.children(new ELContextMenuDivider());
-    this.children(this.noEle);
-    this.children(this.okEle);
+    this.attach(this.orderAz);
+    this.attach(this.orderZa);
+    this.attach(new ELContextMenuDivider());
+    this.attach(this.ifFilter);
+    this.attach(this.valueFilter);
+    this.attach(new ELContextMenuDivider());
+    this.childrenNodes(this.noEle);
+    this.childrenNodes(this.okEle);
     this.okEle.html('确定');
     this.noEle.html('取消');
     this.okHandle = () => {

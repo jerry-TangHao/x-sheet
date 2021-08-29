@@ -15,7 +15,7 @@ class Format extends DropDownItem {
     this.formatContextMenu = new FormatContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

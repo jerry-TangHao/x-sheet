@@ -15,16 +15,16 @@ class ColorItem extends Widget {
     this.icon = this.options.icon;
     this.color = SheetUtils.blankClear(this.options.color);
     if (this.icon) {
-      this.children(this.options.icon);
+      this.childrenNodes(this.options.icon);
     }
     if (this.color) {
       this.css('backgroundColor', this.color);
       if (ColorPicker.isDark(this.options.color)) {
         this.checkedIcon = new Icon('checked-dark');
-        this.children(this.checkedIcon);
+        this.childrenNodes(this.checkedIcon);
       } else {
         this.checkedIcon = new Icon('checked-light');
-        this.children(this.checkedIcon);
+        this.childrenNodes(this.checkedIcon);
       }
       this.checkedIcon.hide();
     }

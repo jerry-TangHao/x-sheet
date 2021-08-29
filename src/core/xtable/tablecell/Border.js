@@ -74,13 +74,6 @@ class Border {
     this.zIndex = value;
   }
 
-  equal(target) {
-    const widthType = this.widthType === target.widthType;
-    const color = this.color === target.color;
-    const type = this.type === target.type;
-    return color && widthType && type;
-  }
-
   priority(border) {
     if (SheetUtils.isUnDef(border)) {
       return -2;
@@ -94,6 +87,23 @@ class Border {
       return -1;
     }
     return 0;
+  }
+
+  clone() {
+    return new Border({
+      widthType: this.widthType,
+      color: this.color,
+      zIndex: this.zIndex,
+      type: this.type,
+      display: this.display,
+    });
+  }
+
+  equal(target) {
+    const widthType = this.widthType === target.widthType;
+    const color = this.color === target.color;
+    const type = this.type === target.type;
+    return color && widthType && type;
   }
 
 }

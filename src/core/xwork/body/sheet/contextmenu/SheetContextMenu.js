@@ -13,14 +13,14 @@ class SheetContextMenu extends ELContextMenu {
     }, options));
     this.items = [
       new SheetContextMenuItem('复制', 1),
-      new SheetContextMenuItem('粘贴', 1),
+      new SheetContextMenuItem('粘贴', 2),
       new ELContextMenuDivider(),
-      new SheetContextMenuItem('插入行', 1),
-      new SheetContextMenuItem('插入列', 1),
-      new SheetContextMenuItem('删除行', 1),
-      new SheetContextMenuItem('删除列', 1),
+      new SheetContextMenuItem('插入行', 3),
+      new SheetContextMenuItem('插入列', 4),
+      new SheetContextMenuItem('删除行', 5),
+      new SheetContextMenuItem('删除列', 6),
       new ELContextMenuDivider(),
-      new SheetContextMenuItem('插入链接', 1),
+      new SheetContextMenuItem('插入链接', 7),
     ];
     this.tab = null;
     this.items.forEach((item) => {

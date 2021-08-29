@@ -9,10 +9,10 @@ import { LINE_TYPE } from '../../draw/Line';
 import { SelectFile } from '../../lib/SelectFile';
 import { HeightUnit } from '../../core/xtable/tableunit/HeightUnit';
 import { WideUnit } from '../../core/xtable/tableunit/WideUnit';
-import { XMerges } from '../../core/xtable/xmerges/XMerges';
 import { XTableDataItems } from '../../core/xtable/XTableDataItems';
 import { Rows } from '../../core/xtable/tablerow/Rows';
 import { Cols } from '../../core/xtable/tablecol/Cols';
+import { Merges } from '../../core/xtable/merges/Merges';
 
 function next(i, step = 1) {
   return i + step;
@@ -76,8 +76,8 @@ class XlsxExport {
       const xTableData = new XTableDataItems({
         items: data,
       });
-      const xMerges = new XMerges({
-        ...merge, xTableData,
+      const xMerges = new Merges({
+        ...merge,
       });
       const xCols = new Cols(cols);
       const xRows = new Rows(rows);

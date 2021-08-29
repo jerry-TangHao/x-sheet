@@ -37,35 +37,35 @@ class BorderTypeContextMenu extends ELContextMenu {
     this.borderIcon4 = new BorderIcon4();
     this.borderIcon5 = new BorderIcon5();
     const div1 = h('div', `${cssPrefix}-border-type-context-menu-type-icon-line`);
-    div1.children(this.borderIcon1);
-    div1.children(this.borderIcon2);
-    div1.children(this.borderIcon3);
-    div1.children(this.borderIcon4);
-    div1.children(this.borderIcon5);
+    div1.childrenNodes(this.borderIcon1);
+    div1.childrenNodes(this.borderIcon2);
+    div1.childrenNodes(this.borderIcon3);
+    div1.childrenNodes(this.borderIcon4);
+    div1.childrenNodes(this.borderIcon5);
     this.borderIcon6 = new BorderIcon6();
     this.borderIcon7 = new BorderIcon7();
     this.borderIcon8 = new BorderIcon8();
     this.borderIcon9 = new BorderIcon9();
     this.borderIcon10 = new BorderIcon10();
     const div2 = h('div', `${cssPrefix}-border-type-context-menu-type-icon-line`);
-    div2.children(this.borderIcon6);
-    div2.children(this.borderIcon7);
-    div2.children(this.borderIcon8);
-    div2.children(this.borderIcon9);
-    div2.children(this.borderIcon10);
+    div2.childrenNodes(this.borderIcon6);
+    div2.childrenNodes(this.borderIcon7);
+    div2.childrenNodes(this.borderIcon8);
+    div2.childrenNodes(this.borderIcon9);
+    div2.childrenNodes(this.borderIcon10);
     this.borderIcons = new BorderTypeContextMenuItem();
     this.borderIcons.removeClass('hover');
-    this.borderIcons.children(div1);
-    this.borderIcons.children(div2);
+    this.borderIcons.childrenNodes(div1);
+    this.borderIcons.childrenNodes(div2);
     // 子菜单
     this.borderColor = new BorderColor();
     this.borderType = new BorderType();
     const div3 = h('div', `${cssPrefix}-border-type-context-menu-type-icon-line`);
-    div3.children(this.borderColor);
-    div3.children(this.borderType);
+    div3.childrenNodes(this.borderColor);
+    div3.childrenNodes(this.borderType);
     this.borderColorAndType = new BorderTypeContextMenuItem();
     this.borderColorAndType.removeClass('hover');
-    this.borderColorAndType.children(div3);
+    this.borderColorAndType.childrenNodes(div3);
     // 追加子菜单
     this.addItem(this.borderIcons);
     this.addItem(new ELContextMenuDivider());
@@ -78,7 +78,7 @@ class BorderTypeContextMenu extends ELContextMenu {
         this.color = color;
         this.borderColor.setColor(color);
       },
-    }));
+    })).parentWidget(this);
     // 边框类型
     this.lineTypeContextMenu = new LineTypeContextMenu(SheetUtils.copy({
       el: this.borderType,
@@ -86,7 +86,7 @@ class BorderTypeContextMenu extends ELContextMenu {
       onUpdate: (type) => {
         this.type = type;
       },
-    }));
+    })).parentWidget(this);
     // 添加事件
     this.bind();
   }

@@ -11,10 +11,10 @@ class SearchInput extends Widget {
     this.inputInnerEle = h('div', `${cssPrefix}-form-input-inner`);
     this.inputEle = h('input', `${cssPrefix}-form-input-source`);
     this.searchEle = h('div', `${cssPrefix}-form-input-search`);
-    this.inputInnerEle.children(this.inputEle);
-    this.inputWrapEle.children(this.inputInnerEle);
-    this.children(this.inputWrapEle);
-    this.children(this.searchEle);
+    this.inputInnerEle.childrenNodes(this.inputEle);
+    this.inputWrapEle.childrenNodes(this.inputInnerEle);
+    this.childrenNodes(this.inputWrapEle);
+    this.childrenNodes(this.searchEle);
     this.bind();
   }
 

@@ -18,9 +18,9 @@ class Listen {
     this.pool[key] = call;
   }
 
-  execute(key, message) {
+  execute(key, ...message) {
     if (this.pool[key]) {
-      this.pool[key](message);
+      this.pool[key](...message);
     }
   }
 

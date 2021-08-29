@@ -28,16 +28,22 @@ class XWorkTabView extends Widget {
       onAdded: () => {},
       onRemove: () => {},
     }, settings, options);
+  }
+
+  /**
+   * 初始化
+   */
+  onAttach() {
+    this.activeIndex = -1;
     this.left = null;
     this.tabList = [];
-    this.activeIndex = -1;
     this.last = h('div', `${cssPrefix}-switch-tab-last-btn`);
     this.next = h('div', `${cssPrefix}-switch-tab-next-btn`);
     this.content = h('div', `${cssPrefix}-sheet-tab-content`);
     this.tabs = h('div', `${cssPrefix}-sheet-tab-tabs`);
     this.plus = h('div', `${cssPrefix}-sheet-tab-plus`);
-    this.content.children(this.tabs);
-    this.children(...[
+    this.content.childrenNodes(this.tabs);
+    this.childrenNodes(...[
       this.last,
       this.next,
       this.content,
@@ -65,7 +71,7 @@ class XWorkTabView extends Widget {
           }
         }
       },
-    });
+    }).parentWidget(this);
     this.bind();
   }
 
@@ -124,7 +130,7 @@ class XWorkTabView extends Widget {
    */
   attach(tab) {
     this.tabList.push(tab);
-    this.tabs.children(tab);
+    this.tabs.childrenNodes(tab);
     tab.onAttach();
     tab.setRClick((event) => {
       if (this.options.showMenu) {

@@ -10,7 +10,7 @@ class AutoFillTypeMenuItem extends ELContextMenuItem {
     this.value = value;
     this.textEle = h('div', `${cssPrefix}-auto-fill-menu-item-title`);
     this.textEle.text(text);
-    this.children(this.textEle);
+    this.childrenNodes(this.textEle);
   }
 
 }

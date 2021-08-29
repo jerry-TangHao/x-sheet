@@ -3,7 +3,7 @@ import { Constant, cssPrefix } from '../../../const/Constant';
 import { h } from '../../../lib/Element';
 import { XEvent } from '../../../lib/XEvent';
 import { SheetUtils } from '../../../utils/SheetUtils';
-import { XSelectItem } from '../../xtable/xscreenitems/xselect/XSelectItem';
+import { XSelectItem } from '../../xtable/screenitems/xselect/XSelectItem';
 import { Throttle } from '../../../lib/Throttle';
 import { SumTotalTask } from '../../../task/SumTotalTask';
 import { TaskProgress } from '../../../module/taskprogress/TaskProgress';
@@ -22,16 +22,41 @@ class XWorkFootMenu extends Widget {
     this.grid = h('div', `${cssPrefix}-bottom-grid`);
     this.totalTask = new SumTotalTask();
     this.throttle = new Throttle({ time: 800 });
-    this.children(this.grid);
-    this.children(this.fullScreen);
-    this.children(this.sum);
-    this.children(this.avg);
-    this.children(this.number);
-    this.children(this.taskProgress);
+    this.childrenNodes(this.grid);
+    this.childrenNodes(this.fullScreen);
+    this.childrenNodes(this.sum);
+    this.childrenNodes(this.avg);
+    this.childrenNodes(this.number);
+    this.childrenNodes(this.taskProgress);
   }
 
   onAttach() {
     this.bind();
+  }
+
+  async computer() {
+    const { totalTask, workBottom } = this;
+    const { work } = workBottom;
+    const { body } = work;
+    const { sheetView } = body;
+    const sheet = sheetView.getActiveSheet();
+    const { table } = sheet;
+    const { xScreen } = table;
+    const data = table.getTableData();
+    const xSelect = xScreen.findType(XSelectItem);
+    const { selectRange } = xSelect;
+    if (selectRange) {
+      const { sri, sci, eri, eci } = selectRange;
+      const items = data.slice(sri, sci, eri, eci);
+      const { total, avg, number } = await totalTask.execute(selectRange, items);
+      this.setSum(SheetUtils.toFixed(total, 2));
+      this.setAvg(SheetUtils.toFixed(avg, 2));
+      this.setNumber(SheetUtils.toFixed(number, 2));
+    } else {
+      this.setSum(0);
+      this.setAvg(0);
+      this.setNumber(0);
+    }
   }
 
   bind() {
@@ -64,7 +89,7 @@ class XWorkFootMenu extends Widget {
       if (SheetUtils.isFull()) {
         SheetUtils.exitFullscreen();
       } else {
-        SheetUtils.fullScreen(work.root);
+        SheetUtils.fullScreen(work.getRootWidget());
       }
     });
   }
@@ -76,29 +101,6 @@ class XWorkFootMenu extends Widget {
     XEvent.unbind(grid);
     XEvent.unbind(fullScreen);
     XEvent.unbind(body);
-  }
-
-  async computer() {
-    const { totalTask, workBottom } = this;
-    const { work } = workBottom;
-    const { body } = work;
-    const { sheetView } = body;
-    const sheet = sheetView.getActiveSheet();
-    const { table } = sheet;
-    const { xScreen } = table;
-    const data = table.getTableData();
-    const xSelect = xScreen.findType(XSelectItem);
-    const { selectRange } = xSelect;
-    if (selectRange) {
-      const { total, avg, number } = await totalTask.execute(selectRange, data);
-      this.setSum(SheetUtils.toFixed(total, 2));
-      this.setAvg(SheetUtils.toFixed(avg, 2));
-      this.setNumber(SheetUtils.toFixed(number, 2));
-    } else {
-      this.setSum(0);
-      this.setAvg(0);
-      this.setNumber(0);
-    }
   }
 
   setSum(val) {

@@ -37,7 +37,7 @@ class XTableRECAreaView extends XTableAreaView {
    * @returns {null|RectRange}
    */
   getLeaveView() {
-    if (SheetUtils.isNotUnDef(this.leaveView)) {
+    if (SheetUtils.isDef(this.leaveView)) {
       return this.leaveView.clone();
     }
     const lastScrollView = this.getLastScrollView();
@@ -60,7 +60,7 @@ class XTableRECAreaView extends XTableAreaView {
    * @returns {null|RectRange}
    */
   getEnterView() {
-    if (SheetUtils.isNotUnDef(this.enterView)) {
+    if (SheetUtils.isDef(this.enterView)) {
       return this.enterView.clone();
     }
     const lastScrollView = this.getLastScrollView();
@@ -107,7 +107,7 @@ class XTableRECAreaView extends XTableAreaView {
    * @returns {null|RectRange}
    */
   getLastScrollView() {
-    if (SheetUtils.isNotUnDef(this.lastScrollView)) {
+    if (SheetUtils.isDef(this.lastScrollView)) {
       return this.lastScrollView.clone();
     }
     return null;
@@ -118,7 +118,7 @@ class XTableRECAreaView extends XTableAreaView {
    * @returns {null|RectRange}
    */
   getScrollEnterView() {
-    if (SheetUtils.isNotUnDef(this.scrollEnterView)) {
+    if (SheetUtils.isDef(this.scrollEnterView)) {
       return this.scrollEnterView.clone();
     }
     const { cols, rows, scroll } = this;

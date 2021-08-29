@@ -7,7 +7,7 @@ class UnderLine extends Item {
   constructor() {
     super(`${cssPrefix}-tools-under-line`);
     this.icon = new Icon('under-line');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
 }

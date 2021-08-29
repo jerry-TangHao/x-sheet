@@ -1,11 +1,9 @@
 /* global window document */
 import { Widget } from '../../lib/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
-import { h } from '../../lib/Element';
 import { SheetUtils } from '../../utils/SheetUtils';
 import { XEvent } from '../../lib/XEvent';
 
-let root = SheetUtils.Nul;
 let instances = [];
 
 /**
@@ -21,6 +19,7 @@ class ElPopUp extends Widget {
    */
   constructor(options) {
     super(`${cssPrefix}-el-pop-up`);
+    instances.push(this);
     this.options = SheetUtils.copy({
       el: SheetUtils.Nul,
       autoWidth: false,
@@ -34,7 +33,6 @@ class ElPopUp extends Widget {
     this.elPopUpDownHandle = () => {
       this.close();
     };
-    instances.push(this);
     this.bind();
   }
 
@@ -82,8 +80,10 @@ class ElPopUp extends Widget {
   elPopUpPosition() {
     const { options } = this;
     const { position } = options;
-    const { el } = options;
-    const elBox = el.box();
+    const elem = options.el;
+    const root = this.getRootWidget();
+    const rootBox = root.box();
+    const elemBox = elem.box();
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
     this.direction = SheetUtils.Undef;
@@ -91,34 +91,34 @@ class ElPopUp extends Widget {
     this.location = 0;
     switch (position) {
       case ElPopUp.POPUP_POSTION.LR: {
-        const width = elBox.width;
-        const elLeft = elBox.left;
-        const leftDiff = elLeft;
-        const rightDiff = winWidth - (elLeft + width);
-        if (leftDiff > rightDiff) {
+        const left = elemBox.left - rootBox.left;
+        const width = elemBox.width;
+        const lDiff = left;
+        const rDiff = winWidth - (left + width);
+        if (lDiff > rDiff) {
           this.direction = 'left';
-          this.spaces = leftDiff;
-          this.location = elLeft;
+          this.spaces = lDiff;
+          this.location = left;
         } else {
           this.direction = 'right';
-          this.spaces = rightDiff;
-          this.location = elLeft + width;
+          this.spaces = rDiff;
+          this.location = left + width;
         }
         break;
       }
       case ElPopUp.POPUP_POSTION.TB: {
-        const height = elBox.height;
-        const elTop = elBox.top;
-        const topDiff = elTop;
-        const bottomDIff = winHeight - (elTop + height);
-        if (topDiff > bottomDIff) {
+        const top = elemBox.top - rootBox.top;
+        const height = elemBox.height;
+        const tDiff = top;
+        const bDiff = winHeight - (top + height);
+        if (tDiff > bDiff) {
           this.direction = 'top';
-          this.spaces = topDiff;
-          this.location = elTop;
+          this.spaces = tDiff;
+          this.location = top;
         } else {
           this.direction = 'bottom';
-          this.spaces = bottomDIff;
-          this.location = elTop + height;
+          this.spaces = bDiff;
+          this.location = top + height;
         }
         break;
       }
@@ -183,9 +183,10 @@ class ElPopUp extends Widget {
    * 显示弹框
    */
   open() {
+    const root = this.getRootWidget();
     if (this.status === false && root) {
-      root.children(this);
       this.status = true;
+      root.childrenNodes(this);
     }
     this.elPopUpPosition();
     this.elPopUpAutosize();
@@ -193,26 +194,28 @@ class ElPopUp extends Widget {
   }
 
   /**
+   * 关闭弹框
+   */
+  close() {
+    const root = this.getRootWidget();
+    if (this.status === true && root) {
+      this.status = false;
+      root.remove(this);
+    }
+  }
+
+  /**
    * 显示弹框
    * @param mouse
    */
   openByMouse(mouse) {
+    const root = this.getRootWidget();
     if (this.status === false && root) {
-      root.children(this);
       this.status = true;
+      root.childrenNodes(this);
     }
     this.mousePopUpLocation(mouse);
     this.elPopUpAutosize();
-  }
-
-  /**
-   * 关闭弹框
-   */
-  close() {
-    if (this.status === true && root) {
-      root.remove(this);
-      this.status = false;
-    }
   }
 
   /**
@@ -273,19 +276,6 @@ class ElPopUp extends Widget {
         item.close();
       }
     });
-  }
-
-  /**
-   * 设置根节点
-   * @param element
-   */
-  static setRoot(element) {
-    if (element.el) {
-      element = h(element.el);
-    } else {
-      element = h(element);
-    }
-    root = element;
   }
 
 }

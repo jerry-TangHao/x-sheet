@@ -7,9 +7,9 @@ class RowHeightGroupIndex {
     xIteratorBuilder,
   }) {
     this.groupIndex = [];
+    this.xFixedView = xFixedView;
     this.rows = rows;
     this.group = group;
-    this.xFixedView = xFixedView;
     this.xIteratorBuilder = xIteratorBuilder;
     this.clear();
   }
@@ -25,7 +25,8 @@ class RowHeightGroupIndex {
   }
 
   limit(ri, top, max) {
-    let { groupIndex, group, rows } = this;
+    let { groupIndex } = this;
+    let { group, rows } = this;
     let find = groupIndex[0];
     let end = rows.len - 1;
     top += rows.getHeight(ri);

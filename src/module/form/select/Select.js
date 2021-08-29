@@ -21,8 +21,8 @@ class Select extends Widget {
     // 文本和图标
     this.selectText = h('div', `${cssPrefix}-form-select-text`);
     this.selectIcon = h('div', `${cssPrefix}-form-select-icon`);
-    this.children(this.selectText);
-    this.children(this.selectIcon);
+    this.childrenNodes(this.selectText);
+    this.childrenNodes(this.selectIcon);
     // 上下文菜单
     this.contextMenu = new SelectContextMenu({
       el: this,
@@ -30,7 +30,7 @@ class Select extends Widget {
         const { value } = item;
         this.setSelect(value);
       },
-    });
+    }).parentWidget(this);
     this.bind();
   }
 

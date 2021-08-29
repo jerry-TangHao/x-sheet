@@ -1,9 +1,9 @@
 import { Widget } from '../../../lib/Widget';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import Download from '../../../lib/donwload/Download';
+import { Download } from '../../../lib/donwload/Download';
 import { h } from '../../../lib/Element';
 import { File } from './option/File';
-import { ForMart } from './option/ForMart';
+import { Format } from './option/Format';
 import { Insert } from './option/Insert';
 import { Look } from './option/Look';
 import { Update } from './option/Update';
@@ -18,7 +18,7 @@ import { Confirm } from '../../../module/confirm/Confirm';
 import { XWorkTab } from '../body/tab/XWorkTab';
 import { XWorkSheet } from '../body/sheet/XWorkSheet';
 
-class XBookTopOption extends Widget {
+class XWorkHeadOption extends Widget {
 
   constructor(workTop) {
     super(`${cssPrefix}-option`);
@@ -29,12 +29,12 @@ class XBookTopOption extends Widget {
     this.optionsEle = h('div', `${cssPrefix}-option-box`);
     this.leftEle = h('div', `${cssPrefix}-option-left`);
     this.rightEle = h('div', `${cssPrefix}-option-right`);
-    this.leftEle.children(this.logoEle);
-    this.rightEle.children(this.titleEle, this.optionsEle);
+    this.leftEle.childrenNodes(this.logoEle);
+    this.rightEle.childrenNodes(this.titleEle, this.optionsEle);
     this.xlsxImportTask = new XlsxImportTask();
     this.xlsxExportTask = new XlsxExportTask();
-    this.children(this.leftEle);
-    this.children(this.rightEle);
+    this.childrenNodes(this.leftEle);
+    this.childrenNodes(this.rightEle);
     this.setTitle(this.title);
     this.xlsxSelect = new SelectFile({
       accept: SelectFile.ACCEPT.XLSX,
@@ -76,7 +76,7 @@ class XBookTopOption extends Widget {
                       body.addTabSheet(tab, sheet);
                     });
                   },
-                }).open();
+                }).parentWidget(this).open();
               }
               break;
             }
@@ -117,22 +117,22 @@ class XBookTopOption extends Widget {
               menu.close();
               new Alert({
                 message: '开发人员正在努力施工中....',
-              }).open();
+              }).parentWidget(this).open();
               break;
             }
           }
         },
       },
-    });
-    this.format = new ForMart();
-    this.insert = new Insert();
-    this.look = new Look();
-    this.update = new Update();
-    this.optionsEle.children(this.file);
-    this.optionsEle.children(this.format);
-    this.optionsEle.children(this.insert);
-    this.optionsEle.children(this.look);
-    this.optionsEle.children(this.update);
+    }).parentWidget(this);
+    this.format = new Format().parentWidget(this);
+    this.insert = new Insert().parentWidget(this);
+    this.look = new Look().parentWidget(this);
+    this.update = new Update().parentWidget(this);
+    this.optionsEle.childrenNodes(this.file);
+    this.optionsEle.childrenNodes(this.update);
+    this.optionsEle.childrenNodes(this.insert);
+    this.optionsEle.childrenNodes(this.look);
+    this.optionsEle.childrenNodes(this.format);
   }
 
   onAttach() {
@@ -153,6 +153,58 @@ class XBookTopOption extends Widget {
       e.preventDefault();
       e.stopPropagation();
     });
+    XEvent.bind(this.format, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      const { format } = this;
+      const { formatContextMenu } = format;
+      const { elPopUp } = formatContextMenu;
+      ElPopUp.closeAll([elPopUp]);
+      if (formatContextMenu.isClose()) {
+        formatContextMenu.open();
+      } else {
+        formatContextMenu.close();
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    XEvent.bind(this.insert, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      const { insert } = this;
+      const { insertContextMenu } = insert;
+      const { elPopUp } = insertContextMenu;
+      ElPopUp.closeAll([elPopUp]);
+      if (insertContextMenu.isClose()) {
+        insertContextMenu.open();
+      } else {
+        insertContextMenu.close();
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    XEvent.bind(this.look, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      const { look } = this;
+      const { lookContextMenu } = look;
+      const { elPopUp } = lookContextMenu;
+      ElPopUp.closeAll([elPopUp]);
+      if (lookContextMenu.isClose()) {
+        lookContextMenu.open();
+      } else {
+        lookContextMenu.close();
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    XEvent.bind(this.update, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      const { update } = this;
+      const { updateContextMenu } = update;
+      const { elPopUp } = updateContextMenu;
+      ElPopUp.closeAll([elPopUp]);
+      if (updateContextMenu.isClose()) {
+        updateContextMenu.open();
+      } else {
+        updateContextMenu.close();
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    });
   }
 
   unbind() {}
@@ -164,4 +216,4 @@ class XBookTopOption extends Widget {
 
 }
 
-export { XBookTopOption };
+export { XWorkHeadOption };

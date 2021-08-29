@@ -7,7 +7,7 @@ class DropColFixed extends Widget {
   constructor(table) {
     super(`${cssPrefix}-table-drop-col-fixed-bar`);
     this.block = h('div', `${cssPrefix}-table-drop-col-fixed-block`);
-    this.children(this.block);
+    this.childrenNodes(this.block);
     this.table = table;
   }
 

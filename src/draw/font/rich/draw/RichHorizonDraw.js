@@ -88,7 +88,7 @@ class RichHorizonDraw extends BaseRich {
     const { draw, ruler, attr } = this;
     const { rect } = this;
     const { width, height } = rect;
-    const { underline, strikethrough, align, verticalAlign } = attr;
+    const { align, verticalAlign } = attr;
     // 文字宽度
     ruler.truncateRuler();
     const {
@@ -136,10 +136,12 @@ class RichHorizonDraw extends BaseRich {
       for (let i = 0, len = textArray.length; i < len; i++) {
         const item = textArray[i];
         const style = SheetUtils.extends({}, attr, item.style);
-        const fontItalic = `${style.italic ? 'italic' : ''}`;
-        const fontBold = `${style.bold ? 'bold' : ''}`;
+        const { strikethrough } = style;
+        const { underline } = style;
         const fontSize = `${style.size}px`;
         const fontName = `${style.name}`;
+        const fontItalic = `${style.italic ? 'italic' : ''}`;
+        const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
         draw.save();
         draw.attr({
@@ -163,10 +165,12 @@ class RichHorizonDraw extends BaseRich {
       for (let i = 0, len = textArray.length; i < len; i++) {
         const item = textArray[i];
         const style = SheetUtils.extends({}, attr, item.style);
-        const fontItalic = `${style.italic ? 'italic' : ''}`;
-        const fontBold = `${style.bold ? 'bold' : ''}`;
+        const { strikethrough } = style;
+        const { underline } = style;
         const fontSize = `${style.size}px`;
         const fontName = `${style.name}`;
+        const fontItalic = `${style.italic ? 'italic' : ''}`;
+        const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
         draw.save();
         draw.attr({
@@ -193,7 +197,7 @@ class RichHorizonDraw extends BaseRich {
     const { draw, ruler, attr } = this;
     const { rect, overflow } = this;
     const { width, height } = rect;
-    const { underline, strikethrough, align, verticalAlign } = attr;
+    const { align, verticalAlign } = attr;
     // 文字宽度
     ruler.overflowRuler();
     const {
@@ -252,10 +256,12 @@ class RichHorizonDraw extends BaseRich {
       for (let i = 0, len = textArray.length; i < len; i++) {
         const item = textArray[i];
         const style = SheetUtils.extends({}, attr, item.style);
-        const fontItalic = `${style.italic ? 'italic' : ''}`;
-        const fontBold = `${style.bold ? 'bold' : ''}`;
+        const { strikethrough } = style;
+        const { underline } = style;
         const fontSize = `${style.size}px`;
         const fontName = `${style.name}`;
+        const fontItalic = `${style.italic ? 'italic' : ''}`;
+        const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
         draw.save();
         draw.attr({
@@ -279,10 +285,12 @@ class RichHorizonDraw extends BaseRich {
       for (let i = 0, len = textArray.length; i < len; i++) {
         const item = textArray[i];
         const style = SheetUtils.extends({}, attr, item.style);
-        const fontItalic = `${style.italic ? 'italic' : ''}`;
-        const fontBold = `${style.bold ? 'bold' : ''}`;
+        const { strikethrough } = style;
+        const { underline } = style;
         const fontSize = `${style.size}px`;
         const fontName = `${style.name}`;
+        const fontItalic = `${style.italic ? 'italic' : ''}`;
+        const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
         draw.save();
         draw.attr({
@@ -310,7 +318,7 @@ class RichHorizonDraw extends BaseRich {
   textWrapDraw() {
     const { rect, draw, ruler, attr } = this;
     const { width, height } = rect;
-    const { underline, strikethrough, align, verticalAlign } = attr;
+    const { align, verticalAlign } = attr;
     // 填充尺寸
     const verticalAlignPadding = this.getVerticalAlignPadding();
     const alignPadding = this.getAlignPadding();
@@ -363,13 +371,15 @@ class RichHorizonDraw extends BaseRich {
         while (subIndex < subLength) {
           // 绘制文本
           const item = wrapLine.items[subIndex];
-          const style = SheetUtils.extends({}, attr, item.style);
           const tx = item.tx + bx;
           const ty = item.ty + by;
-          const fontItalic = `${style.italic ? 'italic' : ''}`;
-          const fontBold = `${style.bold ? 'bold' : ''}`;
+          const style = SheetUtils.extends({}, attr, item.style);
+          const { strikethrough } = style;
+          const { underline } = style;
           const fontSize = `${style.size}px`;
           const fontName = `${style.name}`;
+          const fontItalic = `${style.italic ? 'italic' : ''}`;
+          const fontBold = `${style.bold ? 'bold' : ''}`;
           const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
           draw.save();
           draw.attr({
@@ -425,13 +435,15 @@ class RichHorizonDraw extends BaseRich {
         while (subIndex < subLength) {
           // 绘制文本
           const item = wrapLine.items[subIndex];
-          const style = SheetUtils.extends({}, attr, item.style);
           const tx = item.tx + bx;
           const ty = item.ty + by;
-          const fontItalic = `${style.italic ? 'italic' : ''}`;
-          const fontBold = `${style.bold ? 'bold' : ''}`;
+          const style = SheetUtils.extends({}, attr, item.style);
+          const { strikethrough } = style;
+          const { underline } = style;
           const fontSize = `${style.size}px`;
           const fontName = `${style.name}`;
+          const fontItalic = `${style.italic ? 'italic' : ''}`;
+          const fontBold = `${style.bold ? 'bold' : ''}`;
           const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
           draw.save();
           draw.attr({

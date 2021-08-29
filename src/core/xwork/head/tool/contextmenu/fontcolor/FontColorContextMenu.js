@@ -26,7 +26,7 @@ class FontColorContextMenu extends ELContextMenu {
         }
         this.close();
       },
-    });
+    }).parentWidget(this);
     // 重置颜色按钮
     this.resetColorButton = new FontColorContextMenuItem('重置', new Icon('clear-color'));
     // 默认颜色筛选
@@ -42,7 +42,7 @@ class FontColorContextMenu extends ELContextMenu {
         this.close();
       },
     });
-    this.defaultColorArrayItem.children(this.defaultColorArray);
+    this.defaultColorArrayItem.childrenNodes(this.defaultColorArray);
     // 自定义颜色
     this.customizeColorArrayItem = new FontColorContextMenuItem();
     this.customizeColorArrayItem.removeClass('hover');
@@ -66,8 +66,8 @@ class FontColorContextMenu extends ELContextMenu {
     });
     this.customizeColorTitle = h('div', `${cssPrefix}-font-color-context-menu-color-title`);
     this.customizeColorTitle.text('自定义');
-    this.customizeColorArrayItem.children(this.customizeColorTitle);
-    this.customizeColorArrayItem.children(this.customizeColorArray);
+    this.customizeColorArrayItem.childrenNodes(this.customizeColorTitle);
+    this.customizeColorArrayItem.childrenNodes(this.customizeColorArray);
     // 菜单元素追加子节点
     this.addItem(this.resetColorButton);
     this.addItem(this.defaultColorArrayItem);

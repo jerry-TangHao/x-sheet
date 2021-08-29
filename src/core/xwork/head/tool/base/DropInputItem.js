@@ -11,10 +11,10 @@ class DropInputItem extends Item {
     this.title = h('div', `${cssPrefix}-tools-drop-input-item-title`);
     this.icon = new Icon('arrow-down');
     this.input = h('input', `${cssPrefix}-tools-drop-input`);
-    this.drop.children(this.icon);
-    this.title.children(this.input);
-    this.children(this.title);
-    this.children(this.drop);
+    this.drop.childrenNodes(this.icon);
+    this.title.childrenNodes(this.input);
+    this.childrenNodes(this.title);
+    this.childrenNodes(this.drop);
   }
 
   setValue(value) {

@@ -123,6 +123,12 @@ XEvent.WrapFuncion = {
     let lastPageY = 0;
     let lastTime = 0;
     return (event) => {
+      if (event.button === 2) {
+        lastPageX = 0;
+        lastTime = 0;
+        lastPageY = 0;
+        return;
+      }
       const { pageX, pageY } = event;
       const current = Date.now();
       const diffTime = current - lastTime <= 300;

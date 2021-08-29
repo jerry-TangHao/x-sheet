@@ -15,7 +15,7 @@ class Border extends DropDownItem {
     this.borderTypeContextMenu = new BorderTypeContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
 }

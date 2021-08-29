@@ -14,7 +14,7 @@ class ColorPicker extends Widget {
       selectCb: () => {},
     }, options);
     // 拖拽组件
-    this.dragPanel = new DragPanel();
+    this.dragPanel = new DragPanel().parentWidget(this);
     this.color = [360, 0, 100];
     // 头部
     this.preViewColorPoint = h('div', `${cssPrefix}-color-picker-pre-view-color-point`);
@@ -22,41 +22,41 @@ class ColorPicker extends Widget {
     this.colorValueTips.text('十六进制颜色值');
     this.colorInput = h('input', `${cssPrefix}-color-picker-color-input`);
     this.top = h('div', `${cssPrefix}-color-picker-top`);
-    this.top.children(this.preViewColorPoint);
-    this.top.children(this.colorValueTips);
-    this.top.children(this.colorInput);
+    this.top.childrenNodes(this.preViewColorPoint);
+    this.top.childrenNodes(this.colorValueTips);
+    this.top.childrenNodes(this.colorInput);
     // 中间部分
     this.selectColorPoint = h('div', `${cssPrefix}-color-picker-select-color-point`);
     this.selectColorArea1 = h('div', `${cssPrefix}-color-picker-select-color-area area1`);
     this.selectColorArea2 = h('div', `${cssPrefix}-color-picker-select-color-area area2`);
     this.selectColorArea3 = h('div', `${cssPrefix}-color-picker-select-color-area area3`);
     this.center = h('div', `${cssPrefix}-color-picker-center`);
-    this.center.children(this.selectColorArea1);
-    this.center.children(this.selectColorArea2);
-    this.center.children(this.selectColorArea3);
-    this.center.children(this.selectColorPoint);
+    this.center.childrenNodes(this.selectColorArea1);
+    this.center.childrenNodes(this.selectColorArea2);
+    this.center.childrenNodes(this.selectColorArea3);
+    this.center.childrenNodes(this.selectColorPoint);
     // 底部
     this.colorHuxTips = h('div', `${cssPrefix}-color-picker-color-hux-tips`);
     this.colorBar = h('div', `${cssPrefix}-color-picker-color-bar`);
     this.colorBarPoint = h('div', `${cssPrefix}-color-picker-bar-point`);
     this.bottom = h('div', `${cssPrefix}-color-picker-bottom`);
     this.colorHuxTips.text('HUE');
-    this.colorBar.children(this.colorBarPoint);
-    this.bottom.children(this.colorHuxTips);
-    this.bottom.children(this.colorBar);
+    this.colorBar.childrenNodes(this.colorBarPoint);
+    this.bottom.childrenNodes(this.colorHuxTips);
+    this.bottom.childrenNodes(this.colorBar);
     // 按钮
     this.cancelButton = h('div', `${cssPrefix}-color-picker-button cancel`);
     this.selectButton = h('div', `${cssPrefix}-color-picker-button select`);
     this.buttons = h('div', `${cssPrefix}-color-picker-buttons`);
     this.cancelButton.text('取消');
     this.selectButton.text('确定');
-    this.buttons.children(this.selectButton);
-    this.buttons.children(this.cancelButton);
-    this.children(this.top);
-    this.children(this.center);
-    this.children(this.bottom);
-    this.children(this.buttons);
-    this.dragPanel.children(this);
+    this.buttons.childrenNodes(this.selectButton);
+    this.buttons.childrenNodes(this.cancelButton);
+    this.childrenNodes(this.top);
+    this.childrenNodes(this.center);
+    this.childrenNodes(this.bottom);
+    this.childrenNodes(this.buttons);
+    this.dragPanel.childrenNodes(this);
     this.dragPanel.css('background', '#ffffff');
     this.bind();
   }

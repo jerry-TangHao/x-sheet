@@ -13,7 +13,7 @@ class VerticalAlign extends DropDownItem {
     this.verticalContextMenu = new VerticalContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

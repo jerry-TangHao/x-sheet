@@ -54,7 +54,7 @@ class SheetUtils {
     return e === undefined || e === null;
   }
 
-  static isNotUnDef(e) {
+  static isDef(e) {
     return !this.isUnDef(e);
   }
 

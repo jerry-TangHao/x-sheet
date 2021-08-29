@@ -15,7 +15,7 @@ class Font extends DropDownItem {
     this.fontContextMenu = new FontContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

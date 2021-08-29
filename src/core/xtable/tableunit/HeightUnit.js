@@ -1,4 +1,4 @@
-import FindDpi from '../../../lib/finddpi/FindDpi';
+import { FindDPI } from '../../../lib/finddpi/FindDpi';
 import { SheetUtils } from '../../../utils/SheetUtils';
 
 /**
@@ -13,10 +13,10 @@ class HeightUnit {
   constructor({
     dpi,
   } = {}) {
-    if (SheetUtils.isNotUnDef(dpi)) {
+    if (SheetUtils.isDef(dpi)) {
       this.dpi = dpi;
     } else {
-      this.dpi = FindDpi();
+      this.dpi = FindDPI();
     }
   }
 

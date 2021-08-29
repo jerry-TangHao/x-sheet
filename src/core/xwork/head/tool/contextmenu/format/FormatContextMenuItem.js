@@ -12,14 +12,14 @@ class FormatContextMenuItem extends ELContextMenuItem {
     this.desc = desc;
     this.icon = new Icon('checked');
     this.iconElement = h('div', `${cssPrefix}-format-context-menu-item-icon`);
-    this.iconElement.children(this.icon);
+    this.iconElement.childrenNodes(this.icon);
     this.titleElement = h('div', `${cssPrefix}-format-context-menu-item-title`);
     this.descElement = h('div', `${cssPrefix}-format-context-menu-item-desc`);
     this.titleElement.text(title);
     this.descElement.text(desc);
-    this.children(this.iconElement);
-    this.children(this.titleElement);
-    this.children(this.descElement);
+    this.childrenNodes(this.iconElement);
+    this.childrenNodes(this.titleElement);
+    this.childrenNodes(this.descElement);
     pool.push(this);
   }
 

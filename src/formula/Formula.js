@@ -64,6 +64,16 @@ class Formula {
     this.instruct = SheetUtils.Nul;
   }
 
+  /**
+   * 复制
+   * @returns {Formula}
+   */
+  clone() {
+    return new Formula({
+      expr: this.expr,
+    });
+  }
+
 }
 
 export {

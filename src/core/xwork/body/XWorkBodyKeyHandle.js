@@ -1,5 +1,5 @@
-import { XSelectItem } from '../../xtable/xscreenitems/xselect/XSelectItem';
-import { XSelectPath } from '../../xtable/xscreenitems/xselect/XSelectPath';
+import { XSelectItem } from '../../xtable/screenitems/xselect/XSelectItem';
+import { XSelectPath } from '../../xtable/screenitems/xselect/XSelectPath';
 import { BaseEdit } from '../../xtable/tableedit/base/BaseEdit';
 
 function pageDown({ table, body, response }) {
@@ -32,7 +32,7 @@ function pageDown({ table, body, response }) {
           return;
         }
         // 目标区域是否是合并单元格
-        let merge = merges.getFirstIncludes(clone.sri, clone.sci);
+        let merge = merges.getFirstInclude(clone.sri, clone.sci);
         if (merge) {
           xSelect.setRange(merge);
         } else {
@@ -69,7 +69,7 @@ function pageUp({ table, body, response }) {
         clone.sri = newScrollView.sri + diffSri;
         clone.eri = clone.sri;
         // 目标区域是否是合并单元格
-        let merge = merges.getFirstIncludes(clone.sri, clone.sci);
+        let merge = merges.getFirstInclude(clone.sri, clone.sci);
         if (merge) {
           xSelect.setRange(merge);
         } else {
@@ -97,7 +97,7 @@ function openEdit({ table, response }) {
           clone.eri = sri;
           clone.eci = sci;
           // 目标区域是否是合并单元格
-          let merge = merges.getFirstIncludes(clone.sri, clone.sci);
+          let merge = merges.getFirstInclude(clone.sri, clone.sci);
           if (merge) {
             xSelect.setRange(merge);
           } else {
@@ -141,7 +141,7 @@ function enter({ table, body, response }) {
       let { sri, sci } = clone;
       selectPath.set({ sri, sci, mode: XSelectPath.MODE.TB });
       // 当前区域是否是合并单元格
-      let merge = merges.getFirstIncludes(sri, sci);
+      let merge = merges.getFirstInclude(sri, sci);
       if (merge) {
         sri = merge.eri;
       }
@@ -155,7 +155,7 @@ function enter({ table, body, response }) {
       clone.sri = sri;
       clone.eri = sri;
       // 目标区域是否是合并单元格
-      merge = merges.getFirstIncludes(clone.sri, clone.sci);
+      merge = merges.getFirstInclude(clone.sri, clone.sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {
@@ -188,7 +188,7 @@ function home({ table, response }) {
       clone.sci = 0;
       clone.eci = 0;
       // 目标区域是否是合并单元格
-      let merge = merges.getFirstIncludes(clone.sri, clone.sci);
+      let merge = merges.getFirstInclude(clone.sri, clone.sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {
@@ -215,7 +215,7 @@ function tab({ table, body, response }) {
       let { sri, sci } = clone;
       selectPath.set({ sri, sci, mode: XSelectPath.MODE.LR });
       // 当前区域是否是合并单元格
-      let merge = merges.getFirstIncludes(sri, sci);
+      let merge = merges.getFirstInclude(sri, sci);
       if (merge) {
         sci = merge.eci;
       }
@@ -238,7 +238,7 @@ function tab({ table, body, response }) {
       clone.eri = sri;
       clone.eci = sci;
       // 目标区域是否是合并单元格
-      merge = merges.getFirstIncludes(sri, sci);
+      merge = merges.getFirstInclude(sri, sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {
@@ -302,7 +302,7 @@ function arrowDown({ table, body, response }) {
       let { sri, sci } = clone;
       selectPath.set({ sri, sci, mode: XSelectPath.MODE.TB });
       // 当前区域是否是合并单元格
-      let merge = merges.getFirstIncludes(sri, sci);
+      let merge = merges.getFirstInclude(sri, sci);
       if (merge) {
         sri = merge.eri;
       }
@@ -316,7 +316,7 @@ function arrowDown({ table, body, response }) {
       clone.sri = sri;
       clone.eri = sri;
       // 目标区域是否是合并单元格
-      merge = merges.getFirstIncludes(clone.sri, clone.sci);
+      merge = merges.getFirstInclude(clone.sri, clone.sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {
@@ -362,7 +362,7 @@ function arrowUp({ table, body, response }) {
       clone.sri = sri;
       clone.eri = sri;
       // 目标区域是否是合并单元格
-      let merge = merges.getFirstIncludes(clone.sri, clone.sci);
+      let merge = merges.getFirstInclude(clone.sri, clone.sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {
@@ -407,7 +407,7 @@ function arrowLeft({ table, body, response }) {
       clone.sci = sci;
       clone.eci = sci;
       // 目标区域是否是合并单元格
-      let merge = merges.getFirstIncludes(clone.sri, clone.sci);
+      let merge = merges.getFirstInclude(clone.sri, clone.sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {
@@ -445,7 +445,7 @@ function arrowRight({ table, body, response }) {
       let { sci, sri } = clone;
       selectPath.set({ sri, sci, mode: XSelectPath.MODE.LR });
       // 当前区域是否是合并单元格
-      let merge = merges.getFirstIncludes(sri, sci);
+      let merge = merges.getFirstInclude(sri, sci);
       if (merge) {
         sci = merge.eci;
       }
@@ -459,7 +459,7 @@ function arrowRight({ table, body, response }) {
       clone.sci = sci;
       clone.eci = sci;
       // 目标区域是否是合并单元格
-      merge = merges.getFirstIncludes(clone.sri, clone.sci);
+      merge = merges.getFirstInclude(clone.sri, clone.sci);
       if (merge) {
         xSelect.setRange(merge);
       } else {

@@ -37,7 +37,7 @@ class XTableAreaView {
    * @returns {RectRange}
    */
   getScrollView() {
-    if (SheetUtils.isNotUnDef(this.scrollView)) {
+    if (SheetUtils.isDef(this.scrollView)) {
       return this.scrollView.clone();
     }
     const { xTableScrollView } = this;

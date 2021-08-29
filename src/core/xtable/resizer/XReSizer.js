@@ -16,7 +16,7 @@ class XReSizer extends Widget {
     this.width = options.width;
     this.hoverEl = h('div', `${cssPrefix}-re-sizer-hover`);
     this.lineEl = h('div', `${cssPrefix}-re-sizer-line`);
-    this.children(...[
+    this.childrenNodes(...[
       this.hoverEl,
       this.lineEl,
     ]);
@@ -46,8 +46,8 @@ class XReSizer extends Widget {
     });
     this.tableDown = XEvent.WrapFuncion.mouseClick(() => {
       const { table } = this;
-      const { widgetFocus } = table;
-      const { activate } = widgetFocus;
+      const { focusManage } = table;
+      const { activate } = focusManage;
       const { target } = activate;
       if (target !== table && target !== this) {
         this.hide();
@@ -60,7 +60,7 @@ class XReSizer extends Widget {
 
   onAttach() {
     this.bind();
-    this.table.widgetFocus.register({ target: this });
+    this.table.focusManage.register({ target: this });
   }
 
   bind() {

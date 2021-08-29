@@ -1,11 +1,18 @@
 import { SheetUtils } from '../../../utils/SheetUtils';
+import { ColorArray } from '../../../module/colorpicker/colorarray/ColorArray';
 
 class RichFont {
 
   constructor({
-    text, color, name, size,
-    italic, bold, underline,
-    strikethrough, scaleAdapter,
+    text = '',
+    color = ColorArray.BLACK,
+    name = 'Arial',
+    size = 14,
+    bold = false,
+    italic = false,
+    strikethrough = false,
+    underline = false,
+    scaleAdapter,
   } = {}) {
     this.text = text;
     this.color = color;
@@ -25,6 +32,16 @@ class RichFont {
     return new RichFont({
       text, color, name, size, italic, bold, underline, strikethrough, scaleAdapter,
     });
+  }
+
+  reset() {
+    this.color = ColorArray.BLACK;
+    this.name = 'Arial';
+    this.size = 14;
+    this.bold = false;
+    this.italic = false;
+    this.strikethrough = false;
+    this.underline = false;
   }
 
   plain(option = v => v) {

@@ -6,7 +6,6 @@ import { XEvent } from '../../lib/XEvent';
 import { h } from '../../lib/Element';
 import { SheetUtils } from '../../utils/SheetUtils';
 
-let root = SheetUtils.Undef;
 let instances = [];
 
 /**
@@ -29,7 +28,7 @@ class DragPanel extends Widget {
     this.status = false;
     this.mask = h('div', `${cssPrefix}-drag-panel-mask`);
     this.content = h('div', `${cssPrefix}-drag-panel-content`);
-    super.children(this.content);
+    super.childrenNodes(this.content);
     this.bind();
   }
 
@@ -37,12 +36,13 @@ class DragPanel extends Widget {
    * 显示弹框
    */
   open() {
+    const root = this.getRootWidget();
+    const { mask } = this;
     if (this.status === false && root) {
-      const { mask } = this;
-      root.children(mask);
-      root.children(this);
-      this.dragPanelLocation();
       this.status = true;
+      root.childrenNodes(mask);
+      root.childrenNodes(this);
+      this.dragPanelLocation();
     }
     return this;
   }
@@ -51,11 +51,12 @@ class DragPanel extends Widget {
    * 关闭弹框
    */
   close() {
+    const root = this.getRootWidget();
     if (this.status === true && root) {
       const { mask } = this;
+      this.status = false;
       root.remove(this);
       root.remove(mask);
-      this.status = false;
     }
     return this;
   }
@@ -95,10 +96,11 @@ class DragPanel extends Widget {
    * 设置显示位置
    */
   dragPanelLocation() {
+    const root = this.getRootWidget();
     const { options } = this;
     const { position } = options;
-    const { width, height } = SheetUtils.viewPort();
-    const box = this.box();
+    const rootBox = root.box();
+    const elemBox = this.box();
     switch (position) {
       case DragPanel.DRAG_PANEL_POSITION.LEFT:
         break;
@@ -108,8 +110,8 @@ class DragPanel extends Widget {
         break;
       case DragPanel.DRAG_PANEL_POSITION.CENTER:
         this.offset({
-          left: width / 2 - box.width / 2,
-          top: height / 2 - box.height / 2,
+          left: rootBox.width / 2 - elemBox.width / 2,
+          top: rootBox.height / 2 - elemBox.height / 2,
         });
         break;
       default: break;
@@ -122,8 +124,8 @@ class DragPanel extends Widget {
    * @param args
    * @returns {DragPanel}
    */
-  children(...args) {
-    this.content.children(...args);
+  childrenNodes(...args) {
+    this.content.childrenNodes(...args);
     return this;
   }
 
@@ -162,20 +164,8 @@ class DragPanel extends Widget {
     });
   }
 
-  /**
-   * 设置根节点
-   * @param element
-   */
-  static setRoot(element) {
-    if (element.el) {
-      element = h(element.el);
-    } else {
-      element = h(element);
-    }
-    root = element;
-  }
-
 }
+
 DragPanel.DRAG_PANEL_POSITION = {
   LEFT: 1,
   TOP: 2,

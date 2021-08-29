@@ -26,7 +26,7 @@ class BorderColorContextMenu extends ELContextMenu {
         }
         this.close();
       },
-    });
+    }).parentWidget(this);
     // 重置
     this.resetColorButton = new BorderColorContextMenuItem('重置', new Icon('clear-color'));
     // 颜色筛选
@@ -42,7 +42,7 @@ class BorderColorContextMenu extends ELContextMenu {
         this.close();
       },
     });
-    this.defaultColorArrayItem.children(this.defaultColorArray);
+    this.defaultColorArrayItem.childrenNodes(this.defaultColorArray);
     // 历史选中
     this.customizeColorArray = new ColorArray({
       colors: [
@@ -66,8 +66,8 @@ class BorderColorContextMenu extends ELContextMenu {
     this.customizeColorTitle = h('div', `${cssPrefix}-border-color-context-menu-color-title`);
     this.customizeColorTitle.text('自定义');
     this.customizeColorArrayItem.removeClass('hover');
-    this.customizeColorArrayItem.children(this.customizeColorTitle);
-    this.customizeColorArrayItem.children(this.customizeColorArray);
+    this.customizeColorArrayItem.childrenNodes(this.customizeColorTitle);
+    this.customizeColorArrayItem.childrenNodes(this.customizeColorArray);
     // 菜单元素追加子节点
     this.addItem(this.resetColorButton);
     this.addItem(this.defaultColorArrayItem);

@@ -22,7 +22,25 @@ class RichFonts {
     this.rich.forEach((font) => {
       rich.push(font.clone());
     });
-    return new RichFonts({ rich });
+    return new RichFonts({
+      rich,
+    });
+  }
+
+  reset() {
+    this.each((i) => {
+      i.reset();
+    });
+  }
+
+  hasLength() {
+    return this.rich.length > 0;
+  }
+
+  each(cb = () => {}) {
+    this.rich.forEach((font) => {
+      cb(font);
+    });
   }
 
   plain(option) {

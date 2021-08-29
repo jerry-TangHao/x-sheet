@@ -24,19 +24,19 @@ class IFFilter extends ELContextMenuItem {
     this.titleTextEle = h('span', `${cssPrefix}-if-filter-title-text`);
     this.titleIconEle = h('span', `${cssPrefix}-if-filter-title-icon`);
     this.titleTextEle.text('条件过滤');
-    this.titleEle.children(this.titleIconEle);
-    this.titleEle.children(this.titleTextEle);
-    this.children(this.titleEle);
+    this.titleEle.childrenNodes(this.titleIconEle);
+    this.titleEle.childrenNodes(this.titleTextEle);
+    this.childrenNodes(this.titleEle);
     // 条件类型
     this.selectEleBox = h('div', `${cssPrefix}-if-filter-select-box`);
-    this.selectEle = new Select();
-    this.selectEleBox.children(this.selectEle);
-    this.children(this.selectEleBox);
+    this.selectEle = new Select().parentWidget(this);
+    this.selectEleBox.childrenNodes(this.selectEle);
+    this.childrenNodes(this.selectEleBox);
     // 条件值
     this.valueInputEleBox = h('div', `${cssPrefix}-if-filter-value-input-box`);
-    this.valueInput = new PlainInput();
-    this.valueInputEleBox.children(this.valueInput);
-    this.children(this.valueInputEleBox);
+    this.valueInput = new PlainInput().parentWidget(this);
+    this.valueInputEleBox.childrenNodes(this.valueInput);
+    this.childrenNodes(this.valueInputEleBox);
     // 搜索类型
     this.selectEle.addValue({ text: '无', value: IFFilter.IF_TYPE.NOT });
     this.selectEle.addDivider();

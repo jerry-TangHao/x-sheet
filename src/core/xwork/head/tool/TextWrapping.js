@@ -13,7 +13,7 @@ class TextWrapping extends DropDownItem {
     this.textWrappingContextMenu = new TextWrappingContextMenu({
       el: this,
       ...this.options.contextMenu,
-    });
+    }).parentWidget(this);
   }
 
   destroy() {

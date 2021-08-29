@@ -4,9 +4,6 @@ import { BaseFont } from '../../../../draw/font/BaseFont';
 import { XDraw } from '../../../../draw/XDraw';
 import { Throttle } from '../../../../lib/Throttle';
 
-/**
- * BaseEdit
- */
 class BaseEdit extends Widget {
 
   /**

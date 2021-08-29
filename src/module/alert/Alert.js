@@ -3,18 +3,20 @@ import { Constant, cssPrefix } from '../../const/Constant';
 import { h } from '../../lib/Element';
 import { DragPanel } from '../dragpanel/DragPanel';
 import { XEvent } from '../../lib/XEvent';
+import { SheetUtils } from '../../utils/SheetUtils';
 
 class Alert extends Widget {
 
-  constructor({
-    title = '提示',
-    message = '',
-    closeDestroy = true,
-  } = {}) {
+  constructor(options) {
     super(`${cssPrefix}-alert`);
-    this.title = title;
-    this.message = message;
-    this.closeDestroy = closeDestroy;
+    this.options = SheetUtils.copy({
+      message: '',
+      title: '提示',
+      closeDestroy: true,
+    }, options);
+    this.message = this.options.message;
+    this.title = this.options.title;
+    this.closeDestroy = this.options.closeDestroy;
     // 创建 UI
     this.closeEle = h('div', `${cssPrefix}-alert-close`);
     this.titleEle = h('div', `${cssPrefix}-alert-title`);
@@ -22,17 +24,19 @@ class Alert extends Widget {
     this.okEle = h('div', `${cssPrefix}-alert-ok`);
     this.buttonsEle = h('div', `${cssPrefix}-alert-buttons`);
     // 显示内容消息
-    this.titleEle.html(title);
-    this.contentEle.html(message);
+    this.titleEle.html(this.title);
+    this.contentEle.html(this.message);
     this.okEle.html('确定');
     // 添加UI
-    this.buttonsEle.children(this.okEle);
-    this.children(this.closeEle);
-    this.children(this.titleEle);
-    this.children(this.contentEle);
-    this.children(this.buttonsEle);
+    this.buttonsEle.childrenNodes(this.okEle);
+    this.childrenNodes(this.closeEle);
+    this.childrenNodes(this.titleEle);
+    this.childrenNodes(this.contentEle);
+    this.childrenNodes(this.buttonsEle);
     // 拖拽组件
-    this.dragPanel = new DragPanel().children(this);
+    this.dragPanel = new DragPanel()
+      .childrenNodes(this)
+      .parentWidget(this);
   }
 
   setTitle(title) {

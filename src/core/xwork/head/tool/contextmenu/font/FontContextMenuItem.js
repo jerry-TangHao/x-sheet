@@ -12,12 +12,12 @@ class FontContextMenuItem extends ELContextMenuItem {
     this.title = title;
     this.icon = new Icon('checked');
     this.iconElement = h('div', `${cssPrefix}-font-context-menu-item-icon`);
-    this.iconElement.children(this.icon);
+    this.iconElement.childrenNodes(this.icon);
     this.titleElement = h('div', `${cssPrefix}-font-context-menu-item-title`);
     this.titleElement.text(title);
     this.titleElement.css('font-family', title);
-    this.children(this.iconElement);
-    this.children(this.titleElement);
+    this.childrenNodes(this.iconElement);
+    this.childrenNodes(this.titleElement);
     pool.push(this);
   }
 

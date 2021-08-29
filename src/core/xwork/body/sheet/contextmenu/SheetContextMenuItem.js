@@ -10,7 +10,7 @@ class SheetContextMenuItem extends ELContextMenuItem {
     this.type = type;
     this.titleElement = h('div', `${cssPrefix}-sheet-context-menu-item-title`);
     this.titleElement.text(name);
-    this.children(this.titleElement);
+    this.childrenNodes(this.titleElement);
   }
 
 }

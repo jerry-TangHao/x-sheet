@@ -134,10 +134,10 @@ class XlsxImport {
             xCell.fontAttr.strikethrough = strike;
             if (color) {
               const { theme, tint, argb } = color;
-              if (SheetUtils.isNotUnDef(argb)) {
+              if (SheetUtils.isDef(argb)) {
                 const rgb = HexRgb(argb);
                 xCell.fontAttr.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-              } else if (SheetUtils.isNotUnDef(theme)) {
+              } else if (SheetUtils.isDef(theme)) {
                 xCell.fontAttr.color = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
               }
             }
@@ -160,10 +160,10 @@ class XlsxImport {
                 richFont.strikethrough = strike;
                 if (color) {
                   const { theme, tint, argb } = color;
-                  if (SheetUtils.isNotUnDef(argb)) {
+                  if (SheetUtils.isDef(argb)) {
                     const rgb = HexRgb(argb);
                     richFont.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                  } else if (SheetUtils.isNotUnDef(theme)) {
+                  } else if (SheetUtils.isDef(theme)) {
                     richFont.color = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
                   }
                 }
@@ -172,7 +172,7 @@ class XlsxImport {
                 rich.push(richFont);
               }
             }
-            xCell.rich = rich;
+            xCell.richText = { rich };
             xCell.contentType = Cell.TYPE.RICH_TEXT;
           } else {
             const type = SheetUtils.type(value);
@@ -199,10 +199,10 @@ class XlsxImport {
               xCell.borderAttr.right.display = true;
               if (color) {
                 const { theme, tint, argb } = color;
-                if (SheetUtils.isNotUnDef(argb)) {
+                if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.right.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (SheetUtils.isNotUnDef(theme)) {
+                } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.right.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
                 }
@@ -216,10 +216,10 @@ class XlsxImport {
               xCell.borderAttr.top.widthType = widthType;
               if (color) {
                 const { theme, tint, argb } = color;
-                if (SheetUtils.isNotUnDef(argb)) {
+                if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.top.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (SheetUtils.isNotUnDef(theme)) {
+                } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.top.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
                 }
@@ -233,10 +233,10 @@ class XlsxImport {
               xCell.borderAttr.left.widthType = widthType;
               if (color) {
                 const { theme, tint, argb } = color;
-                if (SheetUtils.isNotUnDef(argb)) {
+                if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.left.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (SheetUtils.isNotUnDef(theme)) {
+                } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.left.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
                 }
@@ -250,10 +250,10 @@ class XlsxImport {
               xCell.borderAttr.bottom.widthType = widthType;
               if (color) {
                 const { theme, tint, argb } = color;
-                if (SheetUtils.isNotUnDef(argb)) {
+                if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.bottom.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
-                } else if (SheetUtils.isNotUnDef(theme)) {
+                } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.bottom.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
                 }
@@ -263,12 +263,12 @@ class XlsxImport {
           // 背景颜色
           if (fill) {
             const { fgColor } = fill;
-            if (SheetUtils.isNotUnDef(fgColor)) {
+            if (SheetUtils.isDef(fgColor)) {
               const { theme, tint, argb } = fgColor;
-              if (SheetUtils.isNotUnDef(argb)) {
+              if (SheetUtils.isDef(argb)) {
                 const rgb = HexRgb(argb);
                 xCell.background = ColorPicker.parseHexToRgb(rgb);
-              } else if (SheetUtils.isNotUnDef(theme)) {
+              } else if (SheetUtils.isDef(theme)) {
                 xCell.background = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
               }
             }

@@ -7,7 +7,7 @@ class FontStrike extends Item {
   constructor() {
     super(`${cssPrefix}-tools-font-strike`);
     this.icon = new Icon('font-strike');
-    this.children(this.icon);
+    this.childrenNodes(this.icon);
   }
 
 }
