@@ -1,4 +1,4 @@
-import { RectRange } from '../core/xtable/tablebase/RectRange';
+import { RectRange } from '../core/table/tablebase/RectRange';
 
 class RtreeUtils {
 

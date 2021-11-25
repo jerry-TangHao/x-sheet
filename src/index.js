@@ -1,18 +1,18 @@
 /* global window document */
 import { Constant, cssPrefix, XSheetVersion } from './const/Constant';
-import { XWork } from './core/xwork/XWork';
+import { XWork } from './core/work/XWork';
 import { Widget } from './lib/Widget';
 import { XDraw } from './draw/XDraw';
 import { h } from './lib/Element';
 import { SheetUtils } from './utils/SheetUtils';
-import { RectRange } from './core/xtable/tablebase/RectRange';
+import { RectRange } from './core/table/tablebase/RectRange';
 import { BaseFont } from './draw/font/BaseFont';
-import { XIcon } from './core/xtable/tableicon/XIcon';
+import { XIcon } from './core/table/tableicon/XIcon';
 import { XlsxExport } from './io/xlsx/XlsxExport';
 import { ColorPicker } from './module/colorpicker/ColorPicker';
 import { FindDPI } from './lib/finddpi/FindDpi';
-import { HeightUnit } from './core/xtable/tableunit/HeightUnit';
-import { WideUnit } from './core/xtable/tableunit/WideUnit';
+import { HeightUnit } from './core/table/tableunit/HeightUnit';
+import { WideUnit } from './core/table/tableunit/WideUnit';
 import { Download } from './lib/donwload/Download';
 import './style/base.less';
 import './style/index.less';
@@ -35,12 +35,12 @@ const settings = {
       tabConfig: {
         showMenu: true,
       },
-      sheets: [{
-        tableConfig: {},
-      }],
       sheetConfig: {
         showMenu: true,
       },
+      sheets: [{
+        tableConfig: {},
+      }],
     },
     bottom: {
       show: true,
@@ -68,8 +68,8 @@ class XSheet extends Widget {
     this.focusManage = new WidgetFocusMange({
       root: this,
     });
-    this.xSheetWork = new XWork(this.options.workConfig);
-    this.attach(this.xSheetWork);
+    this.xWork = new XWork(this.options.workConfig);
+    this.attach(this.xWork);
   }
 }
 

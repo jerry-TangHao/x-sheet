@@ -196,6 +196,7 @@ class IFFilter extends ELContextMenuItem {
    * @param type
    * @param value
    */
+  // eslint-disable-next-line no-unused-vars
   qualified(type, value) {
     switch (type) {
       case IFFilter.IF_TYPE.NOT: {

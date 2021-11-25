@@ -133,8 +133,8 @@ class RichHorizonDraw extends BaseRich {
         rect,
       });
       crop.open();
-      for (let i = 0, len = textArray.length; i < len; i++) {
-        const item = textArray[i];
+      for (let index = 0, len = textArray.length; index < len; index++) {
+        const item = textArray[index];
         const style = SheetUtils.extends({}, attr, item.style);
         const { strikethrough } = style;
         const { underline } = style;
@@ -143,7 +143,6 @@ class RichHorizonDraw extends BaseRich {
         const fontItalic = `${style.italic ? 'italic' : ''}`;
         const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-        draw.save();
         draw.attr({
           font: fontStyle.trim(),
           fillStyle: style.color,
@@ -158,10 +157,10 @@ class RichHorizonDraw extends BaseRich {
         if (strikethrough) {
           this.drawingLine('strike', tx, ty, item.width, item.height);
         }
-        draw.restore();
       }
       crop.close();
     } else {
+      draw.save();
       for (let i = 0, len = textArray.length; i < len; i++) {
         const item = textArray[i];
         const style = SheetUtils.extends({}, attr, item.style);
@@ -172,7 +171,6 @@ class RichHorizonDraw extends BaseRich {
         const fontItalic = `${style.italic ? 'italic' : ''}`;
         const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-        draw.save();
         draw.attr({
           font: fontStyle.trim(),
           fillStyle: style.color,
@@ -187,8 +185,8 @@ class RichHorizonDraw extends BaseRich {
         if (strikethrough) {
           this.drawingLine('strike', tx, ty, item.width, item.height);
         }
-        draw.restore();
       }
+      draw.restore();
     }
     return new DrawResult();
   }
@@ -263,7 +261,6 @@ class RichHorizonDraw extends BaseRich {
         const fontItalic = `${style.italic ? 'italic' : ''}`;
         const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-        draw.save();
         draw.attr({
           font: fontStyle.trim(),
           fillStyle: style.color,
@@ -278,10 +275,10 @@ class RichHorizonDraw extends BaseRich {
         if (strikethrough) {
           this.drawingLine('strike', tx, ty, item.width, item.height);
         }
-        draw.restore();
       }
       crop.close();
     } else {
+      draw.save();
       for (let i = 0, len = textArray.length; i < len; i++) {
         const item = textArray[i];
         const style = SheetUtils.extends({}, attr, item.style);
@@ -292,7 +289,6 @@ class RichHorizonDraw extends BaseRich {
         const fontItalic = `${style.italic ? 'italic' : ''}`;
         const fontBold = `${style.bold ? 'bold' : ''}`;
         const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-        draw.save();
         draw.attr({
           font: fontStyle.trim(),
           fillStyle: style.color,
@@ -307,8 +303,8 @@ class RichHorizonDraw extends BaseRich {
         if (strikethrough) {
           this.drawingLine('strike', tx, ty, item.width, item.height);
         }
-        draw.restore();
       }
+      draw.restore();
     }
     return new DrawResult({
       width: textWidth + alignPadding,
@@ -381,7 +377,6 @@ class RichHorizonDraw extends BaseRich {
           const fontItalic = `${style.italic ? 'italic' : ''}`;
           const fontBold = `${style.bold ? 'bold' : ''}`;
           const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-          draw.save();
           draw.attr({
             font: fontStyle.trim(),
             fillStyle: style.color,
@@ -394,12 +389,12 @@ class RichHorizonDraw extends BaseRich {
           if (strikethrough) {
             this.drawingLine('strike', tx, ty, item.width, item.height);
           }
-          draw.restore();
           subIndex++;
         }
       }
       crop.close();
     } else {
+      draw.save();
       for (let index = 0, textLength = textArray.length; index < textLength; index++) {
         // 文本信息
         let wrapLine = textArray[index];
@@ -445,7 +440,6 @@ class RichHorizonDraw extends BaseRich {
           const fontItalic = `${style.italic ? 'italic' : ''}`;
           const fontBold = `${style.bold ? 'bold' : ''}`;
           const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-          draw.save();
           draw.attr({
             font: fontStyle.trim(),
             fillStyle: style.color,
@@ -458,10 +452,10 @@ class RichHorizonDraw extends BaseRich {
           if (strikethrough) {
             this.drawingLine('strike', tx, ty, item.width, item.height);
           }
-          draw.restore();
           subIndex++;
         }
       }
+      draw.restore();
     }
     return new DrawResult();
   }

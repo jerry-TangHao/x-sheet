@@ -7,9 +7,9 @@ import { LINE_TYPE } from '../../draw/Line';
 import { SheetUtils } from '../../utils/SheetUtils';
 import { ColorArray } from '../../module/colorpicker/colorarray/ColorArray';
 import { HexRgb, Theme, ThemeXml } from './XlsxTheme';
-import { WideUnit } from '../../core/xtable/tableunit/WideUnit';
-import { Cell } from '../../core/xtable/tablecell/Cell';
-import { HeightUnit } from '../../core/xtable/tableunit/HeightUnit';
+import { WideUnit } from '../../core/table/tableunit/WideUnit';
+import { Cell } from '../../core/table/tablecell/Cell';
+import { HeightUnit } from '../../core/table/tableunit/HeightUnit';
 
 /**
  * XLSX 文件导入

@@ -13,11 +13,39 @@
             display: block;
         }
     </style>
+    <style>
+        #demo1 {
+            height: 50%;
+            width: 50%;
+            float: left;
+        }
+        #demo2 {
+            height: 50%;
+            width: 50%;
+            float: left;
+        }
+        #demo3 {
+            height: 50%;
+            width: 50%;
+            float: left;
+        }
+        #demo4 {
+            height: 50%;
+            width: 50%;
+            float: left;
+        }
+    </style>
 </head>
-<body id="dome">
+<body>
+    <div id="demo1"></div>
+    <div id="demo2"></div>
+    <div id="demo3"></div>
+    <div id="demo4"></div>
 </body>
 <script>
-    const dome = document.getElementById('dome');
-    const sheet = new XSheet(dome);
+  new XSheet('#demo1');
+  new XSheet('#demo2');
+  new XSheet('#demo3');
+  new XSheet('#demo4');
 </script>
 </html>

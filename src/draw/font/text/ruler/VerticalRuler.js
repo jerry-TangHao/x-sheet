@@ -6,19 +6,20 @@ import { SheetUtils } from '../../../../utils/SheetUtils';
 class VerticalRuler extends VerticalVisual {
 
   constructor({
-    draw, text, rect,
-    size, verticalAlign, textWrap, padding,
-    spacing = 6, lineHeight = 8,
+    draw, text, rect, bold, name, size, verticalAlign,
+    textWrap, padding, spacing = 6, lineHeight = 8,
   }) {
     super({
       draw, text, verticalAlign, padding,
     });
 
+    this.size = size;
+    this.rect = rect;
+    this.bold = bold;
+    this.name = name;
     this.textWrap = textWrap;
     this.spacing = spacing;
     this.lineHeight = lineHeight;
-    this.size = size;
-    this.rect = rect;
 
     // 裁剪文本
     this.truncateTextArray = [];
@@ -151,6 +152,12 @@ class VerticalRuler extends VerticalVisual {
       return false;
     }
     if (other.text !== this.text) {
+      return false;
+    }
+    if (other.bold !== this.bold) {
+      return false;
+    }
+    if (other.name !== this.name) {
       return false;
     }
     if (other.size !== this.size) {

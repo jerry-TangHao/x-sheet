@@ -135,7 +135,7 @@ class Theme {
     }
     const hex = this.colorPallate[this.theme];
     if (SheetUtils.isUnDef(hex)) {
-      return ColorArray.BLACK;
+      return ColorArray.NULL;
     }
     const rgb = ColorPicker.hexToRgb(hex);
     const rgbColor = new RgbColor(rgb.r, rgb.g, rgb.b);

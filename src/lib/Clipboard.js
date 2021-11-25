@@ -3,6 +3,7 @@ import { XEvent } from './XEvent';
 class Clipboard {
 
   constructor({
+    // eslint-disable-next-line no-undef
     target = document.body,
     filter = () => false,
     paste = () => {},

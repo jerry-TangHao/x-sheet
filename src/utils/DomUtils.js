@@ -6,13 +6,22 @@ import { SheetUtils } from './SheetUtils';
 class DomUtils {
 
   /**
-   * 像素值转数字值
+   * 是否存在指定样式
+   * @param element
+   * @param style
    * @param value
-   * @returns {*|number|number}
    */
-  static pxToNumber(value) {
-    value = value.replace('px', '');
-    return SheetUtils.parseInt(value);
+  static hasStyle(element, style, value) {
+    if (element.css(style) === value) {
+      return true;
+    }
+    const children = element.children();
+    for (let child of children) {
+      if (DomUtils.hasStyle(child, style, value)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -27,6 +36,16 @@ class DomUtils {
       element = element.prev();
     }
     return find;
+  }
+
+  /**
+   * 像素值转数字值
+   * @param value
+   * @returns {*|number|number}
+   */
+  static pxToNumber(value) {
+    value = value.replace('px', '');
+    return SheetUtils.parseInt(value);
   }
 
   /**

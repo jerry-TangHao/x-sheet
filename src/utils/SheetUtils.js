@@ -22,6 +22,7 @@ const DATA_TYPE = {
   Symbol: 13,
   DedicatedWorkerGlobalScope: 14,
   Date: 15,
+  RegExp: 16,
   Un: 0,
 };
 
@@ -77,6 +78,14 @@ class SheetUtils {
 
   static isArray(e) {
     return SheetUtils.type(e) === DATA_TYPE.Array;
+  }
+
+  static isObject(e) {
+    return SheetUtils.type(e) === DATA_TYPE.Object;
+  }
+
+  static isRegExp(e) {
+    return SheetUtils.type(e) === DATA_TYPE.EX;
   }
 
   static isLikeArray(e) {
@@ -185,7 +194,7 @@ class SheetUtils {
       for (let key in item) {
         if (item.hasOwnProperty(key)) {
           const value = item[key];
-          if (value) {
+          if (SheetUtils.isDef(value)) {
             target[key] = value;
           }
         }
@@ -323,6 +332,68 @@ class SheetUtils {
     return (`${S4() + S4()}${S4()}${S4()}${S4()}${S4()}${S4()}${S4()}`);
   }
 
+  static equals(one, tow) {
+    function diffValue(oneValue, towValue) {
+      const oneType = SheetUtils.type(oneValue);
+      const towType = SheetUtils.type(towValue);
+      if (oneType !== towType) {
+        return false;
+      }
+      if (SheetUtils.isArray(oneValue)) {
+        return diffArrays(oneValue, towValue);
+      }
+      if (SheetUtils.isObject(oneValue)) {
+        return diffObject(oneValue, towValue);
+      }
+      if (SheetUtils.isDate(oneValue)) {
+        return oneValue.getTime() === towValue.getTime();
+      }
+      if (SheetUtils.isRegExp(oneValue)) {
+        return oneValue.toString() === towValue.toString();
+      }
+      return oneValue === towValue;
+    }
+    function diffArrays(one, tow) {
+      if (one.length !== tow.length) {
+        return false;
+      }
+      for (let i = 0, len = one.length; i < len; i++) {
+        const oneValue = one[i];
+        const towValue = tow[i];
+        if (!diffValue(oneValue, towValue)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function diffObject(one, tow) {
+      const oneKeys = Object.keys(one);
+      const towKeys = Object.keys(tow);
+      if (oneKeys.length !== towKeys.length) {
+        return false;
+      }
+      for (const key of oneKeys) {
+        if (!towKeys.includes(key)) {
+          return false;
+        }
+        const oneValue = one[key];
+        const towValue = tow[key];
+        if (!diffValue(oneValue, towValue)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return diffValue(one, tow);
+  }
+
+  static toFixed(num, fixed) {
+    if (num.toString().indexOf('.') > -1) {
+      return num.toFixed(fixed);
+    }
+    return num;
+  }
+
   static getExplorerInfo() {
     const explorer = window.navigator.userAgent.toLowerCase();
     // firefox
@@ -369,23 +440,6 @@ class SheetUtils {
     return value;
   }
 
-  static equals(src, target) {
-    if (SheetUtils.isUnDef(src)) {
-      return false;
-    }
-    if (SheetUtils.isUnDef(target)) {
-      return false;
-    }
-    return JSON.stringify(src) === JSON.stringify(target);
-  }
-
-  static toFixed(num, fixed) {
-    if (num.toString().indexOf('.') > -1) {
-      return num.toFixed(fixed);
-    }
-    return num;
-  }
-
   static safeValue(value, defaultValue = '') {
     return SheetUtils.isUnDef(value) ? defaultValue : value;
   }
@@ -405,7 +459,21 @@ class SheetUtils {
   }
 
   static clearBlank(str) {
-    return str.replace(/\s/g, '');
+    return str ? str.replace(/\s/g, '') : str;
+  }
+
+  static clearHideCode(str) {
+    let result = '';
+    for (let i = 0; i < str.length; i++) {
+      let value = str.charAt(i);
+      // 过滤掉 &#xFEFF; 隐藏字符串
+      // 服了 ！！！！！
+      let code = encodeURI(value);
+      if (code !== '%EF%BB%BF') {
+        result += value;
+      }
+    }
+    return result;
   }
 
 }

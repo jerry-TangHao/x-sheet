@@ -24,7 +24,7 @@ class ELContextMenu extends Widget {
   addItem(item) {
     const { menus } = this;
     menus.push(item);
-    this.childrenNodes(item);
+    this.attach(item);
     return this;
   }
 
@@ -33,8 +33,8 @@ class ELContextMenu extends Widget {
     return this;
   }
 
-  openByMouse(event) {
-    this.elPopUp.openByMouse(event);
+  mouse(event) {
+    this.elPopUp.mouse(event);
     return this;
   }
 

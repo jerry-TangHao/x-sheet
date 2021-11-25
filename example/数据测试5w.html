@@ -20,7 +20,7 @@
     <script src="../dist/js/vendor.js" type="text/javascript"></script>
     <script src="../dist/js/XSheet.js" type="text/javascript"></script>
 </head>
-<body id="dome">
+<body id="demo">
 </body>
 <script>
 	console.time("生成数据消耗")
@@ -44,7 +44,7 @@
             data: bigdata,
         },
     };
-    const dome = document.getElementById('dome');
+    const dome = document.getElementById('demo');
     const xSheet = new XSheet(dome, {
         workConfig: {
             body: {

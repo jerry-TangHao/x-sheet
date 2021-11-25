@@ -7,23 +7,24 @@ import { SheetUtils } from '../../../../utils/SheetUtils';
 class AngleBoxRuler extends TextRuler {
 
   constructor({
-    draw, text, rect, overflow,
+    draw, text, rect, overflow, bold, name,
     size, angle, align, verticalAlign, textWrap, padding,
     lineHeight = 8,
   }) {
     super({
       draw, text,
     });
-
     this.size = size;
-    this.angle = angle;
+    this.bold = bold;
     this.rect = rect;
+    this.name = name;
     this.overflow = overflow;
     this.align = align;
+    this.angle = angle;
     this.textWrap = textWrap;
     this.padding = padding;
-    this.lineHeight = lineHeight;
     this.verticalAlign = verticalAlign;
+    this.lineHeight = lineHeight;
 
     this.overflowText = '';
     this.overflowTextWidth = 0;
@@ -367,6 +368,12 @@ class AngleBoxRuler extends TextRuler {
       return false;
     }
     if (other.constructor !== AngleBoxRuler) {
+      return false;
+    }
+    if (other.bold !== this.bold) {
+      return false;
+    }
+    if (other.name !== this.name) {
       return false;
     }
     if (other.text !== this.text) {

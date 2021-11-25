@@ -4,15 +4,15 @@ import { XDraw } from '../../draw/XDraw';
 import { ColorPicker } from '../../module/colorpicker/ColorPicker';
 import { BaseFont } from '../../draw/font/BaseFont';
 import { SheetUtils } from '../../utils/SheetUtils';
-import { Cell } from '../../core/xtable/tablecell/Cell';
+import { Cell } from '../../core/table/tablecell/Cell';
 import { LINE_TYPE } from '../../draw/Line';
 import { SelectFile } from '../../lib/SelectFile';
-import { HeightUnit } from '../../core/xtable/tableunit/HeightUnit';
-import { WideUnit } from '../../core/xtable/tableunit/WideUnit';
-import { XTableDataItems } from '../../core/xtable/XTableDataItems';
-import { Rows } from '../../core/xtable/tablerow/Rows';
-import { Cols } from '../../core/xtable/tablecol/Cols';
-import { Merges } from '../../core/xtable/merges/Merges';
+import { HeightUnit } from '../../core/table/tableunit/HeightUnit';
+import { WideUnit } from '../../core/table/tableunit/WideUnit';
+import { Rows } from '../../core/table/tablerow/Rows';
+import { Cols } from '../../core/table/tablecol/Cols';
+import { Merges } from '../../core/table/merges/Merges';
+import { Cells } from '../../core/table/tablecell/Cells';
 
 function next(i, step = 1) {
   return i + step;
@@ -70,14 +70,14 @@ class XlsxExport {
     // 添加工作表
     sheetList.forEach((sheet) => {
       const { name, tableConfig } = sheet;
-      const { table, data } = tableConfig;
-      const { rows, cols, merge } = tableConfig;
+      const { table, merge } = tableConfig;
+      const { rows, cols, data } = tableConfig;
       // 初始化配置数据
-      const xTableData = new XTableDataItems({
-        items: data,
-      });
       const xMerges = new Merges({
         ...merge,
+      });
+      const xCells = new Cells({
+        data,
       });
       const xCols = new Cols(cols);
       const xRows = new Rows(rows);
@@ -101,107 +101,101 @@ class XlsxExport {
       });
       worksheet.columns = sheetColumns;
       // 处理数据
-      let items = xTableData.getItems();
       let row = 0;
-      while (items.length > 0 && row < xRows.len) {
+      while (xCells.getLength() > 0 && row < xRows.len) {
+        let items = xCells.shift();
         let col = 0;
-        let item = items.shift();
-        if (item) {
+        if (items) {
           const origin = xRows.getOriginHeight(row);
           const height = this.rowHeight(origin);
           const workRow = worksheet.getRow(next(row));
           workRow.height = height;
-          while (item.length > 0 && col < xCols.len) {
-            const wrap = xTableData.wrap(item, 0);
-            if (wrap) {
-              const element = item.shift();
-              const cell = element.getCell();
-              if (cell) {
-                const { contentType, background } = cell;
-                const { text, fontAttr, borderAttr } = cell;
-                const { top, right, left, bottom } = borderAttr;
-                const workCell = workRow.getCell(next(col));
-                // 单元格文本
-                if (text) {
-                  switch (contentType) {
-                    case Cell.TYPE.NUMBER:
-                      workCell.value = SheetUtils.parseFloat(text);
-                      break;
-                    case Cell.TYPE.STRING:
-                      workCell.value = text;
-                      break;
-                  }
-                }
-                // 字体样式
-                workCell.font = {
-                  name: fontAttr.name,
-                  color: {
-                    argb: ColorPicker.parseRgbToHex(fontAttr.color),
-                  },
-                  size: this.fontSize(fontAttr.size),
-                  italic: fontAttr.italic,
-                  bold: fontAttr.bold,
-                  underline: fontAttr.underline,
-                  strike: fontAttr.strikethrough,
-                };
-                // 对齐方式
-                workCell.alignment = {
-                  vertical: fontAttr.verticalAlign,
-                  horizontal: fontAttr.align,
-                  wrapText: fontAttr.textWrap === BaseFont.TEXT_WRAP.WORD_WRAP,
-                };
-                switch (fontAttr.direction) {
-                  case BaseFont.TEXT_DIRECTION.VERTICAL:
-                    workCell.alignment.textRotation = 'vertical';
+          while (items.length > 0 && col < xCols.len) {
+            const config = items.shift();
+            if (config) {
+              const cell = new Cell(config);
+              const { contentType, background } = cell;
+              const { text, fontAttr, borderAttr } = cell;
+              const { top, right, left, bottom } = borderAttr;
+              const workCell = workRow.getCell(next(col));
+              // 单元格文本
+              if (text) {
+                switch (contentType) {
+                  case Cell.TYPE.NUMBER:
+                    workCell.value = SheetUtils.parseFloat(text);
                     break;
-                  case BaseFont.TEXT_DIRECTION.ANGLE:
-                  case BaseFont.TEXT_DIRECTION.ANGLE_BAR:
-                    workCell.alignment.textRotation = fontAttr.angle;
+                  case Cell.TYPE.STRING:
+                    workCell.value = text;
                     break;
-                }
-                // 单元格背景
-                if (background) {
-                  workCell.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: ColorPicker.parseRgbToHex(background) },
-                  };
-                }
-                // 单元格边框
-                workCell.border = {
-                  top: {}, left: {}, right: {}, bottom: {},
-                };
-                if (top.display) {
-                  const { widthType, type, color } = borderAttr.top;
-                  workCell.border.top.style = this.borderType(widthType, type);
-                  workCell.border.top.color = {
-                    argb: ColorPicker.parseRgbToHex(color),
-                  };
-                }
-                if (right.display) {
-                  const { widthType, type, color } = borderAttr.right;
-                  workCell.border.right.style = this.borderType(widthType, type);
-                  workCell.border.right.color = {
-                    argb: ColorPicker.parseRgbToHex(color),
-                  };
-                }
-                if (left.display) {
-                  const { widthType, type, color } = borderAttr.left;
-                  workCell.border.left.style = this.borderType(widthType, type);
-                  workCell.border.left.color = {
-                    argb: ColorPicker.parseRgbToHex(color),
-                  };
-                }
-                if (bottom.display) {
-                  const { widthType, type, color } = borderAttr.bottom;
-                  workCell.border.bottom.style = this.borderType(widthType, type);
-                  workCell.border.bottom.color = {
-                    argb: ColorPicker.parseRgbToHex(color),
-                  };
                 }
               }
-            } else {
-              item.shift();
+              // 字体样式
+              workCell.font = {
+                name: fontAttr.name,
+                color: {
+                  argb: ColorPicker.parseRgbToHex(fontAttr.color),
+                },
+                size: this.fontSize(fontAttr.size),
+                italic: fontAttr.italic,
+                bold: fontAttr.bold,
+                underline: fontAttr.underline,
+                strike: fontAttr.strikethrough,
+              };
+              // 对齐方式
+              workCell.alignment = {
+                vertical: fontAttr.verticalAlign,
+                horizontal: fontAttr.align,
+                wrapText: fontAttr.textWrap === BaseFont.TEXT_WRAP.WORD_WRAP,
+              };
+              switch (fontAttr.direction) {
+                case BaseFont.TEXT_DIRECTION.VERTICAL:
+                  workCell.alignment.textRotation = 'vertical';
+                  break;
+                case BaseFont.TEXT_DIRECTION.ANGLE:
+                case BaseFont.TEXT_DIRECTION.ANGLE_BAR:
+                  workCell.alignment.textRotation = fontAttr.angle;
+                  break;
+              }
+              // 单元格背景
+              if (background) {
+                workCell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: ColorPicker.parseRgbToHex(background) },
+                };
+              }
+              // 单元格边框
+              workCell.border = {
+                top: {}, left: {}, right: {}, bottom: {},
+              };
+              if (top.display) {
+                const { widthType, type, color } = borderAttr.top;
+                workCell.border.top.style = this.borderType(widthType, type);
+                workCell.border.top.color = {
+                  argb: ColorPicker.parseRgbToHex(color),
+                };
+              }
+              if (right.display) {
+                const { widthType, type, color } = borderAttr.right;
+                workCell.border.right.style = this.borderType(widthType, type);
+                workCell.border.right.color = {
+                  argb: ColorPicker.parseRgbToHex(color),
+                };
+              }
+              if (left.display) {
+                const { widthType, type, color } = borderAttr.left;
+                workCell.border.left.style = this.borderType(widthType, type);
+                workCell.border.left.color = {
+                  argb: ColorPicker.parseRgbToHex(color),
+                };
+              }
+              if (bottom.display) {
+                const { widthType, type, color } = borderAttr.bottom;
+                workCell.border.bottom.style = this.borderType(widthType, type);
+                workCell.border.bottom.color = {
+                  argb: ColorPicker.parseRgbToHex(color),
+                };
+              }
             }
             col++;
           }
@@ -209,13 +203,12 @@ class XlsxExport {
         row++;
       }
       // 处理合并
-      xMerges.getAll()
-        .forEach((xMergeRange) => {
-          const { sri, sci, eri, eci } = xMergeRange;
-          worksheet.mergeCells(
-            next(sri), next(sci), next(eri), next(eci),
-          );
-        });
+      xMerges.getAll().forEach((xMergeRange) => {
+        const { sri, sci, eri, eci } = xMergeRange;
+        worksheet.mergeCells(
+          next(sri), next(sci), next(eri), next(eci),
+        );
+      });
     });
     // 返回文件信息
     const data = await workbook.xlsx.writeBuffer();

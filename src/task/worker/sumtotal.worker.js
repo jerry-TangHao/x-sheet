@@ -1,17 +1,16 @@
-import { Cell } from '../../core/xtable/tablecell/Cell';
-import { XTableDataItems } from '../../core/xtable/XTableDataItems';
+import { Cell } from '../../core/table/tablecell/Cell';
 import { SheetUtils } from '../../utils/SheetUtils';
+import { Cells } from '../../core/table/tablecell/Cells';
 
 addEventListener('message', (event) => {
   const { data } = event;
-  const items = new XTableDataItems({
-    items: data
+  const cells = new Cells({
+    data
   });
   let total = 0;
   let number = 0;
-  items.each(item => {
-    if (item) {
-      const cell = item.getCell();
+  cells.each(cell => {
+    if (cell) {
       if (cell.hasFormula()) {
         const value = cell.getComputeText();
         if (SheetUtils.isNumber(value)) {

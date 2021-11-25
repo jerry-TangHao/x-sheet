@@ -81,10 +81,10 @@
             </style>
             <script src="XSheet.js" type="text/javascript"></script>
         </head>
-        <body id="dome">
+        <body id="demo">
             <script>
-              const dome = document.getElementById('dome');
-              const xSheet = new XSheet(dome);
+              const dome = document.getElementById('demo');
+              const xSheet = new XSheet(demo);
             </script>
         </body>
     </html>

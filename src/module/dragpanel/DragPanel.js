@@ -74,18 +74,23 @@ class DragPanel extends Widget {
    */
   bind() {
     const { mask } = this;
-    XEvent.bind(mask, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+    XEvent.bind(mask, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (evt1) => {
       this.close();
-      e.stopPropagation();
+      evt1.stopPropagation();
     });
     XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (evt1) => {
-      if (evt1.button !== 0) return;
-      const downEventXy = this.eventXy(evt1, this);
+      if (evt1.button !== 0) {
+        return;
+      }
+      const root = this.getRootWidget();
+      const box = root.box();
+      const dxy = this.eventXy(evt1);
       XEvent.mouseMoveUp(h(document), (evt2) => {
-        // 计算移动的距离
-        const top = evt2.pageY - downEventXy.y;
-        const left = evt2.pageX - downEventXy.x;
-        this.offset({ top, left });
+        const top = evt2.pageY - box.top - dxy.y;
+        const left = evt2.pageX - box.left - dxy.x;
+        this.offset({
+          top, left,
+        });
         evt2.stopPropagation();
       });
       evt1.stopPropagation();

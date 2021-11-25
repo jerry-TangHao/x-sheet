@@ -5,12 +5,23 @@ import { SheetUtils } from '../../../../utils/SheetUtils';
 class AngleBarRuler extends AngleBoxRuler {
 
   constructor({
-    draw, text, rect, overflow,
-    size, angle, align, verticalAlign, textWrap, padding,
-    lineHeight = 8,
+    draw, text, rect, overflow, bold, name, size, angle,
+    align, verticalAlign, textWrap, padding, lineHeight = 8,
   }) {
     super({
-      draw, text, size, angle, rect, overflow, align, verticalAlign, textWrap, lineHeight, padding,
+      draw,
+      text,
+      size,
+      angle,
+      rect,
+      overflow,
+      bold,
+      name,
+      align,
+      verticalAlign,
+      textWrap,
+      lineHeight,
+      padding,
     });
     this.overflowTextCenterX = 0;
     this.textWrapTextCenterX = 0;
@@ -51,6 +62,12 @@ class AngleBarRuler extends AngleBoxRuler {
       return false;
     }
     if (other.text !== this.text) {
+      return false;
+    }
+    if (other.bold !== this.bold) {
+      return false;
+    }
+    if (other.name !== this.name) {
       return false;
     }
     if (other.size !== this.size) {

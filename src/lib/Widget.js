@@ -34,47 +34,6 @@ class Widget extends Life {
   }
 
   /**
-   * 查找最邻近
-   * 的class元素
-   * @param clazz
-   */
-  closestClass(clazz) {
-    let node = this;
-    while (!h(document.body).is(node)) {
-      if (node.hasClass(clazz)) {
-        return node;
-      }
-      node = node.parent();
-    }
-    return null;
-  }
-
-  /**
-   * 获取 root widget
-   */
-  getRootWidget() {
-    let parent = this.data('parent');
-    while (parent && !parent.$$rootFlag) {
-      parent = parent.data('parent');
-    }
-    return parent;
-  }
-
-  /**
-   * 绑定处理事件
-   */
-  bind() {
-
-  }
-
-  /**
-   * 解绑事件处理
-   */
-  unbind() {
-    XEvent.unbind(this);
-  }
-
-  /**
    * 追加节点
    * 触发onAttach事件
    * @param widget
@@ -86,15 +45,17 @@ class Widget extends Life {
   }
 
   /**
-   * 设置 parent widget
-   * @param widget
+   * 解绑事件处理
    */
-  parentWidget(widget) {
-    if (widget) {
-      this.data('parent', widget);
-      return this;
-    }
-    return this.data('parent');
+  unbind() {
+    XEvent.unbind(this);
+  }
+
+  /**
+   * 绑定处理事件
+   */
+  bind() {
+
   }
 
   /**
@@ -118,6 +79,71 @@ class Widget extends Life {
   destroy() {
     this.unbind();
     this.remove();
+  }
+
+  /**
+   * 查找最邻近
+   * 的class元素
+   * @param clazz
+   */
+  closestClass(clazz) {
+    let node = this;
+    while (!h(document.body).is(node)) {
+      if (node.hasClass(clazz)) {
+        return node;
+      }
+      node = node.parent();
+    }
+    return null;
+  }
+
+  /**
+   * 获取根节点box
+   */
+  getRootBox() {
+    return this.getRootWidget().box();
+  }
+
+  /**
+   * 获取相对于 root box的
+   * 元素box
+   * @returns {{top: number, left: number, width: number, height: number}}
+   */
+  relativeBox() {
+    const root = this.getRootWidget();
+    const thisBox = this.box();
+    const rootBox = root.box();
+    return {
+      right: rootBox.right - thisBox.right,
+      bottom: rootBox.bottom - thisBox.bottom,
+      top: thisBox.top - rootBox.top,
+      left: thisBox.left - rootBox.left,
+      width: thisBox.width,
+      height: thisBox.height,
+    };
+  }
+
+  /**
+   * 获取 root widget
+   */
+  getRootWidget() {
+    let parent = this.data('parent');
+    while (parent && !parent.$$rootFlag) {
+      parent = parent.data('parent');
+    }
+    return parent;
+  }
+
+  /**
+   * 设置 parent widget
+   * @param widget
+   */
+  parentWidget(widget) {
+    if (widget) {
+      this.data('parent', widget);
+      return this;
+    }
+    return this.data('parent');
   }
 
 }

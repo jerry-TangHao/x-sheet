@@ -165,6 +165,7 @@ class ColorArray extends Widget {
 }
 
 ColorArray.BLACK = 'rgb(0, 0, 0)';
+ColorArray.NULL = null;
 ColorArray.WHITE = 'rgb(255, 255, 255)';
 
 export {

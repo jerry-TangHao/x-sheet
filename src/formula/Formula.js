@@ -76,6 +76,15 @@ class Formula {
 
 }
 
+Formula.EMPTY = new Formula();
+
+Formula.getInstance = (config) => {
+  if (config) {
+    return new Formula(config);
+  }
+  return Formula.EMPTY;
+};
+
 export {
   Formula,
 };

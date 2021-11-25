@@ -67,6 +67,7 @@ class RichVerticalRuler extends RichVerticalVisual {
         textArray.push({
           tx: 0,
           ty: textHeight,
+          style: attr,
           text: measureText,
           width: measure.width,
           height: measure.height,
@@ -93,17 +94,17 @@ class RichVerticalRuler extends RichVerticalVisual {
     if (this.used) {
       return;
     }
-    const { size, name, bold, italic } = this;
-    const { draw, rich, rect, spacing } = this;
-    const { height } = rect;
-    const { lineHeight } = this;
-    const verticalAlignPadding = this.getVerticalAlignPadding();
-    const maxHeight = height - (verticalAlignPadding * 2);
+    let { size, name, bold, italic } = this;
+    let { draw, rich, rect, spacing } = this;
+    let { height } = rect;
+    let { lineHeight } = this;
+    let verticalAlignPadding = this.getVerticalAlignPadding();
+    let maxHeight = height - (verticalAlignPadding * 2);
     // 状态标记
-    const textArray = [];
-    const heightArray = [];
+    let wrapLine = new RichVerticalWrapLine();
     let textWidth = 0;
-    const wrapLine = new RichVerticalWrapLine();
+    let textArray = [];
+    let heightArray = [];
     for (let i = 0, len = rich.length, eff = len - 1; i < len; i++) {
       const item = rich[i];
       const attr = SheetUtils.extends({
@@ -189,7 +190,11 @@ class RichVerticalRuler extends RichVerticalVisual {
         breakIndex += 1;
       }
       if (wrapLine.width > 0) {
-        const lineItem = wrapLine.getOrNewItem();
+        const lineItem = wrapLine.getOrNewItem({
+          tx: 0,
+          ty: 0,
+          width: 0,
+        });
         lineItem.tx = wrapLine.offsetX;
         lineItem.ty = wrapLine.offsetY;
         wrapLine.addHeight(spacing);

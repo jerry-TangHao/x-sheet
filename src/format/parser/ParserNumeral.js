@@ -1,0 +1,5 @@
+class ParserNumeral {}
+
+export {
+  ParserNumeral,
+};

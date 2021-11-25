@@ -6,7 +6,7 @@ class RichVerticalWrapLine {
     items = [],
     width = 0,
     height = 0,
-  }) {
+  } = {}) {
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.index = 0;

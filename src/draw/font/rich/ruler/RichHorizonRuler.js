@@ -219,7 +219,11 @@ class RichHorizonRuler extends RichHorizonVisual {
         breakIndex += 1;
       }
       if (wrapLine.width > 0) {
-        const lineItem = wrapLine.getOrNewItem();
+        const lineItem = wrapLine.getOrNewItem({
+          tx: 0,
+          ty: 0,
+          width: 0,
+        });
         lineItem.tx = wrapLine.offsetX;
         lineItem.ty = wrapLine.offsetY;
         wrapLine.addWidth(spacing);

@@ -1,4 +1,4 @@
-/* global window document */
+/* global document */
 import { Widget } from '../../lib/Widget';
 import { Constant, cssPrefix } from '../../const/Constant';
 import { SheetUtils } from '../../utils/SheetUtils';
@@ -24,12 +24,9 @@ class ElPopUp extends Widget {
       el: SheetUtils.Nul,
       autoWidth: false,
       autoHeight: false,
-      position: ElPopUp.POPUP_POSTION.TB,
+      position: ElPopUp.POPUP_POSTION.B,
     }, options);
-    this.direction = SheetUtils.Undef;
     this.status = false;
-    this.location = 0;
-    this.spaces = 0;
     this.elPopUpDownHandle = () => {
       this.close();
     };
@@ -37,145 +34,165 @@ class ElPopUp extends Widget {
   }
 
   /**
-   * 计算显示的大小
+   * 鼠标定位
    */
-  elPopUpAutosize() {
-    const { options, direction, spaces } = this;
-    const { autoWidth, autoHeight } = options;
-    if (autoWidth) {
-      this.css('width', 'initial');
-      this.css('overflow-x', 'initial');
-      const box = this.box();
-      const { width } = box;
-      switch (direction) {
-        case 'left':
-        case 'right':
-          if (width > spaces) {
-            this.css('overflow-x', 'auto');
-            this.css('width', `${spaces}px`);
-          }
-          break;
-      }
-    }
-    if (autoHeight) {
-      this.css('height', 'initial');
-      this.css('overflow-y', 'initial');
-      const box = this.box();
-      const { height } = box;
-      switch (direction) {
-        case 'top':
-        case 'bottom':
-          if (height > spaces) {
-            this.css('overflow-y', 'auto');
-            this.css('height', `${spaces}px`);
-          }
-          break;
-      }
-    }
-  }
-
-  /**
-   * 计算显示的位置
-   */
-  elPopUpPosition() {
-    const { options } = this;
-    const { position } = options;
-    const elem = options.el;
-    const root = this.getRootWidget();
-    const rootBox = root.box();
-    const elemBox = elem.box();
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-    this.direction = SheetUtils.Undef;
-    this.spaces = 0;
-    this.location = 0;
+  pointPos() {
+    // 当前根元素的尺寸和位置
+    const viewport = this.getRootBox();
+    // 当前面板的尺寸和位置
+    const location = this.relativeBox();
+    // 定位的方式(上,下,左,右)
+    const position = this.getPos();
+    // 相对定位元素的尺寸和位置
+    const relative = this.getTarget().relativeBox();
+    // 判断定位方式
     switch (position) {
-      case ElPopUp.POPUP_POSTION.LR: {
-        const left = elemBox.left - rootBox.left;
-        const width = elemBox.width;
-        const lDiff = left;
-        const rDiff = winWidth - (left + width);
-        if (lDiff > rDiff) {
-          this.direction = 'left';
-          this.spaces = lDiff;
-          this.location = left;
-        } else {
-          this.direction = 'right';
-          this.spaces = rDiff;
-          this.location = left + width;
+      case ElPopUp.POPUP_POSTION.L: {
+        // 左边可视区域是否容纳的下
+        const tOffset = relative.left - location.width;
+        if (tOffset > 0) {
+          this.offset({
+            left: tOffset,
+            top: relative.top,
+          });
+          return;
         }
+        // 右边可视区域是否容纳的下
+        const rOffset = relative.left + relative.width;
+        const boundary = rOffset + location.width;
+        if (boundary < viewport.width) {
+          this.offset({
+            left: rOffset,
+            top: relative.top,
+          });
+          return;
+        }
+        // 左右都放不下默认放到左边收缩容器宽度
+        this.offset({
+          left: tOffset,
+          top: relative.top,
+        });
         break;
       }
-      case ElPopUp.POPUP_POSTION.TB: {
-        const top = elemBox.top - rootBox.top;
-        const height = elemBox.height;
-        const tDiff = top;
-        const bDiff = winHeight - (top + height);
-        if (tDiff > bDiff) {
-          this.direction = 'top';
-          this.spaces = tDiff;
-          this.location = top;
-        } else {
-          this.direction = 'bottom';
-          this.spaces = bDiff;
-          this.location = top + height;
+      case ElPopUp.POPUP_POSTION.T: {
+        // 上边可视区域是否容纳的下
+        const tOffset = relative.top - location.height;
+        if (tOffset > 0) {
+          this.offset({
+            left: relative.left,
+            top: tOffset,
+          });
+          return;
         }
+        // 右边可视区域是否容纳的下
+        const bOffset = relative.top + relative.height;
+        const boundary = bOffset + location.height;
+        if (boundary < viewport.height) {
+          this.offset({
+            top: bOffset,
+            left: relative.left,
+          });
+          return;
+        }
+        // 上下都放不下默认放到上边收缩容器宽度
+        this.offset({
+          left: relative.left,
+          top: tOffset,
+        });
+        break;
+      }
+      case ElPopUp.POPUP_POSTION.R: {
+        // 右边可视区域是否容纳的下
+        const rOffset = relative.left + relative.width;
+        const boundary = rOffset + location.width;
+        if (boundary < viewport.width) {
+          this.offset({
+            left: rOffset,
+            top: relative.top,
+          });
+          return;
+        }
+        // 左对齐时坐标的偏移位置
+        const tOffset = relative.left - location.width;
+        if (tOffset > 0) {
+          this.offset({
+            left: tOffset,
+            top: relative.top,
+          });
+          return;
+        }
+        // 左右都放不下默认放到右边收缩容器宽度
+        this.offset({
+          left: rOffset,
+          top: relative.top,
+        });
+        break;
+      }
+      case ElPopUp.POPUP_POSTION.B: {
+        // 右边可视区域是否容纳的下
+        const bOffset = relative.top + relative.height;
+        const boundary = bOffset + location.height;
+        if (boundary < viewport.height) {
+          this.offset({
+            top: bOffset,
+            left: relative.left,
+          });
+          return;
+        }
+        // 上边可视区域是否容纳的下
+        const tOffset = relative.top - location.height;
+        if (tOffset > 0) {
+          this.offset({
+            left: relative.left,
+            top: tOffset,
+          });
+          return;
+        }
+        // 上下都放不下默认放到下边收缩容器宽度
+        this.offset({
+          top: bOffset,
+          left: relative.left,
+        });
         break;
       }
     }
   }
 
   /**
-   * 设置显示位置
+   * 指针定位
+   * @param event
    */
-  elPopUpLocation() {
-    const { direction, location, options } = this;
-    const { el } = options;
-    const box = this.box();
-    const elBox = el.box();
-    const elLeft = elBox.left;
-    const elTop = elBox.top;
-    const { width, height } = box;
-    switch (direction) {
-      case 'left':
-        this.css('top', `${elTop}px`);
-        this.css('left', `${location - width}px`);
-        break;
-      case 'right':
-        this.css('top', `${elTop}px`);
-        this.css('left', `${location}px`);
-        break;
-      case 'top':
-        this.css('left', `${elLeft}px`);
-        this.css('top', `${location - height}px`);
-        break;
-      case 'bottom':
-        this.css('left', `${elLeft}px`);
-        this.css('top', `${location}px`);
-        break;
-    }
-  }
-
-  /**
-   * 设置显示位置
-   */
-  mousePopUpLocation(mouse) {
-    const mLeft = mouse.pageX;
-    const mlTop = mouse.pageY;
-    const winHeight = window.innerHeight;
-    const winWidth = window.innerWidth;
-    const box = this.box();
-    const rightDiff = winWidth - (mLeft + box.width);
-    const bottomDIff = winHeight - (mlTop + box.height);
-    if (rightDiff < 0) {
-      this.css('left', `${mLeft - box.width}px`);
+  mousePos(event) {
+    // 当前面板的尺寸和位置
+    const location = this.relativeBox();
+    // 当前根元素的尺寸和位置
+    const viewport = this.getRootBox();
+    // 鼠标相对根元素位置
+    const { x, y } = this.getRootWidget().eventXy(event);
+    // 位置边界
+    const rBoundary = x + location.width;
+    const bBoundary = y + location.height;
+    // 右边是否能显示下
+    if (rBoundary < viewport.width) {
+      this.offset({
+        left: x,
+      });
     } else {
-      this.css('left', `${mLeft}px`);
+      const lOffset = x - location.width;
+      this.offset({
+        left: lOffset,
+      });
     }
-    if (bottomDIff < 0) {
-      this.css('top', `${mlTop - box.height}px`);
+    // 左边是否能显示下
+    if (bBoundary < viewport.height) {
+      this.offset({
+        top: y,
+      });
     } else {
-      this.css('top', `${mlTop}px`);
+      const tOffset = y - location.height;
+      this.offset({
+        top: tOffset,
+      });
     }
   }
 
@@ -188,9 +205,27 @@ class ElPopUp extends Widget {
       this.status = true;
       root.childrenNodes(this);
     }
-    this.elPopUpPosition();
-    this.elPopUpAutosize();
-    this.elPopUpLocation();
+    this.pointPos();
+  }
+
+  /**
+   * 显示弹框
+   * @param event
+   */
+  mouse(event) {
+    const root = this.getRootWidget();
+    if (this.status === false && root) {
+      this.status = true;
+      root.childrenNodes(this);
+    }
+    this.mousePos(event);
+  }
+
+  /**
+   * 获取定位方式
+   */
+  getPos() {
+    return this.options.position;
   }
 
   /**
@@ -205,17 +240,13 @@ class ElPopUp extends Widget {
   }
 
   /**
-   * 显示弹框
-   * @param mouse
+   * 绑定事件
    */
-  openByMouse(mouse) {
-    const root = this.getRootWidget();
-    if (this.status === false && root) {
-      this.status = true;
-      root.childrenNodes(this);
-    }
-    this.mousePopUpLocation(mouse);
-    this.elPopUpAutosize();
+  bind() {
+    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      e.stopPropagation();
+    });
+    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, this.elPopUpDownHandle);
   }
 
   /**
@@ -227,21 +258,18 @@ class ElPopUp extends Widget {
   }
 
   /**
-   * 绑定事件
-   */
-  bind() {
-    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
-      e.stopPropagation();
-    });
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, this.elPopUpDownHandle);
-  }
-
-  /**
    * 设置环绕元素
    * @param el
    */
   setEL(el) {
     this.options.el = el;
+  }
+
+  /**
+   * 获取定位的相对元素
+   */
+  getTarget() {
+    return this.options.el;
   }
 
   /**
@@ -281,8 +309,10 @@ class ElPopUp extends Widget {
 }
 
 ElPopUp.POPUP_POSTION = {
-  TB: Symbol('上下位置'),
-  LR: Symbol('左右位置'),
+  B: Symbol('下'),
+  T: Symbol('上'),
+  L: Symbol('左'),
+  R: Symbol('右'),
 };
 
 export {

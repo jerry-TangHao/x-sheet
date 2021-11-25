@@ -242,6 +242,7 @@ class ValueFilter extends ELContextMenuItem {
    * 是否符合筛选条件
    * @param items
    */
+  // eslint-disable-next-line no-unused-vars
   qualified(items) {
 
   }

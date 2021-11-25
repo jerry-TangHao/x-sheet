@@ -46,28 +46,28 @@ class DrawTextBuilder {
 
   buildRuler() {
     const { text, attr, draw, rect, overflow } = this;
-    const { size, align, angle } = attr;
-    const { padding, textWrap } = attr;
+    const { size, align, angle, name } = attr;
+    const { padding, bold, textWrap } = attr;
     switch (attr.direction) {
       case BaseFont.TEXT_DIRECTION.HORIZONTAL:
         return new HorizonRuler({
           draw, text, size, rect, overflow,
-          align, textWrap, padding
+          bold, name, align, textWrap, padding
         });
       case BaseFont.TEXT_DIRECTION.VERTICAL:
         return new VerticalRuler({
           draw, text, size, rect, overflow,
-          align, textWrap, padding
+          bold, name, align, textWrap, padding
         });
       case BaseFont.TEXT_DIRECTION.ANGLE:
         return new AngleBoxRuler({
-          draw, text, rect, overflow,
-          size, angle, align, textWrap, padding
+          draw, text, rect, overflow, bold,
+          size, name, angle, align, textWrap, padding
         });
       case BaseFont.TEXT_DIRECTION.ANGLE_BAR:
         return new AngleBarRuler({
-          draw, text,rect, overflow,
-          size, angle, align, textWrap, padding
+          draw, text,rect, overflow, bold,
+          size, name, angle, align, textWrap, padding
         });
     }
     return null;

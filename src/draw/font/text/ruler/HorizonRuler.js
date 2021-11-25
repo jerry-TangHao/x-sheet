@@ -6,8 +6,8 @@ import { SheetUtils } from '../../../../utils/SheetUtils';
 class HorizonRuler extends HorizonVisual {
 
   constructor({
-    draw, text, rect, overflow,
-    size, align, textWrap, padding,
+    draw, text, rect, overflow, bold,
+    name, size, align, textWrap, padding,
     lineHeight = 8,
   }) {
     super({
@@ -16,8 +16,10 @@ class HorizonRuler extends HorizonVisual {
 
     this.overflow = overflow;
     this.textWrap = textWrap;
+    this.bold = bold;
     this.size = size;
     this.rect = rect;
+    this.name = name;
     this.lineHeight = lineHeight;
 
     // 裁剪文本
@@ -143,6 +145,12 @@ class HorizonRuler extends HorizonVisual {
       return false;
     }
     if (other.constructor !== HorizonRuler) {
+      return false;
+    }
+    if (other.bold !== this.bold) {
+      return false;
+    }
+    if (other.name !== this.name) {
       return false;
     }
     if (other.text !== this.text) {

@@ -126,6 +126,7 @@ class Tokenizer {
   lexical(input) {
     let OPERATOR = /^(\+|-|\*|\/|%|>|<|,|\^|=|&|!|:|>=|<=|<>)$/;
     let NUMBERS = /[0-9.]/;
+    let SPACE = /\s/;
     let LETTERS = /[a-z0-9_$]/i;
     // 文本字符长度
     let { length } = input;
@@ -140,7 +141,6 @@ class Tokenizer {
       // 当前处理的字符
       let char = input[current];
       // 跳过连续空格
-      let SPACE = /\s/;
       if (SPACE.test(char)) {
         const next = input[current + 1];
         if (SPACE.test(next)) {

@@ -11,6 +11,7 @@ module.exports = {
     "no-shadow": "off",
     "no-continue": "off",
     "no-loop-func": "off",
+    "no-use-before-define": "off",
     "max-len": ["error", 300],
     "object-curly-newline": "off",
     "padded-blocks": "off",
