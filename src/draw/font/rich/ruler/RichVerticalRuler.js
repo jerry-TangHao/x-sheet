@@ -25,195 +25,12 @@ class RichVerticalRuler extends RichVerticalVisual {
     this.rect = rect;
     this.overflow = overflow;
 
-    // 裁剪文本
     this.truncateTextArray = [];
     this.truncateTextHeight = 0;
 
-    // 自动换行文本
+    this.textWrapTextWidth = 0;
     this.textWrapTextArray = [];
     this.textWrapHeightArray = [];
-    this.textWrapTextWidth = 0;
-  }
-
-  truncateRuler() {
-    if (this.used) {
-      return;
-    }
-    const { size, name, bold, italic } = this;
-    const { rich, spacing } = this;
-    const { draw } = this;
-    const textArray = [];
-    let textHeight = 0;
-    for (let i = 0, len = rich.length; i < len; i++) {
-      const item = rich[i];
-      const attr = SheetUtils.extends({
-        size, name, bold, italic,
-      }, item);
-      const fontItalic = `${attr.italic ? 'italic' : ''}`;
-      const fontBold = `${attr.bold ? 'bold' : ''}`;
-      const fontSize = `${attr.size}px`;
-      const fontName = `${attr.name}`;
-      const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-      const { text } = attr;
-      draw.save();
-      draw.attr({
-        font: fontStyle.trim(),
-      });
-      let textLength = text.length;
-      let textIndex = 0;
-      while (textIndex < textLength) {
-        const measureText = text.charAt(textIndex);
-        const measure = this.textSize(measureText);
-        textArray.push({
-          tx: 0,
-          ty: textHeight,
-          style: attr,
-          text: measureText,
-          width: measure.width,
-          height: measure.height,
-          ascent: measure.ascent,
-        });
-        textHeight += measure.height + spacing;
-        textIndex += 1;
-      }
-      draw.restore();
-    }
-    if (textHeight > 0) {
-      textHeight -= spacing;
-    }
-    this.truncateTextArray = textArray;
-    this.truncateTextHeight = textHeight;
-    this.setUsedType(BaseRuler.USED.TRUNCATE);
-  }
-
-  overflowRuler() {
-    this.truncateRuler();
-  }
-
-  textWrapRuler() {
-    if (this.used) {
-      return;
-    }
-    let { size, name, bold, italic } = this;
-    let { draw, rich, rect, spacing } = this;
-    let { height } = rect;
-    let { lineHeight } = this;
-    let verticalAlignPadding = this.getVerticalAlignPadding();
-    let maxHeight = height - (verticalAlignPadding * 2);
-    // 状态标记
-    let wrapLine = new RichVerticalWrapLine();
-    let textWidth = 0;
-    let textArray = [];
-    let heightArray = [];
-    for (let i = 0, len = rich.length, eff = len - 1; i < len; i++) {
-      const item = rich[i];
-      const attr = SheetUtils.extends({
-        size, name, bold, italic,
-      }, item);
-      const fontItalic = `${attr.italic ? 'italic' : ''}`;
-      const fontBold = `${attr.bold ? 'bold' : ''}`;
-      const fontSize = `${attr.size}px`;
-      const fontName = `${attr.name}`;
-      const fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
-      const { text } = attr;
-      draw.save();
-      draw.attr({
-        font: fontStyle.trim(),
-      });
-      const breakArray = this.textBreak(text);
-      const breakLength = breakArray.length;
-      let breakIndex = 0;
-      while (breakIndex < breakLength) {
-        if (breakIndex) {
-          const lineItem = wrapLine.getOrNewItem();
-          lineItem.tx = wrapLine.offsetX;
-          lineItem.ty = wrapLine.offsetY;
-          textArray.push({
-            items: wrapLine.items,
-            width: wrapLine.width,
-            height: wrapLine.height,
-          });
-          wrapLine.addOffsetX(lineHeight);
-          wrapLine.addOffsetX(wrapLine.height);
-          wrapLine.resetWrapLine();
-        }
-        const text = breakArray[breakIndex];
-        const textLength = text.length;
-        let innerIndex = 0;
-        while (innerIndex < textLength) {
-          const lineItem = wrapLine.getOrNewItem({
-            style: attr, text: '',
-          });
-          const measureText = lineItem.text + text.charAt(innerIndex);
-          const measure = this.textSize(measureText);
-          const effectHeight = wrapLine.offsetY + measure.height;
-          if (effectHeight > maxHeight) {
-            if (wrapLine.height === 0) {
-              lineItem.ascent = measure.ascent;
-              lineItem.text = measureText;
-              lineItem.tx = wrapLine.offsetX;
-              lineItem.ty = wrapLine.offsetY;
-              lineItem.width = measure.width;
-              lineItem.height = measure.height;
-              wrapLine.width = measure.width;
-              wrapLine.height = measure.height;
-              textArray.push({
-                items: wrapLine.items,
-                width: wrapLine.width,
-                height: wrapLine.height,
-              });
-              innerIndex += 1;
-            } else {
-              lineItem.tx = wrapLine.offsetX;
-              lineItem.ty = wrapLine.offsetY;
-              textArray.push({
-                items: wrapLine.items,
-                width: wrapLine.width,
-                height: wrapLine.height,
-              });
-            }
-            wrapLine.addOffsetX(lineHeight);
-            wrapLine.addOffsetX(wrapLine.width);
-            wrapLine.resetWrapLine();
-          } else {
-            lineItem.text = measureText;
-            lineItem.height = measure.height;
-            lineItem.width = measure.width;
-            lineItem.ascent = measure.ascent;
-            wrapLine.height = effectHeight;
-            if (measure.width > wrapLine.width) {
-              wrapLine.width = measure.width;
-            }
-            innerIndex += 1;
-          }
-        }
-        breakIndex += 1;
-      }
-      if (wrapLine.width > 0) {
-        const lineItem = wrapLine.getOrNewItem({
-          tx: 0,
-          ty: 0,
-          width: 0,
-        });
-        lineItem.tx = wrapLine.offsetX;
-        lineItem.ty = wrapLine.offsetY;
-        wrapLine.addHeight(spacing);
-        wrapLine.addOffsetY(spacing);
-        wrapLine.addOffsetY(lineItem.width);
-      }
-      if (i < eff) {
-        wrapLine.nextLineItem();
-      }
-      draw.restore();
-    }
-    // 文本最大宽度
-    if (textWidth > 0) {
-      textWidth -= lineHeight;
-    }
-    this.textWrapTextWidth = textWidth;
-    this.textWrapTextArray = textArray;
-    this.textWrapHeightArray = heightArray;
-    this.setUsedType(BaseRuler.USED.TEXT_WRAP);
   }
 
   equals(other) {
@@ -249,6 +66,184 @@ class RichVerticalRuler extends RichVerticalVisual {
       }
     }
     return true;
+  }
+
+  truncateRuler() {
+    if (this.used) {
+      return;
+    }
+    let { size, name, bold, italic } = this;
+    let { rich, draw, spacing } = this;
+    let textArray = [];
+    let textHeight = 0;
+    for (let i = 0, len = rich.length; i < len; i++) {
+      let item = rich[i];
+      let attr = SheetUtils.extends({
+        size, name, bold, italic,
+      }, item);
+      let fontItalic = `${attr.italic ? 'italic' : ''}`;
+      let fontBold = `${attr.bold ? 'bold' : ''}`;
+      let fontSize = `${attr.size}px`;
+      let fontName = `${attr.name}`;
+      let fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
+      let { text } = attr;
+      draw.save();
+      draw.attr({
+        font: fontStyle.trim(),
+      });
+      let textLength = text.length;
+      let textIndex = 0;
+      while (textIndex < textLength) {
+        let measureText = text.charAt(textIndex);
+        let measure = this.textSize(measureText);
+        textArray.push({
+          tx: 0,
+          ty: textHeight,
+          style: attr,
+          text: measureText,
+          width: measure.width,
+          height: measure.height,
+          ascent: measure.ascent,
+        });
+        textHeight += measure.height + spacing;
+        textIndex += 1;
+      }
+      draw.restore();
+    }
+    if (textHeight > 0) {
+      textHeight -= spacing;
+    }
+    this.truncateTextArray = textArray;
+    this.truncateTextHeight = textHeight;
+    this.setUsedType(BaseRuler.USED.TRUNCATE);
+  }
+
+  overflowRuler() {
+    this.truncateRuler();
+  }
+
+  textWrapRuler() {
+    if (this.used) { return; }
+    let { size, name, bold, italic } = this;
+    let { draw, rich, rect, spacing } = this;
+    let { height } = rect;
+    let { lineHeight } = this;
+    let verticalAlignPadding = this.getVerticalAlignPadding();
+    let maxRectHeight = height - (verticalAlignPadding * 2);
+    let wrapTextArray = [];
+    let wrapHeightArray = [];
+    let wrapLine = new RichVerticalWrapLine();
+    for (let i = 0, len = rich.length, eff = len - 1; i < len; i++) {
+      let item = rich[i];
+      let style = SheetUtils.extends({
+        size, name, bold, italic,
+      }, item);
+      let { text } = style;
+      let fontItalic = `${style.italic ? 'italic' : ''}`;
+      let fontName = `${style.name}`;
+      let fontBold = `${style.bold ? 'bold' : ''}`;
+      let fontSize = `${style.size}px`;
+      let fontStyle = `${fontItalic} ${fontBold} ${fontSize} ${fontName}`;
+      draw.save();
+      draw.attr({
+        font: fontStyle.trim(),
+      });
+      let breakArray = this.textBreak(text);
+      let breakLength = breakArray.length;
+      let breakIndex = 0;
+      while (breakIndex < breakLength) {
+        if (breakIndex) {
+          wrapTextArray.push({
+            items: wrapLine.items,
+            width: wrapLine.width,
+            height: wrapLine.height,
+          });
+          wrapHeightArray.push(wrapLine.height);
+          wrapLine.addOffsetX(lineHeight);
+          wrapLine.addOffsetX(wrapLine.width);
+          wrapLine.resetWrapLine();
+        }
+        let text = breakArray[breakIndex];
+        let textLength = text.length;
+        let textIndex = 0;
+        while (textIndex < textLength) {
+          let wrapLineItem = wrapLine.getOrNewItem({ style });
+          let measureText = text.charAt(textIndex);
+          let measureSize = this.textSize(measureText);
+          let totalHeight = wrapLine.offsetY + measureSize.height;
+          let offsetHeight = totalHeight + spacing;
+          if (offsetHeight > maxRectHeight) {
+            if (wrapLine.height === 0) {
+              wrapLine.width = measureSize.width;
+              wrapLine.height = measureSize.height;
+              wrapLineItem.width = measureSize.width;
+              wrapLineItem.height = measureSize.height;
+              wrapLineItem.append({
+                text: measureText,
+                tx: wrapLine.offsetX,
+                ty: wrapLine.offsetY,
+                width: measureSize.width,
+                height: measureSize.height,
+                ascent: measureSize.ascent,
+              });
+              wrapTextArray.push({
+                items: wrapLine.items,
+                width: wrapLine.width,
+                height: wrapLine.height,
+              });
+              wrapHeightArray.push(wrapLine.height);
+              textIndex += 1;
+            } else {
+              wrapTextArray.push({
+                items: wrapLine.items,
+                width: wrapLine.width,
+                height: wrapLine.height,
+              });
+              wrapHeightArray.push(wrapLine.height);
+            }
+            wrapLine.addOffsetX(lineHeight);
+            wrapLine.addOffsetX(wrapLine.width);
+            wrapLine.resetWrapLine();
+          } else {
+            let olderOffsetY = wrapLine.offsetY;
+            wrapLine.width = Math.max(measureSize.width, wrapLine.width);
+            wrapLine.height = offsetHeight;
+            wrapLine.offsetY = offsetHeight;
+            wrapLineItem.width = wrapLine.width;
+            wrapLineItem.height = wrapLine.height;
+            wrapLineItem.append({
+              text: measureText,
+              tx: wrapLine.offsetX,
+              ty: olderOffsetY,
+              width: measureSize.width,
+              height: measureSize.height,
+              ascent: measureSize.ascent,
+            });
+            textIndex += 1;
+          }
+        }
+        breakIndex += 1;
+      }
+      if (i < eff) {
+        wrapLine.nextLineItem();
+      }
+      draw.restore();
+    }
+    if (wrapLine.height > 0) {
+      wrapTextArray.push({
+        items: wrapLine.items,
+        width: wrapLine.width,
+        height: wrapLine.height,
+      });
+      wrapHeightArray.push(wrapLine.height);
+      wrapLine.addOffsetX(lineHeight);
+      wrapLine.addOffsetX(wrapLine.width);
+      wrapLine.resetWrapLine();
+    }
+    this.textWrapTextArray = wrapTextArray;
+    this.textWrapHeightArray = wrapHeightArray;
+    this.textWrapTextWidth = wrapLine.offsetX;
+    this.setUsedType(BaseRuler.USED.TEXT_WRAP);
   }
 
 }

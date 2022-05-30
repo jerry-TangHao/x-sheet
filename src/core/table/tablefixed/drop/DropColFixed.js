@@ -19,7 +19,7 @@ class DropColFixed extends Widget {
   setSize() {
     const { table, block } = this;
     const height = table.visualHeight();
-    const width = 6;
+    const width = table.settings.xFixedBar.width;
     block.offset({
       height: table.getIndexHeight(), width,
     });

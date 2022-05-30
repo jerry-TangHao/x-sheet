@@ -1206,9 +1206,7 @@ class XTableDimension extends Widget {
   scrollX(x) {
     const { cols, xFixedView, scroll } = this;
     const fixedView = xFixedView.getFixedView();
-    const [
-      ci, left,
-    ] = this.colsReduceIf(fixedView.eci + 1, cols.len, 0, 0, x, i => cols.getWidth(i));
+    const [ci, left] = this.colsReduceIf(fixedView.eci + 1, cols.len, 0, 0, x, i => cols.getWidth(i));
     // 记录滚动方向
     if (scroll.x > left) {
       scroll.x = left;
@@ -1232,9 +1230,7 @@ class XTableDimension extends Widget {
   scrollY(y) {
     const { rows, scroll, rowHeightGroupIndex } = this;
     const find = rowHeightGroupIndex.get(y);
-    const [
-      ri, top,
-    ] = this.rowsReduceIf(find.ri, rows.len, find.top, 0, y, i => rows.getHeight(i));
+    const [ri, top] = this.rowsReduceIf(find.ri, rows.len, find.top, 0, y, i => rows.getHeight(i));
     // 记录滚动方向
     if (scroll.y > top) {
       scroll.type = SCROLL_TYPE.V_TOP;
@@ -1255,10 +1251,11 @@ class XTableDimension extends Widget {
    * 滚动到指定行
    */
   scrollRi(ri) {
-    const { rows, scroll } = this;
-    const top = rows.sectionSumHeight(0, ri);
+    const { rows, scroll, xFixedView } = this;
+    const fixedView = xFixedView.getFixedView();
+    const top = rows.sectionSumHeight(fixedView.eri + 1, ri);
     // 记录滚动方向
-    if (scroll.y > top) {
+    if (scroll.y >= top) {
       scroll.type = SCROLL_TYPE.V_TOP;
       scroll.y = top;
       scroll.ri = ri;
@@ -1277,19 +1274,20 @@ class XTableDimension extends Widget {
    * 滚动到指定列
    */
   scrollCi(ci) {
-    const { cols, scroll } = this;
-    const left = cols.sectionSumWidth(0, ci);
+    const { cols, scroll, xFixedView } = this;
+    const fixedView = xFixedView.getFixedView();
+    const left = cols.sectionSumWidth(fixedView.eci + 1, ci);
     // 记录滚动方向
-    if (scroll.x > left) {
+    if (scroll.x >= left) {
+      scroll.type = SCROLL_TYPE.H_LEFT;
       scroll.x = left;
       scroll.ci = ci;
-      scroll.type = SCROLL_TYPE.H_LEFT;
       this.scrolling();
       scroll.type = SCROLL_TYPE.UN;
     } else if (scroll.x < left) {
+      scroll.type = SCROLL_TYPE.H_RIGHT;
       scroll.x = left;
       scroll.ci = ci;
-      scroll.type = SCROLL_TYPE.H_RIGHT;
       this.scrolling();
       scroll.type = SCROLL_TYPE.UN;
     }

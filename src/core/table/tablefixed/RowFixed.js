@@ -115,7 +115,7 @@ class RowFixed extends Widget {
     const { table, block } = this;
     const { fxSri, fxEri } = this;
     const { rows } = table;
-    const height = RowFixed.HEIGHT;
+    const height = table.settings.xFixedBar.height;
     const width = fxEri > -1 ? table.visualWidth() : table.getIndexWidth();
     const outer = fxEri > -1 ? height / 2 : height;
     const top = rows.sectionSumHeight(fxSri, fxEri) + table.getIndexHeight() - outer;

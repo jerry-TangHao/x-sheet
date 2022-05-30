@@ -1,3 +1,21 @@
+class RichHorizonWrapLineItem {
+  constructor({
+    text = '',
+    style = {},
+    tx = 0,
+    ty = 0,
+    width = 0,
+    height = 0,
+  } = {}) {
+    this.text = text;
+    this.tx = tx;
+    this.ty = ty;
+    this.style = style;
+    this.width = width;
+    this.height = height;
+  }
+}
+
 class RichHorizonWrapLine {
 
   static wrapAlignBottom(items) {
@@ -68,7 +86,7 @@ class RichHorizonWrapLine {
     if (item) {
       return item;
     }
-    this.items[this.index] = { ...options };
+    this.items[this.index] = new RichHorizonWrapLineItem(options);
     return this.items[this.index];
   }
 

@@ -1,3 +1,21 @@
+class RichVerticalWrapLineItem {
+  constructor({
+    text = [],
+    style = {},
+    width = 0,
+    height = 0,
+  }) {
+    this.style = style;
+    this.text = text;
+    this.width = width;
+    this.height = height;
+  }
+
+  append(item) {
+    this.text.push(item);
+  }
+}
+
 class RichVerticalWrapLine {
 
   constructor({
@@ -31,7 +49,7 @@ class RichVerticalWrapLine {
   }
 
   resetWrapLine() {
-    this.offsetX = 0;
+    this.offsetY = 0;
     this.index = 0;
     this.items = [];
     this.width = 0;
@@ -51,7 +69,7 @@ class RichVerticalWrapLine {
     if (item) {
       return item;
     }
-    this.items[this.index] = { ...options };
+    this.items[this.index] = new RichVerticalWrapLineItem(options);
     return this.items[this.index];
   }
 

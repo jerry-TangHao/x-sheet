@@ -31,7 +31,7 @@ class XFilter extends XScreenCssBorderItem {
     this.activeIcon = null;
     this.icons = [];
     this.display = false;
-    this.mask = new Mask().setRoot(table);
+    this.mask = new Mask().setRoot(table).parentWidget(table);
     this.filter = new FilterData({
       el: this.mask,
       ok: ({

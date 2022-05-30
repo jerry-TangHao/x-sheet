@@ -31,6 +31,53 @@ class VerticalRuler extends VerticalVisual {
     this.textWrapTextWidth = 0;
   }
 
+  equals(other) {
+    if (SheetUtils.isUnDef(other)) {
+      return false;
+    }
+    if (other.constructor !== VerticalRuler) {
+      return false;
+    }
+    if (other.text !== this.text) {
+      return false;
+    }
+    if (other.bold !== this.bold) {
+      return false;
+    }
+    if (other.name !== this.name) {
+      return false;
+    }
+    if (other.size !== this.size) {
+      return false;
+    }
+    if (other.spacing !== this.spacing) {
+      return false;
+    }
+    if (other.padding !== this.padding) {
+      return false;
+    }
+    if (other.verticalAlign !== this.verticalAlign) {
+      return false;
+    }
+    if (other.textWrap !== this.textWrap) {
+      return false;
+    }
+    const diffWidth = other.rect.width !== this.rect.width;
+    const diffHeight = other.rect.height !== this.rect.height;
+    if (diffWidth || diffHeight) {
+      return false;
+    }
+    switch (this.textWrap) {
+      case BaseFont.TEXT_WRAP.WORD_WRAP: {
+        if (other.lineHeight !== this.lineHeight) {
+          return false;
+        }
+        break;
+      }
+    }
+    return true;
+  }
+
   truncateRuler() {
     if (this.used) {
       return;
@@ -142,53 +189,6 @@ class VerticalRuler extends VerticalVisual {
     this.textWrapTextArray = textArray;
     this.textWrapHeightArray = heightArray;
     this.setUsedType(BaseRuler.USED.TEXT_WRAP);
-  }
-
-  equals(other) {
-    if (SheetUtils.isUnDef(other)) {
-      return false;
-    }
-    if (other.constructor !== VerticalRuler) {
-      return false;
-    }
-    if (other.text !== this.text) {
-      return false;
-    }
-    if (other.bold !== this.bold) {
-      return false;
-    }
-    if (other.name !== this.name) {
-      return false;
-    }
-    if (other.size !== this.size) {
-      return false;
-    }
-    if (other.spacing !== this.spacing) {
-      return false;
-    }
-    if (other.padding !== this.padding) {
-      return false;
-    }
-    if (other.verticalAlign !== this.verticalAlign) {
-      return false;
-    }
-    if (other.textWrap !== this.textWrap) {
-      return false;
-    }
-    const diffWidth = other.rect.width !== this.rect.width;
-    const diffHeight = other.rect.height !== this.rect.height;
-    if (diffWidth || diffHeight) {
-      return false;
-    }
-    switch (this.textWrap) {
-      case BaseFont.TEXT_WRAP.WORD_WRAP: {
-        if (other.lineHeight !== this.lineHeight) {
-          return false;
-        }
-        break;
-      }
-    }
-    return true;
   }
 
 }

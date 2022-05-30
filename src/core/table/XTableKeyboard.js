@@ -15,20 +15,25 @@ class XTableKeyboard {
   constructor(table) {
     const { focusManage } = table;
     this.table = table;
+    this.count = 0;
     this.items = [];
-    this.keyCode = '';
+    this.keyCodes = [];
     this.doHandle = (event) => {
       const { keyCode } = event;
       const { activate } = focusManage;
-      if (!`${this.keyCode}`.includes(`${keyCode}`)) {
-        this.keyCode = `${this.keyCode}${keyCode}`;
+      // 修复输入中文时产生的bug
+      if (keyCode === 229) {
+        return;
+      }
+      if (!this.keyCodes.includes(keyCode)) {
+        this.keyCodes.push(keyCode);
       }
       if (activate) {
         const { target } = activate;
         const find = this.find(target);
         if (find) {
           const { response } = find;
-          const flagCode = SheetUtils.parseInt(this.keyCode);
+          const flagCode = this.getKeyCode();
           response.forEach((item) => {
             if (item.keyCode(flagCode, event)) {
               item.handle(event);
@@ -36,10 +41,15 @@ class XTableKeyboard {
           });
         }
       }
+      this.count += 1;
     };
     this.upHandle = (event) => {
       const { keyCode } = event;
-      this.keyCode = `${this.keyCode}`.replace(`${keyCode}`, '');
+      const index = this.keyCodes.indexOf(keyCode);
+      if (index > -1) {
+        this.keyCodes.splice(index, 1);
+      }
+      this.count = Math.max(0, this.count - 1);
     };
     this.bind();
   }
@@ -99,13 +109,11 @@ class XTableKeyboard {
    * @param el
    * @param event
    */
-  forward({
-    target, event,
-  }) {
+  forward({ target, event }) {
     const find = this.find(target);
     if (find) {
       const { response } = find;
-      const flagCode = SheetUtils.parseInt(this.keyCode);
+      const flagCode = this.getKeyCode();
       response.forEach((item) => {
         if (item.keyCode(flagCode, event)) {
           item.handle(event);
@@ -120,7 +128,8 @@ class XTableKeyboard {
    * @param target
    */
   register({
-    response = [], target = null,
+    response = [],
+    target = null,
   }) {
     let find = this.find(target);
     if (find) {
@@ -149,7 +158,8 @@ class XTableKeyboard {
    * @param response
    */
   removeResponse({
-    target, item,
+    item,
+    target,
   }) {
     let find = this.find(target);
     if (find) {
@@ -163,6 +173,14 @@ class XTableKeyboard {
    */
   destroy() {
     this.unbind();
+  }
+
+  /**
+   * 获取keyCode
+   * @returns {*|number|number}
+   */
+  getKeyCode() {
+    return SheetUtils.parseInt(this.keyCodes.join(''));
   }
 
 }

@@ -127,6 +127,24 @@ class Items {
 
 class Cells extends Items {
 
+  static wrapCell(item) {
+    if (item instanceof Cell) {
+      return item;
+    }
+
+    if (SheetUtils.isString(item)) {
+      let config = { text: item };
+      return new Cell(config);
+    } else {
+      if (SheetUtils.isDef(item)) {
+        let config = item.cell ? item.cell : item;
+        return new Cell(config);
+      }
+    }
+
+    return item;
+  }
+
   constructor({
     snapshot = new Snapshot(),
     data = [],
@@ -158,20 +176,9 @@ class Cells extends Items {
     let { data } = this;
     let items = data[ri];
     if (items) {
-      let item = items[ci];
-      if (item) {
-        if (item instanceof Cell) {
-          return item;
-        }
-        if (SheetUtils.isString(item)) {
-          let config = { text: item };
-          items[ci] = new Cell(config);
-        } else {
-          let config = item.cell ? item.cell : item;
-          items[ci] = new Cell(config);
-        }
-        return items[ci];
-      }
+      const wrap = Cells.wrapCell(items[ci]);
+      items[ci] = wrap;
+      return wrap;
     }
     return SheetUtils.Undef;
   }

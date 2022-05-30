@@ -113,7 +113,7 @@ class XlsxExport {
           while (items.length > 0 && col < xCols.len) {
             const config = items.shift();
             if (config) {
-              const cell = new Cell(config);
+              const cell = Cells.wrapCell(config);
               const { contentType, background } = cell;
               const { text, fontAttr, borderAttr } = cell;
               const { top, right, left, bottom } = borderAttr;

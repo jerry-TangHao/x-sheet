@@ -117,7 +117,7 @@ class ColFixed extends Widget {
     } = this;
     const { fxSci, fxEci } = this;
     const { cols } = table;
-    const width = ColFixed.WIDTH;
+    const width = table.settings.xFixedBar.width;
     const height = fxEci > -1 ? table.visualHeight() : table.getIndexHeight();
     const offset = fxEci > -1 ? width / 2 : width;
     const left = cols.sectionSumWidth(fxSci, fxEci) + table.getIndexWidth() - offset;

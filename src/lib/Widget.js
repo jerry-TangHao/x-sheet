@@ -35,6 +35,19 @@ class Widget extends Life {
 
   /**
    * 追加节点
+   * @param args[]
+   */
+  childrenNodes(...args) {
+    args.forEach((ele) => {
+      if (ele.parentWidget) {
+        ele.parentWidget(this);
+      }
+    });
+    return super.childrenNodes(...args);
+  }
+
+  /**
+   * 追加节点
    * 触发onAttach事件
    * @param widget
    */
@@ -42,6 +55,24 @@ class Widget extends Life {
     this.childrenNodes(widget);
     widget.parentWidget(this);
     widget.onAttach(this);
+  }
+
+  /**
+   * 追加节点
+   * @param widget
+   */
+  before(widget) {
+    widget.parentWidget(this);
+    return super.before(widget);
+  }
+
+  /**
+   * 追加节点
+   * @param widget
+   */
+  after(widget) {
+    widget.parentWidget(this);
+    return super.after(widget);
   }
 
   /**

@@ -19,7 +19,7 @@ class DropRowFixed extends Widget {
   setSize() {
     const { table, block } = this;
     const width = table.visualWidth();
-    const height = 6;
+    const height = table.settings.xFixedBar.height;
     block.offset({
       width: table.getIndexWidth(), height,
     });

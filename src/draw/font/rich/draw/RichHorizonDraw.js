@@ -89,17 +89,14 @@ class RichHorizonDraw extends BaseRich {
     const { rect } = this;
     const { width, height } = rect;
     const { align, verticalAlign } = attr;
-    // 文字宽度
     ruler.truncateRuler();
     const {
       truncateText: textArray,
       truncateTextWidth: textWidth,
       truncateTextHeight: textHeight,
     } = ruler;
-    // 填充宽度
     const verticalAlignPadding = this.getVerticalAlignPadding();
     const alignPadding = this.getAlignPadding();
-    // 计算文本坐标
     let bx = rect.x;
     let by = rect.y;
     switch (align) {
@@ -124,7 +121,6 @@ class RichHorizonDraw extends BaseRich {
         by += height - textHeight - verticalAlignPadding;
         break;
     }
-    // 边界检查
     const outboundsHeight = textHeight + verticalAlignPadding > height;
     const outboundsWidth = textWidth + alignPadding > width;
     if (outboundsHeight || outboundsWidth) {
@@ -196,17 +192,14 @@ class RichHorizonDraw extends BaseRich {
     const { rect, overflow } = this;
     const { width, height } = rect;
     const { align, verticalAlign } = attr;
-    // 文字宽度
     ruler.overflowRuler();
     const {
       overflowText: textArray,
       overflowTextWidth: textWidth,
       overflowTextHeight: textHeight,
     } = ruler;
-    // 填充宽度
     const verticalAlignPadding = this.getVerticalAlignPadding();
     const alignPadding = this.getAlignPadding();
-    // 计算文本坐标
     let bx = rect.x;
     let by = rect.y;
     switch (align) {
@@ -231,7 +224,6 @@ class RichHorizonDraw extends BaseRich {
         by += height - textHeight - verticalAlignPadding;
         break;
     }
-    // 边界检查
     const outboundsHeight = textHeight + verticalAlignPadding > overflow.height;
     const outboundsWidth = textWidth + alignPadding > overflow.width;
     let pointOffset = false;
@@ -315,16 +307,13 @@ class RichHorizonDraw extends BaseRich {
     const { rect, draw, ruler, attr } = this;
     const { width, height } = rect;
     const { align, verticalAlign } = attr;
-    // 填充尺寸
     const verticalAlignPadding = this.getVerticalAlignPadding();
     const alignPadding = this.getAlignPadding();
-    // 计算文本折行
     ruler.textWrapRuler();
     const {
       textWrapTextArray: textArray,
       textWrapTextHeight: textHeight,
     } = ruler;
-    // 边界检查
     const outboundsHeight = textHeight > height;
     if (outboundsHeight) {
       const crop = new Crop({
@@ -333,12 +322,9 @@ class RichHorizonDraw extends BaseRich {
       });
       crop.open();
       for (let index = 0, textLength = textArray.length; index < textLength; index++) {
-        // 文本信息
         let wrapLine = textArray[index];
-        // 计算文本坐标
         let bx = rect.x;
         let by = rect.y;
-        // 对齐方式
         switch (align) {
           case BaseFont.ALIGN.left:
             bx += alignPadding;
@@ -361,11 +347,9 @@ class RichHorizonDraw extends BaseRich {
             by += height - textHeight - verticalAlignPadding;
             break;
         }
-        // 子文本
         let subLength = wrapLine.items.length;
         let subIndex = 0;
         while (subIndex < subLength) {
-          // 绘制文本
           const item = wrapLine.items[subIndex];
           const tx = item.tx + bx;
           const ty = item.ty + by;
@@ -396,12 +380,9 @@ class RichHorizonDraw extends BaseRich {
     } else {
       draw.save();
       for (let index = 0, textLength = textArray.length; index < textLength; index++) {
-        // 文本信息
         let wrapLine = textArray[index];
-        // 计算文本坐标
         let bx = rect.x;
         let by = rect.y;
-        // 对齐方式
         switch (align) {
           case BaseFont.ALIGN.left:
             bx += alignPadding;
@@ -424,11 +405,9 @@ class RichHorizonDraw extends BaseRich {
             by += height - textHeight - verticalAlignPadding;
             break;
         }
-        // 子文本
         let subLength = wrapLine.items.length;
         let subIndex = 0;
         while (subIndex < subLength) {
-          // 绘制文本
           const item = wrapLine.items[subIndex];
           const tx = item.tx + bx;
           const ty = item.ty + by;

@@ -307,6 +307,9 @@ class XlsxImport {
       if (xRows.data.length > xRows.len) {
         xRows.len = xRows.data.length;
       }
+      if (xData.length > xRows.len) {
+        xRows.len = xData.length;
+      }
       sheets.push({
         name,
         tableConfig: {

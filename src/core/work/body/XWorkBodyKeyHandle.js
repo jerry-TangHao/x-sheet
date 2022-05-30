@@ -85,7 +85,11 @@ function openEdit({ table, response }) {
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
-    keyCode: keyCode => (keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90),
+    keyCode: (keyCode) => {
+      const leftKeyCode = (keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90);
+      const rightKeyCode = (keyCode >= 96 && keyCode <= 105);
+      return leftKeyCode || rightKeyCode;
+    },
     handle: (event) => {
       if (edit.mode === BaseEdit.MODE.HIDE) {
         let { selectRange } = xSelect;
@@ -337,13 +341,14 @@ function arrowDown({ table, body, response }) {
 }
 
 function arrowUp({ table, body, response }) {
-  const { xTableScrollView } = table;
-  const { edit, xScreen } = table;
+  const { xScreen } = table;
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
     keyCode: keyCode => keyCode === 38,
     handle: () => {
+      const { xTableScrollView } = table;
+      const { edit, rowFixed } = table;
       if (edit.mode === BaseEdit.MODE.SHOW) {
         return;
       }
@@ -368,27 +373,31 @@ function arrowUp({ table, body, response }) {
       } else {
         xSelect.setRange(clone);
       }
-      // 是否超过视图区域
-      let minRi = scrollView.sri;
-      if (sri < minRi) {
-        let diff = minRi - sri;
-        let last = scrollView.sri - diff;
-        table.scrollRi(last);
-        body.refreshScrollBarSize();
-        body.refreshScrollBarLocal();
+      // 检查是否超过冻结区域
+      if (sri > rowFixed.fxEri) {
+        // 是否超过视图区域
+        let minRi = scrollView.sri;
+        if (sri < minRi) {
+          let diff = minRi - sri;
+          let last = scrollView.sri - diff;
+          table.scrollRi(last);
+          body.refreshScrollBarSize();
+          body.refreshScrollBarLocal();
+        }
       }
     },
   });
 }
 
 function arrowLeft({ table, body, response }) {
-  const { xTableScrollView } = table;
-  const { edit, xScreen } = table;
+  const { xScreen } = table;
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
     keyCode: keyCode => keyCode === 37,
     handle: () => {
+      const { xTableScrollView } = table;
+      const { edit, colFixed } = table;
       if (edit.mode === BaseEdit.MODE.SHOW) {
         return;
       }
@@ -413,14 +422,17 @@ function arrowLeft({ table, body, response }) {
       } else {
         xSelect.setRange(clone);
       }
-      // 是否超过视图区域
-      let minCi = scrollView.sci;
-      if (sci < minCi) {
-        let diff = minCi - sci;
-        let last = scrollView.sci - diff;
-        table.scrollCi(last);
-        body.refreshScrollBarSize();
-        body.refreshScrollBarLocal();
+      // 检查是否超过冻结区域
+      if (sci > colFixed.fxEci) {
+        // 是否超过视图区域
+        let minCi = scrollView.sci;
+        if (sci < minCi) {
+          let diff = minCi - sci;
+          let last = scrollView.sci - diff;
+          table.scrollCi(last);
+          body.refreshScrollBarSize();
+          body.refreshScrollBarLocal();
+        }
       }
     },
   });
