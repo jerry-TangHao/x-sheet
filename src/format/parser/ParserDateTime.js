@@ -1,5 +1,0 @@
-class ParserDateTime {}
-
-export {
-  ParserDateTime,
-};

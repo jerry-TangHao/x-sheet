@@ -1,6 +1,6 @@
 import { BaseTask } from './base/BaseTask';
-import SumTotalWorker from './worker/sumtotal.worker';
-import SplitDataWorker from './worker/splitdata.worker';
+import SumTotalWorker from './task/sumtotal.worker';
+import SplitDataWorker from './task/splitdata.worker';
 
 /**
  * 对用户筛选区域做数据统计

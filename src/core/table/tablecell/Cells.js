@@ -135,12 +135,12 @@ class Cells extends Items {
     if (SheetUtils.isString(item)) {
       let config = { text: item };
       return new Cell(config);
-    } else {
-      if (SheetUtils.isDef(item)) {
-        let config = item.cell ? item.cell : item;
-        return new Cell(config);
-      }
     }
+    if (SheetUtils.isDef(item)) {
+      let config = item.cell ? item.cell : item;
+      return new Cell(config);
+    }
+
 
     return item;
   }

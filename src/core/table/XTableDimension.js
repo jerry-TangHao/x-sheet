@@ -39,7 +39,7 @@ import { Alert } from '../../module/alert/Alert';
 import { Snapshot } from './snapshot/Snapshot';
 import { TableEdit } from './tableedit/TableEdit';
 import { Protection } from './protection/Protection';
-import { DateCellsHelper } from './helper/dimension/DateCellsHelper';
+import { DataCellsHelper } from './helper/dimension/DataCellsHelper';
 
 class Dimensions {
 
@@ -605,7 +605,7 @@ class XTableDimension extends Widget {
       xFixedView: this.xFixedView,
     });
     // 数据操作帮助类
-    this.dateCellsHelper = new DateCellsHelper(this);
+    this.dataCellsHelper = new DataCellsHelper(this);
     // table区域
     this.xTableFrozenContent = new XTableFrozenContent(this);
     this.xLeftIndex = new XTableLeftIndex(this);
@@ -790,10 +790,10 @@ class XTableDimension extends Widget {
 
   /**
    * 数据操作帮助类
-   * @returns {DateCellsHelper}
+   * @returns {DataCellsHelper}
    */
-  getDateCellsHelper() {
-    return this.dateCellsHelper;
+  getDataCellsHelper() {
+    return this.dataCellsHelper;
   }
 
   /**

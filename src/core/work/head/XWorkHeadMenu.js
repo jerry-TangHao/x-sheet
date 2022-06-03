@@ -108,7 +108,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { xScreen } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
           this.format.setTitle(title);
@@ -124,7 +124,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { edit } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           this.font.setTitle(name);
           if (edit.mode === BaseEdit.MODE.SHOW) {
             edit.fontFamily(name);
@@ -144,7 +144,7 @@ class XWorkHeadMenu extends Widget {
           const { table } = sheet;
           const { edit } = table;
           this.dprFontSize.setTitle(size);
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           if (edit.mode === BaseEdit.MODE.SHOW) {
             edit.fontSize(size);
           } else {
@@ -161,7 +161,7 @@ class XWorkHeadMenu extends Widget {
         onUpdate: (background) => {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const { xScreen } = table;
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
@@ -181,7 +181,7 @@ class XWorkHeadMenu extends Widget {
             edit.fontColor(color);
           } else {
             const { xScreen } = table;
-            const helper = table.getDateCellsHelper();
+            const helper = table.getDataCellsHelper();
             const xSelect = xScreen.findType(XSelectItem);
             const { selectRange } = xSelect;
             helper.setStyleFontColor({ selectRange, color });
@@ -257,7 +257,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { xScreen } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
           helper.setStyleBorder({
@@ -272,7 +272,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { xScreen } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
           switch (type) {
@@ -299,7 +299,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { xScreen } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
           switch (type) {
@@ -326,7 +326,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { xScreen } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
           helper.setStyleAngleNumber({ selectRange, number });
@@ -335,7 +335,7 @@ class XWorkHeadMenu extends Widget {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
           const { xScreen } = table;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
           helper.setStyleAngleType({ selectRange, type });
@@ -347,7 +347,7 @@ class XWorkHeadMenu extends Widget {
         onUpdate: (type) => {
           const sheet = sheetView.getActiveSheet();
           const { table } = sheet;
-          const helper = table.getDateCellsHelper();
+          const helper = table.getDataCellsHelper();
           const { xScreen } = table;
           const xSelect = xScreen.findType(XSelectItem);
           const { selectRange } = xSelect;
@@ -549,7 +549,7 @@ class XWorkHeadMenu extends Widget {
     XEvent.bind(this.merge, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, () => {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
-      const helper = table.getDateCellsHelper();
+      const helper = table.getDataCellsHelper();
       const { xScreen } = table;
       const xSelect = xScreen.findType(XSelectItem);
       const { selectRange } = xSelect;
@@ -560,7 +560,7 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       const { edit } = table;
-      const helper = table.getDateCellsHelper();
+      const helper = table.getDataCellsHelper();
       if (edit.mode === BaseEdit.MODE.SHOW) {
         edit.fontBold();
       } else {
@@ -574,7 +574,7 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       const { edit } = table;
-      const helper = table.getDateCellsHelper();
+      const helper = table.getDataCellsHelper();
       if (edit.mode === BaseEdit.MODE.SHOW) {
         edit.fontItalic();
       } else {
@@ -589,7 +589,7 @@ class XWorkHeadMenu extends Widget {
       const { table } = sheet;
       const { xScreen } = table;
       const { edit } = table;
-      const helper = table.getDateCellsHelper();
+      const helper = table.getDataCellsHelper();
       if (edit.mode === BaseEdit.MODE.SHOW) {
         edit.underLine();
       } else {
@@ -606,7 +606,7 @@ class XWorkHeadMenu extends Widget {
       const { table } = sheet;
       const { xScreen } = table;
       const { edit } = table;
-      const helper = table.getDateCellsHelper();
+      const helper = table.getDataCellsHelper();
       if (edit.mode === BaseEdit.MODE.SHOW) {
         edit.strikeLine();
       } else {
@@ -841,7 +841,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let name = helper.getStyleFontName({ selectRange });
@@ -893,7 +893,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let format = helper.getCellFormat({ selectRange });
@@ -958,7 +958,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let underline = helper.hasStyleUnderLine({ selectRange });
@@ -971,7 +971,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let size = helper.getStyleFontSize({ selectRange });
@@ -984,7 +984,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let bold = helper.hasStyleBold({ selectRange });
@@ -997,7 +997,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let strikethrough = helper.hasStyleStrikeLine({ selectRange });
@@ -1010,7 +1010,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let italic = helper.hasStyleItalic({ selectRange });
@@ -1023,7 +1023,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let angle = helper.getStyleAngle({ selectRange });
@@ -1036,7 +1036,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let {
@@ -1058,7 +1058,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let color = helper.getStyleBackground({ selectRange });
@@ -1074,7 +1074,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let color = helper.getStyleColor({ selectRange });
@@ -1090,7 +1090,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let icon = new Icon('align-left');
@@ -1116,7 +1116,7 @@ class XWorkHeadMenu extends Widget {
     let sheet = sheetView.getActiveSheet();
     let { table } = sheet;
     let { xScreen } = table;
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let xSelect = xScreen.findType(XSelectItem);
     let { selectRange } = xSelect;
     let icon = new Icon('align-middle');
@@ -1143,7 +1143,7 @@ class XWorkHeadMenu extends Widget {
     let { table } = sheet;
     let { xScreen } = table;
     let xSelect = xScreen.findType(XSelectItem);
-    let helper = table.getDateCellsHelper();
+    let helper = table.getDataCellsHelper();
     let { selectRange } = xSelect;
     let icon = new Icon('text-wrap');
     let wrapping = helper.getStyleWrapping({ selectRange });

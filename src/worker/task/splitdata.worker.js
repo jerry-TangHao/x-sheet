@@ -1,4 +1,4 @@
-addEventListener("message" , (event) => {
+addEventListener('message', (event) => {
   let { range, items, group } = event.data;
   let { sri, eri } = range;
   let result = [];
@@ -13,12 +13,11 @@ addEventListener("message" , (event) => {
     }
     let row = items[index];
     splice.push(row);
-    sri ++;
-    index ++;
+    sri++;
+    index++;
   }
   if (splice.length) {
     result.push(splice);
   }
   postMessage(result);
 });
-

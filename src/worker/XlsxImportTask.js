@@ -1,15 +1,15 @@
 import { BaseTask } from './base/BaseTask';
-import Worker from './worker/xlsxexport.worker';
+import Worker from './task/xlsximport.worker';
 
-class XlsxExportTask extends BaseTask {
+class XlsxImportTask extends BaseTask {
 
   constructor() {
     super();
-    this.notice = null;
     this.worker = null;
+    this.notice = null;
   }
 
-  async execute(workOptions, sheetList, dpr, unit, dpi) {
+  async execute(file, dpr, unit, dpi) {
     return new Promise((resolve) => {
       this.resetTask();
       this.notice = resolve;
@@ -17,7 +17,7 @@ class XlsxExportTask extends BaseTask {
       const finish = workerFinish.bind(this);
       this.worker = new Worker();
       this.worker.addEventListener('message', finish);
-      this.worker.postMessage({ workOptions, sheetList, dpr, unit, dpi });
+      this.worker.postMessage({ file, dpr, unit, dpi });
     });
   }
 
@@ -25,8 +25,8 @@ class XlsxExportTask extends BaseTask {
     if (this.worker) {
       this.worker.terminate();
     }
-    this.notice = null;
     this.worker = null;
+    this.notice = null;
   }
 
   workerFinish(event) {
@@ -40,5 +40,5 @@ class XlsxExportTask extends BaseTask {
 }
 
 export {
-  XlsxExportTask,
+  XlsxImportTask,
 };

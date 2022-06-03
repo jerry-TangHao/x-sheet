@@ -5,11 +5,11 @@ import { Cells } from '../../core/table/tablecell/Cells';
 addEventListener('message', (event) => {
   const { data } = event;
   const cells = new Cells({
-    data
+    data,
   });
   let total = 0;
   let number = 0;
-  cells.each(cell => {
+  cells.each((cell) => {
     if (cell) {
       if (cell.hasFormula()) {
         const value = cell.getComputeText();
@@ -28,6 +28,6 @@ addEventListener('message', (event) => {
     }
   });
   postMessage({
-    total, number
+    total, number,
   });
 });

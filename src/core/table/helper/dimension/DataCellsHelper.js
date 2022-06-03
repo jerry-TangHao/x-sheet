@@ -6,7 +6,7 @@ import { Constant } from '../../../../const/Constant';
 import { LINE_TYPE } from '../../../../draw/Line';
 import { XDraw } from '../../../../draw/XDraw';
 
-class DateCellsHelper extends BaseCellsHelper {
+class DataCellsHelper extends BaseCellsHelper {
 
   constructor(table) {
     super();
@@ -1164,5 +1164,5 @@ class DateCellsHelper extends BaseCellsHelper {
 }
 
 export {
-  DateCellsHelper,
+  DataCellsHelper,
 };

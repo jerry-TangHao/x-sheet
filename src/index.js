@@ -14,11 +14,12 @@ import { FindDPI } from './lib/finddpi/FindDpi';
 import { HeightUnit } from './core/table/tableunit/HeightUnit';
 import { WideUnit } from './core/table/tableunit/WideUnit';
 import { Download } from './lib/donwload/Download';
-import './style/base.less';
-import './style/index.less';
 import { XEvent } from './lib/XEvent';
 import { XlsxImport } from './io/xlsx/XlsxImport';
 import { WidgetFocusMange } from './lib/WidgetFocusMange';
+
+import './style/base.less';
+import './style/index.less';
 
 const settings = {
   workConfig: {

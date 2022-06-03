@@ -5,9 +5,9 @@ import { XEvent } from '../../../lib/XEvent';
 import { SheetUtils } from '../../../utils/SheetUtils';
 import { XSelectItem } from '../../table/screenitems/xselect/XSelectItem';
 import { Throttle } from '../../../lib/Throttle';
-import { SumTotalTask } from '../../../task/SumTotalTask';
+import { SumTotalTask } from '../../../worker/SumTotalTask';
 import { TaskProgress } from '../../../module/taskprogress/TaskProgress';
-import { TaskManage } from '../../../task/base/TaskManage';
+import { TaskManage } from '../../../worker/base/TaskManage';
 
 class XWorkFootMenu extends Widget {
 
