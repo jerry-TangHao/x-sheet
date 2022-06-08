@@ -205,9 +205,7 @@ class XlsxExport {
       // 处理合并
       xMerges.getAll().forEach((xMergeRange) => {
         const { sri, sci, eri, eci } = xMergeRange;
-        worksheet.mergeCells(
-          next(sri), next(sci), next(eri), next(eci),
-        );
+        worksheet.mergeCells(next(sri), next(sci), next(eri), next(eci));
       });
     });
     // 返回文件信息

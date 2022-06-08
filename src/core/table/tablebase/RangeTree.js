@@ -64,7 +64,7 @@ class RangeTree {
     let { rTree } = this;
     let bbox = RtreeUtils.rangeToBbox(rectRange);
     const array = rTree.search(bbox);
-    return array.map(bbox => RtreeUtils.bboxToRange(bbox));
+    return array.map((bbox) => RtreeUtils.bboxToRange(bbox));
   }
 
   /**
@@ -159,7 +159,7 @@ class RangeTree {
      */
   getAll() {
     let { rTree } = this;
-    return rTree.all().map(bbox => RtreeUtils.bboxToRange(bbox));
+    return rTree.all().map((bbox) => RtreeUtils.bboxToRange(bbox));
   }
 
   /**

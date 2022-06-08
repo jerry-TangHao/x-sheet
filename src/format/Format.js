@@ -14,7 +14,7 @@ function getFormatter(parseData, initOpts) {
   const { pattern, partitions, locale } = parseData;
 
   const getRuntimeOptions = (opts) => {
-    const runOpts = Object.assign({}, options(), initOpts, opts);
+    const runOpts = { ...options(), ...initOpts, ...opts };
     if (locale) {
       runOpts.locale = locale;
     }
@@ -49,7 +49,7 @@ function numfmt(pattern, opts) {
   if (_cache[pattern]) {
     parseData = _cache[pattern];
   } else {
-    const constructOpts = Object.assign({}, options(), opts);
+    const constructOpts = { ...options(), ...opts };
     parseData = constructOpts.throws
       ? parsePattern(pattern)
       : parseCatch(pattern);
@@ -60,13 +60,13 @@ function numfmt(pattern, opts) {
   return getFormatter(parseData, opts);
 }
 
-numfmt.isDate = d =>
+numfmt.isDate = (d) =>
   // run parser in robust mode: malformed format code is not a date
   numfmt(d, { throws: false }).isDate();
-numfmt.isPercent = d =>
+numfmt.isPercent = (d) =>
   // run parser in robust mode: malformed format code is not a percent
   numfmt(d, { throws: false }).isPercent();
-numfmt.isText = d =>
+numfmt.isText = (d) =>
   // run parser in robust mode: malformed format code is not a percent
   numfmt(d, { throws: false }).isText();
 numfmt.dateToSerial = dateToSerial;

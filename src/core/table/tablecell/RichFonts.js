@@ -6,7 +6,7 @@ class RichFonts {
   constructor({
     rich = [],
   } = {}) {
-    this.rich = rich.map(font => new RichFont(font));
+    this.rich = rich.map((font) => new RichFont(font));
   }
 
   setRich(rich = []) {
@@ -70,7 +70,7 @@ class RichFonts {
 
   toString() {
     let text = [];
-    this.each(i => text.push(i.text));
+    this.each((i) => text.push(i.text));
     return text.join('');
   }
 

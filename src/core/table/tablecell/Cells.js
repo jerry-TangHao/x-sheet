@@ -141,7 +141,6 @@ class Cells extends Items {
       return new Cell(config);
     }
 
-
     return item;
   }
 

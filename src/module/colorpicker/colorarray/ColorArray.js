@@ -110,7 +110,7 @@ class ColorArray extends Widget {
   }
 
   add(item) {
-    const find = this.colors.findIndex(color => color.color === item.color);
+    const find = this.colors.findIndex((color) => color.color === item.color);
     if (find === -1) {
       const { colors } = this;
       colors.push(item);
@@ -136,7 +136,7 @@ class ColorArray extends Widget {
 
   findItemByColor(color) {
     color = SheetUtils.blankClear(color);
-    return this.colors.find(item => item.color === color);
+    return this.colors.find((item) => item.color === color);
   }
 
   setActiveByColor(color) {

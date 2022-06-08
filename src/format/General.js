@@ -48,8 +48,10 @@ export default function general(ret, part, value, l10n) {
       }
       ret.push(
         fixLocale(`${m}`, l10n),
-        l10n.exponent, (exp < 0 ? l10n.negative : l10n.positive),
-        x < 10 ? '0' : '', x,
+        l10n.exponent, (
+          exp < 0 ? l10n.negative : l10n.positive),
+        x < 10 ? '0' : '',
+        x,
       );
     };
 

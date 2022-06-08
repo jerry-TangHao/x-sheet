@@ -70,7 +70,7 @@ class Select extends Widget {
   setSelect(value) {
     const { contextMenu, selectText } = this;
     const { items } = contextMenu;
-    const find = items.find(item => item.value && item.value === value);
+    const find = items.find((item) => item.value && item.value === value);
     if (find) {
       selectText.html(`&nbsp;${find.text}`);
       this.selectValue = find.value;

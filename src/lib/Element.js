@@ -86,7 +86,7 @@ class Element {
     if (arguments.length === 0) {
       return Element.wrapElement(this.el.children);
     }
-    args.forEach(ele => this.append(ele));
+    args.forEach((ele) => this.append(ele));
     return this;
   }
 
@@ -100,7 +100,7 @@ class Element {
     if (arguments.length === 0) {
       return Element.wrapElement(this.el.childNodes);
     }
-    args.forEach(ele => this.append(ele));
+    args.forEach((ele) => this.append(ele));
     return this;
   }
 
@@ -110,7 +110,7 @@ class Element {
    */
   childrenNodesAppend(ele) {
     if (!this.isTextNode()) {
-      ele.childrenNodes().forEach(i => this.append(i));
+      ele.childrenNodes().forEach((i) => this.append(i));
     }
     return this;
   }
@@ -121,7 +121,7 @@ class Element {
    */
   childrenNodesPrepend(ele) {
     if (!this.isTextNode()) {
-      ele.childrenNodes().forEach(i => this.prepend(i));
+      ele.childrenNodes().forEach((i) => this.prepend(i));
     }
     return this;
   }
@@ -830,7 +830,7 @@ class Element {
 
 const h = (tag, className = '') => new Element(tag, className);
 
-const TextNode = text => Element.createText(text);
+const TextNode = (text) => Element.createText(text);
 
 export {
   Element,

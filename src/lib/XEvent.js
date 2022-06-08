@@ -146,7 +146,7 @@ XEvent.WrapFuncion = {
       }
     };
   },
-  mouseClick: callback => (event) => {
+  mouseClick: (callback) => (event) => {
     callback(event);
   },
 };

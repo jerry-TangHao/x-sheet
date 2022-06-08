@@ -928,7 +928,7 @@ class DataCellsHelper extends BaseCellsHelper {
         }
         const intersects = merges.getIntersects(merge);
         if (intersects.length) {
-          const hasEqual = intersects.find(item => item.equals(merge));
+          const hasEqual = intersects.find((item) => item.equals(merge));
           if (hasEqual) {
             snapshot.open();
             merges.batchDelete(intersects);

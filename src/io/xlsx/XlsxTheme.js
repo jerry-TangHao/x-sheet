@@ -177,9 +177,9 @@ class ThemeXml {
 
   getThemeList() {
     const { nods } = this;
-    const theme = nods.find(node => node.tagName === 'a:theme');
-    const themeElements = theme.children.find(child => child.tagName === 'a:themeElements');
-    const clrScheme = themeElements.children.find(child => child.tagName === 'a:clrScheme');
+    const theme = nods.find((node) => node.tagName === 'a:theme');
+    const themeElements = theme.children.find((child) => child.tagName === 'a:themeElements');
+    const clrScheme = themeElements.children.find((child) => child.tagName === 'a:clrScheme');
     const array = [];
     const sort = [
       'a:lt1', 'a:dk1', 'a:lt2', 'a:dk2', 'a:accent1', 'a:accent2', 'a:accent3', 'a:accent4', 'a:accent5', 'a:accent6',
@@ -189,7 +189,7 @@ class ThemeXml {
       if (sort.indexOf(tagName) === -1) {
         return;
       }
-      const sysClr = item.children.find(child => child.tagName === 'a:sysClr');
+      const sysClr = item.children.find((child) => child.tagName === 'a:sysClr');
       if (sysClr) {
         const { attributes } = sysClr;
         if (attributes) {
@@ -201,7 +201,7 @@ class ThemeXml {
           }
         }
       } else {
-        const srgbClr = item.children.find(child => child.tagName === 'a:srgbClr');
+        const srgbClr = item.children.find((child) => child.tagName === 'a:srgbClr');
         if (srgbClr) {
           const { attributes } = srgbClr;
           if (attributes) {
@@ -220,7 +220,7 @@ class ThemeXml {
       const key2 = b.key;
       return sort.indexOf(key1) - sort.indexOf(key2);
     });
-    return array.map(item => item.val);
+    return array.map((item) => item.val);
   }
 }
 

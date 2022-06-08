@@ -44,7 +44,7 @@ class RichFont {
     this.underline = false;
   }
 
-  plain(option = v => v) {
+  plain(option = (v) => v) {
     return option(this.clone());
   }
 

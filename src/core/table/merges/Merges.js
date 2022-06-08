@@ -16,7 +16,7 @@ class Merges extends RangeTree {
     merges = [],
   } = {}) {
     super({ snapshot });
-    merges.map(merge => RectRange.valueOf(merge)).forEach(view => this.add(view));
+    merges.map((merge) => RectRange.valueOf(merge)).forEach((view) => this.add(view));
   }
 
   /**
@@ -24,7 +24,7 @@ class Merges extends RangeTree {
    */
   getData() {
     return {
-      merges: this.getAll().map(range => range.toString()),
+      merges: this.getAll().map((range) => range.toString()),
     };
   }
 

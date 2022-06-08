@@ -67,7 +67,7 @@ export function getLocale(l4e) {
 
 // creates a new locale options object
 export function createLocale(data) {
-  return Object.assign({}, defaultData, data);
+  return { ...defaultData, ...data };
 }
 
 // adds a locale object to locale collection

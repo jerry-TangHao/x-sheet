@@ -1,44 +1,14 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const resolve = dir => path.resolve(__dirname, '..', dir);
+const resolve = (url) => path.resolve(__dirname, "..", url);
 
 module.exports = {
   entry: {
-    XSheet: './src/index.js',
+    'x-sheet': resolve("src/index.js"),
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-              presets: ['@babel/preset-env'],
-            }
-          }
-        ],
-        include: resolve("src")
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: '../',
-            }
-          },
-          {
-            loader: 'style-loader',
-          },
-          {
-            loader: 'css-loader',
-          },
-        ],
-      },
       {
         test: /\.less$/,
         use: [
@@ -46,14 +16,14 @@ module.exports = {
             loader: MiniCssExtractPlugin.loader,
             options: {
               publicPath: '../',
-            }
+            },
           },
           {
             loader: 'css-loader',
           },
           {
             loader: 'less-loader',
-          }
+          },
         ],
       },
       {
@@ -62,13 +32,27 @@ module.exports = {
           {
             loader: 'url-loader',
             options: {
-              limit: 18192,
               outputPath: 'img',
+              limit: false,
               name: '[name].[ext]?[hash]',
-              esModule: false
-            }
-          }
-        ]
+              esModule: false,
+            },
+          },
+        ],
+        type:"javascript/auto",
+      },
+      {
+        test: /\.(mp3|wav)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: 'audio',
+              esModule: false,
+            },
+          },
+        ],
+        type:"javascript/auto",
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
@@ -77,48 +61,27 @@ module.exports = {
             loader: 'file-loader',
             options: {
               outputPath: 'font',
-              esModule: false
-            }
-          }
-        ]
-      },
-      {
-        test: /\.worker\.js$/,
-        use: [
-          {
-            loader: 'worker-loader',
-            options: {
-              inline: true,
-              name: 'js/[name].js'
+              esModule: false,
             },
           },
-          {
-            loader: 'babel-loader'
-          },
-        ]
-      }
+        ],
+        type:"javascript/auto",
+      },
+      {
+        test: /\.wasm$/,
+        type: 'webassembly/async',
+      },
     ],
   },
-  optimization:  {
-    runtimeChunk: {
-      name: 'runtime',
+  resolve: {
+    extensions: ['.js', '.json'],
+    alias: {
+      '@': resolve('src'),
     },
-    splitChunks: {
-      minSize: 30,
-      cacheGroups: {
-        default: {
-          name: 'common',
-          chunks: 'all',
-          minChunks: 2,
-          priority: -20
-        },
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
-          chunks: 'all',
-          priority: -10
-        },
-      }
-    }
   },
+  experiments: {
+    syncWebAssembly: true,
+    asyncWebAssembly: true,
+    topLevelAwait: true,
+  }
 };

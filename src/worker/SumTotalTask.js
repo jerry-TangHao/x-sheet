@@ -1,6 +1,4 @@
 import { BaseTask } from './base/BaseTask';
-import SumTotalWorker from './task/sumtotal.worker';
-import SplitDataWorker from './task/splitdata.worker';
 
 /**
  * 对用户筛选区域做数据统计
@@ -40,7 +38,7 @@ class SumTotalTask extends BaseTask {
    */
   createWorker(data) {
     const { workers } = this;
-    const worker = new SumTotalWorker();
+    const worker = new Worker(new URL('./task/sumtotal.worker.js', import.meta.url));
     workers.push(worker);
     worker.postMessage(data);
     worker.addEventListener('message', (event) => {
@@ -105,7 +103,7 @@ class SumTotalTask extends BaseTask {
   async splitData(range, items) {
     return new Promise((resolve) => {
       const { workers, group } = this;
-      const worker = new SplitDataWorker();
+      const worker = new Worker(new URL('./task/splitdata.worker.js', import.meta.url));
       workers.push(worker);
       worker.postMessage({
         range, items, group,

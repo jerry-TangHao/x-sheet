@@ -2,7 +2,7 @@ import { Cell } from '../../core/table/tablecell/Cell';
 import { SheetUtils } from '../../utils/SheetUtils';
 import { Cells } from '../../core/table/tablecell/Cells';
 
-addEventListener('message', (event) => {
+self.addEventListener('message', (event) => {
   const { data } = event;
   const cells = new Cells({
     data,
@@ -27,7 +27,7 @@ addEventListener('message', (event) => {
       }
     }
   });
-  postMessage({
+  self.postMessage({
     total, number,
   });
 });

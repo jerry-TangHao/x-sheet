@@ -1,5 +1,4 @@
 import { BaseTask } from './base/BaseTask';
-import Worker from './task/xlsxexport.worker';
 
 class XlsxExportTask extends BaseTask {
 
@@ -15,7 +14,7 @@ class XlsxExportTask extends BaseTask {
       this.notice = resolve;
       const { workerFinish } = this;
       const finish = workerFinish.bind(this);
-      this.worker = new Worker();
+      this.worker = new Worker(new URL('./task/xlsxexport.worker.js', import.meta.url));
       this.worker.addEventListener('message', finish);
       this.worker.postMessage({ workOptions, sheetList, dpr, unit, dpi });
     });

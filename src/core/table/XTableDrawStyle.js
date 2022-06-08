@@ -733,8 +733,16 @@ class XTableUI {
       const oy = this.getMapOriginY();
       const tx = this.getMapTargetX();
       const ty = this.getMapTargetY();
-      draw.copyImage(ox, oy, mapWidth, mapHeight,
-        tx, ty, mapWidth, mapHeight);
+      draw.copyImage(
+        ox,
+        oy,
+        mapWidth,
+        mapHeight,
+        tx,
+        ty,
+        mapWidth,
+        mapHeight,
+      );
     }
   }
 
@@ -2639,8 +2647,8 @@ class XTableDrawStyle extends Widget {
       xIteratorBuilder: this.xIteratorBuilder,
       snapshot: this.snapshot,
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.stylePx(this.scale.goto(v)),
-        back: v => this.scale.back(v),
+        goto: (v) => XDraw.stylePx(this.scale.goto(v)),
+        back: (v) => this.scale.back(v),
       }),
       ...this.settings.cols,
     });
@@ -2658,13 +2666,13 @@ class XTableDrawStyle extends Widget {
       xIteratorBuilder: this.xIteratorBuilder,
       snapshot: this.snapshot,
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.stylePx(this.scale.goto(v)),
+        goto: (v) => XDraw.stylePx(this.scale.goto(v)),
       }),
       ...this.settings.rows,
     });
     this.index = new Code({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.stylePx(this.scale.goto(v)),
+        goto: (v) => XDraw.stylePx(this.scale.goto(v)),
       }),
       ...this.settings.index,
     });
@@ -2728,7 +2736,7 @@ class XTableDrawStyle extends Widget {
     this.draw = new XDraw(this.el);
     this.textFactory = new TextFactory({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.stylePx(this.scale.goto(v)),
+        goto: (v) => XDraw.stylePx(this.scale.goto(v)),
       }),
       table: this,
     });

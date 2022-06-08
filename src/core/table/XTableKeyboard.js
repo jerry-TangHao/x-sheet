@@ -66,8 +66,18 @@ class XTableKeyboard {
    * 绑定事件
    */
   bind() {
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, this.doHandle);
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_UP, this.upHandle);
+    const table = this.table;
+    const root = table.getRootWidget();
+    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, (e) => {
+      if (root.contains(table.focusManage.element)) {
+        this.doHandle(e);
+      }
+    });
+    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_UP, (e) => {
+      if (root.contains(table.focusManage.element)) {
+        this.upHandle(e);
+      }
+    });
   }
 
   /**
@@ -164,7 +174,7 @@ class XTableKeyboard {
     let find = this.find(target);
     if (find) {
       const { response } = find;
-      find.response = response.filter(i => i !== item);
+      find.response = response.filter((i) => i !== item);
     }
   }
 

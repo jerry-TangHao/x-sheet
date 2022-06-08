@@ -542,13 +542,13 @@ class XTableDimension extends Widget {
     // 表格数据配置
     this.index = new Code({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.cssPx(this.scale.goto(v)),
+        goto: (v) => XDraw.cssPx(this.scale.goto(v)),
       }),
       ...this.settings.index,
     });
     this.cols = new Cols({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.cssPx(this.scale.goto(v)),
+        goto: (v) => XDraw.cssPx(this.scale.goto(v)),
       }),
       snapshot: this.snapshot,
       xIteratorBuilder: this.xIteratorBuilder,
@@ -556,7 +556,7 @@ class XTableDimension extends Widget {
     });
     this.rows = new Rows({
       scaleAdapter: new ScaleAdapter({
-        goto: v => XDraw.cssPx(this.scale.goto(v)),
+        goto: (v) => XDraw.cssPx(this.scale.goto(v)),
       }),
       snapshot: this.snapshot,
       xIteratorBuilder: this.xIteratorBuilder,
@@ -1206,7 +1206,7 @@ class XTableDimension extends Widget {
   scrollX(x) {
     const { cols, xFixedView, scroll } = this;
     const fixedView = xFixedView.getFixedView();
-    const [ci, left] = this.colsReduceIf(fixedView.eci + 1, cols.len, 0, 0, x, i => cols.getWidth(i));
+    const [ci, left] = this.colsReduceIf(fixedView.eci + 1, cols.len, 0, 0, x, (i) => cols.getWidth(i));
     // 记录滚动方向
     if (scroll.x > left) {
       scroll.x = left;
@@ -1230,7 +1230,7 @@ class XTableDimension extends Widget {
   scrollY(y) {
     const { rows, scroll, rowHeightGroupIndex } = this;
     const find = rowHeightGroupIndex.get(y);
-    const [ri, top] = this.rowsReduceIf(find.ri, rows.len, find.top, 0, y, i => rows.getHeight(i));
+    const [ri, top] = this.rowsReduceIf(find.ri, rows.len, find.top, 0, y, (i) => rows.getHeight(i));
     // 记录滚动方向
     if (scroll.y > top) {
       scroll.type = SCROLL_TYPE.V_TOP;

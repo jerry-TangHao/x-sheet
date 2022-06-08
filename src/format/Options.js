@@ -21,7 +21,7 @@ const defaultOptions = {
   ignoreTimezone: false,
 };
 
-const globalOptions = Object.assign({}, defaultOptions);
+const globalOptions = { ...defaultOptions };
 
 export default function options(opts) {
   // passing in a null will reset to defaults

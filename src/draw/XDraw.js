@@ -151,7 +151,7 @@ class Wrapping extends Base {
 
 class Extends extends Wrapping {
 
-  polyStroke(interpolation = xys => xys, ...xys) {
+  polyStroke(interpolation = (xys) => xys, ...xys) {
     const { ctx } = this;
     if (xys.length > 1) {
       this.beginPath();
@@ -165,7 +165,7 @@ class Extends extends Wrapping {
     }
   }
 
-  polyInFill(interpolation = xys => xys, ...xys) {
+  polyInFill(interpolation = (xys) => xys, ...xys) {
     const { ctx } = this;
     if (xys.length > 1) {
       this.beginPath();
@@ -358,16 +358,24 @@ class XDraw extends CorsLine {
   fillRect(x, y, w, h) {
     x += this.getOffsetX();
     y += this.getOffsetY();
-    this.ctx.fillRect(XDraw.round(x), XDraw.round(y),
-      XDraw.round(w), XDraw.round(h));
+    this.ctx.fillRect(
+      XDraw.round(x),
+      XDraw.round(y),
+      XDraw.round(w),
+      XDraw.round(h),
+    );
     return this;
   }
 
   rect(x, y, w, h) {
     x += this.getOffsetX();
     y += this.getOffsetY();
-    this.ctx.rect(XDraw.round(x), XDraw.round(y),
-      XDraw.round(w), XDraw.round(h));
+    this.ctx.rect(
+      XDraw.round(x),
+      XDraw.round(y),
+      XDraw.round(w),
+      XDraw.round(h),
+    );
     return this;
   }
 
@@ -377,11 +385,17 @@ class XDraw extends CorsLine {
     sx += this.getOffsetX();
     ty += this.getOffsetY();
     sy += this.getOffsetY();
-    ctx.drawImage(this.canvas,
-      XDraw.round(sx), XDraw.round(sy),
-      XDraw.round(sw), XDraw.round(sh),
-      XDraw.round(tx), XDraw.round(ty),
-      XDraw.round(tw), XDraw.round(th));
+    ctx.drawImage(
+      this.canvas,
+      XDraw.round(sx),
+      XDraw.round(sy),
+      XDraw.round(sw),
+      XDraw.round(sh),
+      XDraw.round(tx),
+      XDraw.round(ty),
+      XDraw.round(tw),
+      XDraw.round(th),
+    );
     return this;
   }
 
@@ -389,11 +403,17 @@ class XDraw extends CorsLine {
     const { ctx } = this;
     tx += this.getOffsetX();
     ty += this.getOffsetY();
-    ctx.drawImage(el,
-      XDraw.round(sx), XDraw.round(sy),
-      XDraw.round(sw), XDraw.round(sh),
-      XDraw.round(tx), XDraw.round(ty),
-      XDraw.round(tw), XDraw.round(th));
+    ctx.drawImage(
+      el,
+      XDraw.round(sx),
+      XDraw.round(sy),
+      XDraw.round(sw),
+      XDraw.round(sh),
+      XDraw.round(tx),
+      XDraw.round(ty),
+      XDraw.round(tw),
+      XDraw.round(th),
+    );
     return this;
   }
 

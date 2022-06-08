@@ -10,8 +10,8 @@ class TaskManage {
 
   removeTask(task) {
     task.destroy();
-    this.sleepTasks = this.sleepTasks.filter(item => item !== task);
-    this.activeTasks = this.activeTasks.filter(item => item !== task);
+    this.sleepTasks = this.sleepTasks.filter((item) => item !== task);
+    this.activeTasks = this.activeTasks.filter((item) => item !== task);
     return this;
   }
 

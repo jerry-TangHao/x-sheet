@@ -1,4 +1,3 @@
-
 // eslint-disable-next-line max-len
 /* global requestAnimationFrame webkitRequestAnimationFrame cancelAnimationFrame webkitCancelAnimationFrame */
 
@@ -74,8 +73,13 @@ class Animate {
   fakeHandle() {
     let times = Date.now() - this.start;
     times = times >= this.option.duration ? this.option.duration : times;
-    const val = TWEEN[this.option.type](times, this.option.begin,
-      this.option.end - this.option.begin, this.option.duration, 0.7);
+    const val = TWEEN[this.option.type](
+      times,
+      this.option.begin,
+      this.option.end - this.option.begin,
+      this.option.duration,
+      0.7,
+    );
     this.option.receive(val.toFixed(2));
     if (this.status === 'cancel') {
       this.option.cancel();

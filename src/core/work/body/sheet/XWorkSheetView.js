@@ -156,7 +156,7 @@ class XWorkSheetView extends Widget {
    * @returns {number}
    */
   getIndexByTab(tab) {
-    return this.sheetList.findIndex(item => item.tab === tab);
+    return this.sheetList.findIndex((item) => item.tab === tab);
   }
 
   /**
@@ -165,7 +165,7 @@ class XWorkSheetView extends Widget {
    * @returns {number}
    */
   getIndexBySheet(sheet) {
-    return this.sheetList.findIndex(item => item === sheet);
+    return this.sheetList.findIndex((item) => item === sheet);
   }
 
   /**

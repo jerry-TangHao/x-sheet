@@ -21,8 +21,8 @@ class Scale {
 class ScaleAdapter {
 
   constructor({
-    goto = v => v,
-    back = v => v,
+    goto = (v) => v,
+    back = (v) => v,
   } = {}) {
     this.goto = goto;
     this.back = back;

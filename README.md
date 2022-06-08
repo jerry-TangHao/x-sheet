@@ -91,6 +91,9 @@
     
 ## **支持的浏览器**
     Modern browsers(chrome, firefox).
-       
+
+## **交流**
+![输入图片说明](./assets/_cgi-bin_mmwebwx-bin_webwxgetmsgimg__&MsgID=5735869489061871077&skey=@crypt_263d2072_0bf9ffd48a131828db37818811803386&mmweb_appid=wx_webfilehelper.jpg)
+
 ## **LICENSE**
     MOZILLA PUBLIC LICENSE

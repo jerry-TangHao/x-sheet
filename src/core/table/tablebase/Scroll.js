@@ -1,4 +1,3 @@
-
 const SCROLL_TYPE = {
   H_LEFT: Symbol('水平方向左边滚动条'),
   H_RIGHT: Symbol('水平方向向右边滚动'),

@@ -1543,7 +1543,7 @@ class Evaluation {
   power() {
     const b = this.memory.pop();
     const a = this.memory.pop();
-    this.memory.push(Math.pow(a, b));
+    this.memory.push(a ** b);
   }
 
   /**
@@ -1612,7 +1612,7 @@ const Instruct = (inst) => {
  * 编译运行
  * @constructor
  */
-const Evaluate = input => Instruct(Compile(input));
+const Evaluate = (input) => Instruct(Compile(input));
 
 export {
   Tokenizer,

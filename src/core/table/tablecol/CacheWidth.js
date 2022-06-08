@@ -1,4 +1,3 @@
-
 class CacheItems {
 
   constructor() {

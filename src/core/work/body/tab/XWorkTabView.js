@@ -188,7 +188,7 @@ class XWorkTabView extends Widget {
    * @returns {number}
    */
   getIndexByTab(tab) {
-    return this.tabList.findIndex(item => item === tab);
+    return this.tabList.findIndex((item) => item === tab);
   }
 
   /**

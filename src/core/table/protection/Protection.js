@@ -21,7 +21,7 @@ class Protection extends Merges {
    */
   getData() {
     return {
-      protections: this.getAll().map(range => range.toString()),
+      protections: this.getAll().map((range) => range.toString()),
     };
   }
 

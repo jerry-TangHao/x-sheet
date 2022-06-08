@@ -432,7 +432,7 @@ class XFilter extends XScreenCssBorderItem {
         const valueItem = new ValueItem({
           text: item,
         });
-        if (valueFilterItems.find(item => valueItem.equals(item))) {
+        if (valueFilterItems.find((item) => valueItem.equals(item))) {
           valueItem.setStatus(true);
         } else {
           valueItem.setStatus(false);

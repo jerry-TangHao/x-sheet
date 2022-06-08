@@ -13,8 +13,8 @@ class LineGenerator {
     bx = 0,
     model = LineGenerator.MODEL.ALL,
     optimize = true,
-    getHeight = ri => table.rows.getHeight(ri),
-    getWidth = ci => table.cols.getWidth(ci),
+    getHeight = (ri) => table.rows.getHeight(ri),
+    getWidth = (ci) => table.cols.getWidth(ci),
     foldOnOff = null,
     scrollView = RectRange.EMPTY,
   }) {

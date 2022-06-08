@@ -14,7 +14,7 @@ class ScrollBarY extends Widget {
       style: {},
       last: () => 0,
       next: () => 0,
-      scroll: to => to,
+      scroll: (to) => to,
     }, option);
     this.lastBut = h('div', `${cssPrefix}-scroll-bar-y-last-but`);
     this.nextBut = h('div', `${cssPrefix}-scroll-bar-y-next-but`);

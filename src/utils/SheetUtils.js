@@ -203,7 +203,7 @@ class SheetUtils {
     return target;
   }
 
-  static sum(objOrAry, cb = value => value) {
+  static sum(objOrAry, cb = (value) => value) {
     let total = 0;
     let size = 0;
     Object.keys(objOrAry).forEach((key) => {

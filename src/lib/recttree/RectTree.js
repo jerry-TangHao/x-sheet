@@ -296,7 +296,7 @@ class RectTree {
       // 散装树的目标高度
       height = Math.ceil(Math.log(N) / Math.log(M));
       // 目标根条目数以最大限度地提高存储利用率
-      M = Math.ceil(N / Math.pow(M, height - 1));
+      M = Math.ceil(N / M ** (height - 1));
     }
 
     node = createNode([]);

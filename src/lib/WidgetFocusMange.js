@@ -13,15 +13,17 @@ class WidgetFocusMange {
    * WidgetFocusMange
    */
   constructor(options) {
-    this.activate = {};
     this.items = [];
+    this.activate = {};
     this.native = {};
+    this.element = null;
     this.options = SheetUtils.copy({
       root: h(document.body),
     }, options);
     this.downHandle = (event) => {
-      const ele = new Element(event.target);
-      const find = this.include(ele);
+      const element = new Element(event.target);
+      const find = this.include(element);
+      this.element = element;
       if (find) {
         const { target } = find;
         this.forward({
@@ -34,8 +36,9 @@ class WidgetFocusMange {
       }
     };
     this.focusHandle = (event) => {
-      const ele = new Element(event.target);
-      const find = this.include(ele);
+      const element = new Element(event.target);
+      const find = this.include(element);
+      this.element = element;
       if (find) {
         const { target } = find;
         this.forward({
@@ -56,10 +59,8 @@ class WidgetFocusMange {
   bind() {
     const { downHandle } = this;
     const { focusHandle } = this;
-    const { options } = this;
-    const { root } = options;
-    XEvent.bind(root, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, downHandle, true);
-    XEvent.bind(root, Constant.SYSTEM_EVENT_TYPE.FOCUS, focusHandle, true);
+    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, downHandle, true);
+    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.FOCUS, focusHandle, true);
   }
 
   /**

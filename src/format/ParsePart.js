@@ -18,7 +18,7 @@ function patternToPadding(ss) {
     const nch = [];
     const chars = ss
       .replace(/^[#,]+/, '')
-      .replace(/[1-9]\d*/g, m => '?'.repeat(m.length));
+      .replace(/[1-9]\d*/g, (m) => '?'.repeat(m.length));
     for (let i = 0; i < chars.length; i++) {
       const c = chars.charAt(i);
       nch[i] = (c in _numchars) ? _numchars[c] : c;

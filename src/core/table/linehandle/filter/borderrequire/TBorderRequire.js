@@ -21,7 +21,6 @@ class TBorderRequire {
     return LineIteratorFilter.RETURN_TYPE.JUMP;
   }
 
-
 }
 
 export {

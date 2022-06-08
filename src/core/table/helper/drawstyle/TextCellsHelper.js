@@ -83,7 +83,7 @@ class TextCellsHelper extends BaseCellsHelper {
               newCol(col);
               x -= width;
               if (merge) {
-                const find = filter.find(i => i.equals(merge));
+                const find = filter.find((i) => i.equals(merge));
                 if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
@@ -136,7 +136,7 @@ class TextCellsHelper extends BaseCellsHelper {
               const width = cols.getWidth(col);
               newCol(col);
               if (merge) {
-                const find = filter.find(i => i.equals(merge));
+                const find = filter.find((i) => i.equals(merge));
                 if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
@@ -190,7 +190,7 @@ class TextCellsHelper extends BaseCellsHelper {
               newCol(col);
               x -= width;
               if (merge) {
-                const find = filter.find(i => i.equals(merge));
+                const find = filter.find((i) => i.equals(merge));
                 if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({
@@ -243,7 +243,7 @@ class TextCellsHelper extends BaseCellsHelper {
               const width = cols.getWidth(col);
               newCol(col);
               if (merge) {
-                const find = filter.find(i => i.equals(merge));
+                const find = filter.find((i) => i.equals(merge));
                 if (SheetUtils.isUnDef(find)) {
                   filter.push(merge);
                   const mergeInfo = this.mergeInfo({

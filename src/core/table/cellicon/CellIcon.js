@@ -50,7 +50,7 @@ class CellIcon {
     if (xIcons) {
       const offset = this.getOffset(ri, ci);
       if (xIcon) {
-        xIcons = xIcons.filter(item => item !== xIcon);
+        xIcons = xIcons.filter((item) => item !== xIcon);
         data[offset] = xIcons;
       } else {
         data[offset] = SheetUtils.Undef;

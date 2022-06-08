@@ -1,4 +1,4 @@
-/* global Image console */
+/* global Image */
 import { SheetUtils } from '../../../utils/SheetUtils';
 import { XDraw } from '../../../draw/XDraw';
 import { Rect } from '../../../draw/Rect';

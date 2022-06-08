@@ -21,7 +21,6 @@ class TBorderIgnore {
     return LineIteratorFilter.RETURN_TYPE.EXEC;
   }
 
-
 }
 
 export {

@@ -7,7 +7,7 @@ function pageDown({ table, body, response }) {
   const xSelect = xScreen.findType(XSelectItem);
   const merges = table.getTableMerges();
   response.push({
-    keyCode: keyCode => keyCode === 34,
+    keyCode: (keyCode) => keyCode === 34,
     handle: () => {
       // 滚动到指定行
       let scrollView = xTableScrollView.getScrollView();
@@ -48,7 +48,7 @@ function pageUp({ table, body, response }) {
   const xSelect = xScreen.findType(XSelectItem);
   const merges = table.getTableMerges();
   response.push({
-    keyCode: keyCode => keyCode === 33,
+    keyCode: (keyCode) => keyCode === 33,
     handle: () => {
       // 滚动到指定行
       let scrollView = xTableScrollView.getScrollView();
@@ -117,7 +117,7 @@ function openEdit({ table, response }) {
 function closeEdit({ table, response }) {
   const { edit } = table;
   response.push({
-    keyCode: keyCode => keyCode === 27,
+    keyCode: (keyCode) => keyCode === 27,
     handle: (event) => {
       if (edit.mode === BaseEdit.MODE.SHOW) {
         edit.close(event);
@@ -132,7 +132,7 @@ function enter({ table, body, response }) {
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
-    keyCode: keyCode => keyCode === 13,
+    keyCode: (keyCode) => keyCode === 13,
     handle: (event) => {
       if (edit.mode === BaseEdit.MODE.SHOW) {
         edit.close(event);
@@ -185,7 +185,7 @@ function home({ table, response }) {
   const xSelect = xScreen.findType(XSelectItem);
   const merges = table.getTableMerges();
   response.push({
-    keyCode: keyCode => keyCode === 36,
+    keyCode: (keyCode) => keyCode === 36,
     handle: () => {
       let { selectRange } = xSelect;
       let clone = selectRange.clone();
@@ -208,7 +208,7 @@ function tab({ table, body, response }) {
   const xSelect = xScreen.findType(XSelectItem);
   const merges = table.getTableMerges();
   response.push({
-    keyCode: keyCode => keyCode === 9,
+    keyCode: (keyCode) => keyCode === 9,
     handle: (event) => {
       edit.close(event);
       let scrollView = xTableScrollView.getScrollView();
@@ -293,7 +293,7 @@ function arrowDown({ table, body, response }) {
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
-    keyCode: keyCode => keyCode === 40,
+    keyCode: (keyCode) => keyCode === 40,
     handle: () => {
       if (edit.mode === BaseEdit.MODE.SHOW) {
         return;
@@ -345,7 +345,7 @@ function arrowUp({ table, body, response }) {
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
-    keyCode: keyCode => keyCode === 38,
+    keyCode: (keyCode) => keyCode === 38,
     handle: () => {
       const { xTableScrollView } = table;
       const { edit, rowFixed } = table;
@@ -394,7 +394,7 @@ function arrowLeft({ table, body, response }) {
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
-    keyCode: keyCode => keyCode === 37,
+    keyCode: (keyCode) => keyCode === 37,
     handle: () => {
       const { xTableScrollView } = table;
       const { edit, colFixed } = table;
@@ -444,7 +444,7 @@ function arrowRight({ table, body, response }) {
   const merges = table.getTableMerges();
   const xSelect = xScreen.findType(XSelectItem);
   response.push({
-    keyCode: keyCode => keyCode === 39,
+    keyCode: (keyCode) => keyCode === 39,
     handle: () => {
       if (edit.mode === BaseEdit.MODE.SHOW) {
         return;
@@ -493,7 +493,7 @@ function arrowRight({ table, body, response }) {
 
 function controllerZ({ table, response }) {
   response.push({
-    keyCode: keyCode => keyCode === 1790,
+    keyCode: (keyCode) => keyCode === 1790,
     handle: () => {
       const { snapshot } = table;
       if (snapshot.canUndo()) {
@@ -505,7 +505,7 @@ function controllerZ({ table, response }) {
 
 function controllerY({ table, response }) {
   response.push({
-    keyCode: keyCode => keyCode === 1789,
+    keyCode: (keyCode) => keyCode === 1789,
     handle: () => {
       const { snapshot } = table;
       if (snapshot.canRedo()) {

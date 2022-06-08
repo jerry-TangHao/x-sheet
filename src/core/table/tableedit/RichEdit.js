@@ -167,7 +167,7 @@ class RichEdit extends StyleEdit {
     let count = 0;
     let handle = (ele) => {
       if (ele.hasChild()) {
-        ele.childrenNodes().forEach(i => handle(i));
+        ele.childrenNodes().forEach((i) => handle(i));
       }
       if (ele.isTextNode()) {
         if (!SheetUtils.isBlank(ele.nodeValue())) {

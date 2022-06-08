@@ -36,7 +36,7 @@ class TableEdit extends TextEdit {
       }
     };
     this.enterResponse = {
-      keyCode: keyCode => keyCode === 13,
+      keyCode: (keyCode) => keyCode === 13,
       handle: (event) => {
         const { table } = this;
         const { focusManage } = table;
@@ -48,7 +48,7 @@ class TableEdit extends TextEdit {
       },
     };
     this.tabResponse = {
-      keyCode: keyCode => keyCode === 9,
+      keyCode: (keyCode) => keyCode === 9,
       handle: (event) => {
         const { table } = this;
         const { focusManage } = table;
@@ -62,7 +62,7 @@ class TableEdit extends TextEdit {
       },
     };
     this.escResponse = {
-      keyCode: keyCode => keyCode === 27,
+      keyCode: (keyCode) => keyCode === 27,
       handle: (event) => {
         const { table } = this;
         const { focusManage } = table;
@@ -76,7 +76,7 @@ class TableEdit extends TextEdit {
       },
     };
     this.altEnterResponse = {
-      keyCode: keyCode => keyCode === 1813,
+      keyCode: (keyCode) => keyCode === 1813,
       handle: () => {
         this.insertHtml('<br />');
       },

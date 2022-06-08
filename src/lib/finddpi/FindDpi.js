@@ -22,7 +22,7 @@ function findFirstPositive(fn) {
 
 function FindDPI() {
   // eslint-disable-next-line no-undef
-  return findFirstPositive(x => matchMedia(`(max-resolution: ${x}dpi)`).matches);
+  return findFirstPositive((x) => matchMedia(`(max-resolution: ${x}dpi)`).matches);
 }
 
 export { FindDPI };

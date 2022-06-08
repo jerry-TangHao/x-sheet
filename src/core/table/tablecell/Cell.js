@@ -140,7 +140,6 @@ class Cell {
   setFormat(format = 'default') {
     this.format = format;
     this.formatText = null;
-    this.clearRuler();
     this.setContentWidth(0);
     return this;
   }

@@ -13,39 +13,56 @@
             display: block;
         }
     </style>
-    <style>
-        #demo1 {
-            height: 50%;
-            width: 50%;
-            float: left;
-        }
-        #demo2 {
-            height: 50%;
-            width: 50%;
-            float: left;
-        }
-        #demo3 {
-            height: 50%;
-            width: 50%;
-            float: left;
-        }
-        #demo4 {
-            height: 50%;
-            width: 50%;
-            float: left;
-        }
-    </style>
 </head>
-<body>
-    <div id="demo1"></div>
-    <div id="demo2"></div>
-    <div id="demo3"></div>
-    <div id="demo4"></div>
+<body id="demo1">
 </body>
 <script>
-  new XSheet('#demo1');
-  new XSheet('#demo2');
-  new XSheet('#demo3');
-  new XSheet('#demo4');
+  new XSheet('#demo1', {
+    workConfig: {
+      name: 'x-sheet',
+      top: {
+        option: {
+          show: true,
+        },
+        menu: {
+          show: true,
+        },
+      },
+      body: {
+        sheetConfig: {
+          showMenu: true,
+        },
+        sheets: [{
+          tableConfig: {
+            rows: {
+              data: [{height: 90}]
+            },
+            data: [
+              [{
+                contentType: 2,
+                fontAttr: {
+                  textWrap: 2,
+                  direction: 'vertical'
+                },
+                richText: {
+                  rich: [{text: '哈哈aaFDF', color: 'rgb(255,0,2)'}, {text: 'FDFDFDF'}]
+                }
+              }]
+            ],
+            xFixedBar: {
+              height: 2,
+              width: 2,
+            },
+          },
+        }],
+        tabConfig: {
+          showMenu: true,
+        },
+      },
+      bottom: {
+        show: true,
+      },
+    },
+  });
 </script>
 </html>
