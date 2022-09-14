@@ -37,7 +37,7 @@ class BorderHandle {
 
   getRItem() {
     const { table, bx, by, optimize } = this;
-    const { cols, rows, cells, xIteratorBuilder } = table;
+    const { cols, rows, xIteratorBuilder } = table;
     const rCols = [];
     const optimizeJoin = new LineOptimizeJoin(xIteratorBuilder);
     return new LineIteratorItem({
@@ -62,7 +62,7 @@ class BorderHandle {
       }),
       exec: ({ row, col }) => {
         const height = rows.getHeight(row);
-        const cell = cells.getCell(row, col);
+        const cell = table.getMasterMergeCellOrCell(row, col);
         const item = rCols[col];
         const { borderAttr } = cell;
         item.ey += height;
@@ -97,7 +97,7 @@ class BorderHandle {
 
   getLItem() {
     const { table, bx, by, optimize } = this;
-    const { rows, cells, xIteratorBuilder } = table;
+    const { rows, xIteratorBuilder } = table;
     const lCols = [];
     const optimizeJoin = new LineOptimizeJoin(xIteratorBuilder);
     return new LineIteratorItem({
@@ -121,7 +121,7 @@ class BorderHandle {
       }),
       exec: ({ row, col }) => {
         const item = lCols[col];
-        const cell = cells.getCell(row, col);
+        const cell = table.getMasterMergeCellOrCell(row, col);
         const height = rows.getHeight(row);
         const { borderAttr } = cell;
         item.ey += height;
@@ -156,7 +156,7 @@ class BorderHandle {
 
   getTItem() {
     const { table, bx, by, optimize } = this;
-    const { cols, cells } = table;
+    const { cols } = table;
     const tLine = [];
     const tRow = {};
     const optimizeJoin = new LineOptimizeJoin();
@@ -178,7 +178,7 @@ class BorderHandle {
       }),
       exec: ({ row, col }) => {
         const width = cols.getWidth(col);
-        const cell = cells.getCell(row, col);
+        const cell = table.getMasterMergeCellOrCell(row, col);
         const { borderAttr } = cell;
         tRow.ex += width;
         const { sx, sy, ex, ey } = tRow;
@@ -202,7 +202,7 @@ class BorderHandle {
 
   getBItem() {
     const { table, bx, by, optimize } = this;
-    const { cols, rows, cells } = table;
+    const { cols, rows } = table;
     const bLine = [];
     const bRow = {};
     const optimizeJoin = new LineOptimizeJoin();
@@ -225,7 +225,7 @@ class BorderHandle {
       }),
       exec: ({ row, col }) => {
         const width = cols.getWidth(col);
-        const cell = cells.getCell(row, col);
+        const cell = table.getMasterMergeCellOrCell(row, col);
         const { borderAttr } = cell;
         bRow.ex += width;
         const { sx, sy, ex, ey } = bRow;

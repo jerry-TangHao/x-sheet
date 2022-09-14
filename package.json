@@ -25,6 +25,7 @@
     "canvas"
   ],
   "devDependencies": {
+
     "@babel/core": "7.16.0",
     "@babel/preset-env": "7.16.4",
     "@babel/eslint-parser": "7.18.2",

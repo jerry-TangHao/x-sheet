@@ -60,15 +60,9 @@ function numfmt(pattern, opts) {
   return getFormatter(parseData, opts);
 }
 
-numfmt.isDate = (d) =>
-  // run parser in robust mode: malformed format code is not a date
-  numfmt(d, { throws: false }).isDate();
-numfmt.isPercent = (d) =>
-  // run parser in robust mode: malformed format code is not a percent
-  numfmt(d, { throws: false }).isPercent();
-numfmt.isText = (d) =>
-  // run parser in robust mode: malformed format code is not a percent
-  numfmt(d, { throws: false }).isText();
+numfmt.isDate = (d) => numfmt(d, { throws: false }).isDate();
+numfmt.isPercent = (d) => numfmt(d, { throws: false }).isPercent();
+numfmt.isText = (d) => numfmt(d, { throws: false }).isText();
 numfmt.dateToSerial = dateToSerial;
 numfmt.dateFromSerial = dateFromSerial;
 numfmt.options = options;

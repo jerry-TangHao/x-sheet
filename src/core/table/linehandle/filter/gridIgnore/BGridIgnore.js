@@ -10,9 +10,8 @@ class BGridIgnore {
     row, col,
   }) {
     const { table } = this;
-    const { cells } = table;
-    const main = cells.getCell(row, col);
-    const next = cells.getCell(row + 1, col);
+    const main = table.getMasterMergeCellOrCell(row, col);
+    const next = table.getMasterMergeCellOrCell(row + 1, col);
     if (main) {
       const { bottom } = main.borderAttr;
       if (bottom.display) {

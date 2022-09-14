@@ -113,7 +113,7 @@ class XWorkHeadOption extends Widget {
               Download(file, `${options.name}.xlsx`);
               break;
             }
-            case 3: {
+            default: {
               menu.close();
               new Alert({
                 message: '开发人员正在努力施工中....',
@@ -124,10 +124,46 @@ class XWorkHeadOption extends Widget {
         },
       },
     }).parentWidget(this);
-    this.format = new Format().parentWidget(this);
-    this.insert = new Insert().parentWidget(this);
-    this.look = new Look().parentWidget(this);
-    this.update = new Update().parentWidget(this);
+    this.format = new Format({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Format', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
+    this.insert = new Insert({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Insert', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
+    this.look = new Look({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Look', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
+    this.update = new Update({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Update', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
     this.optionsEle.childrenNodes(this.file);
     this.optionsEle.childrenNodes(this.update);
     this.optionsEle.childrenNodes(this.insert);

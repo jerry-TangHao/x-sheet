@@ -469,11 +469,13 @@ class XTableTopIndex extends Dimensions {
 
 const settings = {
   index: {
+    gridColor: 'rgb(193,193,193)',
     height: 30,
     width: 50,
-    gridColor: 'rgb(193,193,193)',
     size: 12,
     color: 'rgb(0,0,0)',
+    displayTopIndex: true,
+    displayLeftIndex: true,
   },
   table: {
     showGrid: true,
@@ -631,8 +633,42 @@ class XTableDimension extends Widget {
     this.dropRowFixed = new DropRowFixed(this);
     // 粘贴板
     this.clipboard = new Clipboard({
-      filter: () => {},
-      paste: () => {},
+      filter: () => true,
+      paste: (e) => {
+        const data = e.clipboardData.getData('text/plain');
+
+        // 解析数据为二维数组
+        const dataArray = data.split(/[\r\n]+/).map((row) => row.split('\t'));
+
+        const operateCellsHelper = this.getOperateCellsHelper();
+        const xSelect = this.xScreen.findType(XSelectItem);
+        const { selectRange } = xSelect;
+        const cells = this.dataCellsHelper.getCells();
+
+        // 扩大选区
+        selectRange.eri = selectRange.sri + dataArray.length - 1;
+        selectRange.eci = selectRange.sci + dataArray[0].length - 1;
+
+        this.snapshot.open();
+
+        // 将粘贴过来的数据更新到单元格中
+        operateCellsHelper.getCellOrNewCellByViewRange({
+          rectRange: selectRange,
+          callback: (ri, ci, cell) => {
+            const newCell = cell.clone();
+            newCell.setText(dataArray[ri - selectRange.sri][ci - selectRange.sci]);
+            cells.setCell(ri, ci, newCell);
+          },
+        });
+        // 设定新的选区
+        xSelect.setRange(selectRange);
+
+        this.snapshot.close({
+          type: Constant.TABLE_EVENT_TYPE.DATA_CHANGE,
+        });
+        // 刷新表格
+        this.xContent.table.render();
+      },
     });
     // 单元格辅助类
     this.cellMergeCopyHelper = new CellMergeCopyHelper(this);

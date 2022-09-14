@@ -10,14 +10,33 @@ class Code {
     color = 'rgb(88,87,87)',
     size = 11,
     gridColor = 'rgb(232,232,232)',
+    displayLeftIndex = true,
+    displayTopIndex = true,
   }) {
-    this.scaleAdapter = scaleAdapter;
-    this.height = height;
-    this.width = width;
+    this.displayLeftIndex = displayLeftIndex;
+    this.displayTopIndex = displayTopIndex;
+    this.size = size;
     this.background = background;
     this.color = color;
-    this.size = size;
     this.gridColor = gridColor;
+    this.scaleAdapter = scaleAdapter;
+    // 保留边框
+    this.width = width < 1 || !displayLeftIndex ? 1 : width;
+    this.height = height < 1 || !displayTopIndex ? 1 : height;
+  }
+
+  isDisplayTopIndex() {
+    return this.displayTopIndex;
+  }
+
+  isDisplayLeftIndex() {
+    return this.displayLeftIndex;
+  }
+
+  getSize() {
+    const { scaleAdapter } = this;
+    const { size } = this;
+    return scaleAdapter.goto(size);
   }
 
   getGridColor() {
@@ -30,15 +49,10 @@ class Code {
     return color;
   }
 
-  getSize() {
+  getWidth() {
     const { scaleAdapter } = this;
-    const { size } = this;
-    return scaleAdapter.goto(size);
-  }
-
-  getBackground() {
-    const { background } = this;
-    return background;
+    const { width } = this;
+    return scaleAdapter.goto(width);
   }
 
   getHeight() {
@@ -47,10 +61,9 @@ class Code {
     return scaleAdapter.goto(height);
   }
 
-  getWidth() {
-    const { scaleAdapter } = this;
-    const { width } = this;
-    return scaleAdapter.goto(width);
+  getBackground() {
+    const { background } = this;
+    return background;
   }
 
 }

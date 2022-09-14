@@ -10,9 +10,8 @@ class RBorderPriority {
     row, col,
   }) {
     const { table } = this;
-    const { cells } = table;
-    const main = cells.getCell(row, col);
-    const next = cells.getCell(row, col + 1);
+    const main = table.getMasterMergeCellOrCell(row, col);
+    const next = table.getMasterMergeCellOrCell(row, col + 1);
     if (main) {
       if (next) {
         const { right } = main.borderAttr;

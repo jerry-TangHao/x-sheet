@@ -1,6 +1,5 @@
 build
 dist
 test
-src/template/**
-src/libs
-src/task/worker
+template
+worker

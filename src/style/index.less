@@ -332,12 +332,12 @@
 
 
 // sheet 选项卡
-.@{css-prefix}-sheet-switch-tab {
+.@{css-prefix}-slide-tab-container {
   height: 25px;
   width: 100%;
   background: #e8e8e8;
 }
-.@{css-prefix}-switch-tab-last-btn {
+.@{css-prefix}-slide-tab-last-btn {
   height: 100%;
   width: 30px;
   float: left;
@@ -345,7 +345,7 @@
   background-size: 50% 50%;
   cursor: pointer;
 }
-.@{css-prefix}-switch-tab-next-btn {
+.@{css-prefix}-slide-tab-next-btn {
   height: 100%;
   width: 30px;
   float: left;
@@ -353,18 +353,14 @@
   background-size: 50% 50%;
   cursor: pointer;
 }
-.@{css-prefix}-sheet-tab-content {
+.@{css-prefix}-slide-tab-content {
   height: 100%;
   width: auto;
   max-width: calc(100% - 85px);
   float: left;
   overflow: hidden;
 }
-.@{css-prefix}-sheet-tab-tabs {
-  width: max-content;
-  height: 100%;
-}
-.@{css-prefix}-sheet-tab-plus{
+.@{css-prefix}-slide-tab-plus-btn {
   height: 100%;
   width: 25px;
   background: url("../../assets/svg/plus.svg") center center no-repeat;
@@ -372,22 +368,34 @@
   float: left;
   cursor: pointer;
 }
-.@{css-prefix}-sheet-tab {
+.@{css-prefix}-sheet-tab-tabs {
+  max-width: 100%;
+  width: 100%;
   height: 100%;
-  padding: 0 20px 0 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.@{css-prefix}-sheet-tab-tabs::-webkit-scrollbar {
+  display: none;
+}
+.@{css-prefix}-sheet-tab {
+  user-select: none;
+  height: 100%;
   box-sizing: border-box;
-  background: #d0d0d0;
-  float: left;
-  text-align: center;
-  line-height: 25px;
-  font-size: 12px;
-  font-weight: bold;
-  border-left: 1px solid #ccc;
   color: #787878;
   cursor: pointer;
-}
-.@{css-prefix}-sheet-tab:first-child {
-  border-left: none;
+  padding: 0 20px 0 20px;
+  flex-shrink:0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 25px;
+  font-weight: bold;
+  background: #d0d0d0;
+  font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 }
 .@{css-prefix}-sheet-tab.active {
   background: #ffffff;

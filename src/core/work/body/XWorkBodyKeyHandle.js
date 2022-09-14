@@ -1,6 +1,7 @@
 import { XSelectItem } from '../../table/screenitems/xselect/XSelectItem';
 import { XSelectPath } from '../../table/screenitems/xselect/XSelectPath';
 import { BaseEdit } from '../../table/tableedit/BaseEdit';
+import { Constant } from '../../../const/Constant';
 
 function pageDown({ table, body, response }) {
   const { xTableScrollView, xScreen, rows } = table;
@@ -515,6 +516,25 @@ function controllerY({ table, response }) {
   });
 }
 
+function backspace({ table, response }) {
+  response.push({
+    keyCode: (keyCode) => keyCode === 8 || keyCode === 46 || keyCode === 868,
+    handle: () => {
+      const { xScreen, snapshot } = table;
+      const xSelect = xScreen.findType(XSelectItem);
+      let { selectRange } = xSelect;
+
+      let cells = table.getTableCells();
+      snapshot.open();
+      cells.clear(selectRange);
+      snapshot.close({
+        type: Constant.TABLE_EVENT_TYPE.DATA_CHANGE,
+      });
+      table.render();
+    },
+  });
+}
+
 class XWorkBodyKeyHandle {
 
   static register({ table, body }) {
@@ -533,6 +553,7 @@ class XWorkBodyKeyHandle {
     arrowUp({ table, body, response });
     arrowLeft({ table, body, response });
     arrowRight({ table, body, response });
+    backspace({ table, body, response });
     keyboard.register({
       target: table, response,
     });

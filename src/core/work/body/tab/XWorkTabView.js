@@ -4,6 +4,7 @@ import { SheetUtils } from '../../../../utils/SheetUtils';
 import { XEvent } from '../../../../lib/XEvent';
 import { TabContextMenu } from './contextmenu/TabContextMenu';
 import { ElPopUp } from '../../../../module/elpopup/ElPopUp';
+import { SlideTabBar } from '../../../../lib/slidebar/SlideTabBar';
 
 const settings = {
   showMenu: true,
@@ -16,12 +17,23 @@ const settings = {
  */
 class XWorkTabView extends Widget {
 
+  _reloadSlideTabBar() {
+    if (this.slideTabBar) {
+      this.slideTabBar.destroy();
+    }
+    this.slideTabBar = new SlideTabBar({
+      slideTabBarClassName: `${cssPrefix}-sheet-tab-tabs`,
+      slideTabItemClassName: `${cssPrefix}-sheet-tab`,
+      slideTabActiveClassName: 'active',
+    });
+  }
+
   /**
    * XWorkTabView
    * @param options
    */
   constructor(options) {
-    super(`${cssPrefix}-sheet-switch-tab`);
+    super(`${cssPrefix}-slide-tab-container`);
     this.options = SheetUtils.copy({
       onSwitch: () => {},
       onAdded: () => {},
@@ -36,11 +48,11 @@ class XWorkTabView extends Widget {
     this.activeIndex = -1;
     this.left = null;
     this.tabList = [];
-    this.last = new Widget(`${cssPrefix}-switch-tab-last-btn`);
-    this.next = new Widget(`${cssPrefix}-switch-tab-next-btn`);
+    this.last = new Widget(`${cssPrefix}-slide-tab-last-btn`);
+    this.next = new Widget(`${cssPrefix}-slide-tab-next-btn`);
     this.tabs = new Widget(`${cssPrefix}-sheet-tab-tabs`);
-    this.plus = new Widget(`${cssPrefix}-sheet-tab-plus`);
-    this.content = new Widget(`${cssPrefix}-sheet-tab-content`);
+    this.plus = new Widget(`${cssPrefix}-slide-tab-plus-btn`);
+    this.content = new Widget(`${cssPrefix}-slide-tab-content`);
     this.content.attach(this.tabs);
     super.attach(this.last);
     super.attach(this.next);
@@ -70,6 +82,7 @@ class XWorkTabView extends Widget {
       },
     }).parentWidget(this);
     this.bind();
+    this._reloadSlideTabBar();
   }
 
   /**
@@ -88,38 +101,14 @@ class XWorkTabView extends Widget {
   bind() {
     const { next, last, plus } = this;
     XEvent.bind(next, Constant.SYSTEM_EVENT_TYPE.CLICK, () => {
-      const maxWidth = this.content.offset().width;
-      const current = this.tabs.offset().width;
-      const min = -(current - maxWidth);
-      let left = this.left || 0;
-      left -= 30;
-      if (left < min) left = min;
-      this.left = left;
-      this.tabs.css('marginLeft', `${this.left}px`);
+      this.slideTabBar.getScrollbar().scrollX(this.slideTabBar.getScrollbar().getScrollX() + 50);
     });
     XEvent.bind(last, Constant.SYSTEM_EVENT_TYPE.CLICK, () => {
-      let left = this.left || 0;
-      left += 30;
-      if (left > 0) left = 0;
-      this.left = left;
-      this.tabs.css('marginLeft', `${this.left}px`);
+      this.slideTabBar.getScrollbar().scrollX(this.slideTabBar.getScrollbar().getScrollX() - 50);
     });
     XEvent.bind(plus, Constant.SYSTEM_EVENT_TYPE.CLICK, () => {
       this.options.onAdded();
-      this.offsetLast();
     });
-  }
-
-  /**
-   * 移动到最后一个tab
-   */
-  offsetLast() {
-    const maxWidth = this.content.offset().width;
-    const current = this.tabs.offset().width;
-    if (current > maxWidth) {
-      this.left = -(current - maxWidth);
-      this.tabs.css('marginLeft', `${this.left}px`);
-    }
   }
 
   /**
@@ -144,6 +133,7 @@ class XWorkTabView extends Widget {
       this.setActive(tab);
       this.options.onSwitch(tab, event);
     });
+    this._reloadSlideTabBar();
     tab.onAttach();
   }
 

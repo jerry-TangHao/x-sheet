@@ -10,8 +10,7 @@ class TBorderIgnore {
     row, col,
   }) {
     const { table } = this;
-    const { cells } = table;
-    const cell = cells.getCell(row, col);
+    const cell = table.getMasterMergeCellOrCell(row, col);
     if (cell) {
       const { top } = cell.borderAttr;
       return top.display
