@@ -25,6 +25,7 @@ import { Confirm } from '../../../module/confirm/Confirm';
 const settings = {
   sheets: [],
   tabConfig: {},
+  banner: true,
   sheetConfig: {},
 };
 
@@ -46,7 +47,9 @@ class XWorkBody extends Widget {
     // 版本标识
     this.version = h('div', `${cssPrefix}-version-tips`);
     this.version.html(`<a target="_blank" href="https://gitee.com/eigi/x-sheet">${XSheetVersion}</a>`);
-    this.childrenNodes(this.version);
+    if (this.options.banner) {
+      this.childrenNodes(this.version);
+    }
     // 组件
     this.sheetView = new XWorkSheetView({
       ...this.options.sheetConfig,
@@ -59,7 +62,11 @@ class XWorkBody extends Widget {
       },
       onAdded: () => {
         const tab = new XWorkTab();
-        const sheet = new XWorkSheet(tab);
+        const sheet = new XWorkSheet(tab, {
+          tableConfig: {
+            data: [],
+          },
+        });
         this.addTabSheet(tab, sheet);
       },
       onRemove: (tab) => {
@@ -70,6 +77,9 @@ class XWorkBody extends Widget {
             this.removeByIndex(index);
           },
         }).parentWidget(this).open();
+      },
+      onSort: () => {
+        this.sheetView.sortByTabs(this.tabView.getTabs());
       },
     });
     this.scrollBarY = new ScrollBarY({
@@ -346,6 +356,15 @@ class XWorkBody extends Widget {
   }
 
   /**
+   * 获取指定索引的sheet
+   * @param index
+   * @returns {XWorkSheet}
+   */
+  getSheetByIndex(index = 0) {
+    return this.sheetView.getSheetByIndex(index);
+  }
+
+  /**
    * 获取当前激活的tab
    * @returns {*}
    */
@@ -469,8 +488,8 @@ class XWorkBody extends Widget {
     const table = this.getActiveTable();
     if (table) {
       table.reset();
-      this.refreshScrollBarLocal();
       this.refreshScrollBarSize();
+      this.refreshScrollBarLocal();
       table.resize();
     }
   }
@@ -503,6 +522,14 @@ class XWorkBody extends Widget {
     const table = this.getActiveTable();
     this.scrollBarY.setLocal(table.getTop());
     this.scrollBarX.setLocal(table.getLeft());
+  }
+
+  /**
+   * 获取所有的sheet
+   * @returns {XWorkSheet[]|[]}
+   */
+  getSheets() {
+    return this.sheetView.getSheets();
   }
 
   /**

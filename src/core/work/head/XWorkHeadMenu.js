@@ -34,6 +34,7 @@ import { XCopyStyle } from '../../table/screenitems/xcopystyle/XCopyStyle';
 import { FontAngle } from './tool/FontAngle';
 import { Divider } from './tool/base/Divider';
 import { BaseEdit } from '../../table/tableedit/BaseEdit';
+import { RecycleMenu } from './tool/RecycleMenu';
 
 class XWorkHeadMenu extends Widget {
 
@@ -366,6 +367,7 @@ class XWorkHeadMenu extends Widget {
         },
       },
     });
+    this.recycleMenu = new RecycleMenu(this);
 
     // 追加到菜单中
     this.attach(this.undo);
@@ -397,6 +399,7 @@ class XWorkHeadMenu extends Widget {
     this.attach(this.fixed);
     this.attach(this.filter);
     this.attach(this.functions);
+    this.attach(this.recycleMenu);
     this.bind();
   }
 

@@ -23,6 +23,14 @@ class XWorkSheet extends Widget {
     this.attach(table);
   }
 
+  getTable() {
+    return this.table;
+  }
+
+  getTab() {
+    return this.tab;
+  }
+
   destroy() {
     super.destroy();
     this.table.destroy();

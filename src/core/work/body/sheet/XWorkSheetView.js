@@ -160,12 +160,44 @@ class XWorkSheetView extends Widget {
   }
 
   /**
+   * 依据tab排序
+   * @param tabs
+   */
+  sortByTabs(tabs) {
+    const activeSheet = this.sheetList[this.activeIndex];
+    this.sheetList.sort((a, b) => {
+      let ai = tabs.indexOf(a.getTab());
+      let bi = tabs.indexOf(b.getTab());
+      return ai > bi ? 1 : -1;
+    });
+    this.activeIndex = this.sheetList.indexOf(activeSheet);
+    console.log(this.activeIndex);
+  }
+
+  /**
    * 获取sheet的索引
    * @param sheet
    * @returns {number}
    */
   getIndexBySheet(sheet) {
     return this.sheetList.findIndex((item) => item === sheet);
+  }
+
+  /**
+   * 获取指定索引的Sheet
+   * @param index
+   * @returns {XWorkSheet}
+   */
+  getSheetByIndex(index = 0) {
+    return this.sheetList[index];
+  }
+
+  /**
+   * 获取所有的sheet列表
+   * @returns {XWorkSheet[]|[]}
+   */
+  getSheets() {
+    return SheetUtils.newArray(this.sheetList);
   }
 
   /**
@@ -203,6 +235,9 @@ class XWorkSheetView extends Widget {
     this.setActive(active);
   }
 
+  /**
+   * 销毁
+   */
   destroy() {
     super.destroy();
     this.unbind();

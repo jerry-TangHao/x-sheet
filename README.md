@@ -54,7 +54,7 @@
   - 打印 **(处理中)** 
   - 数据验证 **(处理中)** 
   - 导出XLSX
-  - 导入XLSX **(处理中)** 
+  - 导入XLSX
   - 导出CVS **(处理中)** 
   - 导入CVS **(处理中)** 
   - 导入图片 **(处理中)** 
@@ -94,6 +94,9 @@
 
 ## **交流**
 ![输入图片说明](./assets/_cgi-bin_mmwebwx-bin_webwxgetmsgimg__&MsgID=5735869489061871077&skey=@crypt_263d2072_0bf9ffd48a131828db37818811803386&mmweb_appid=wx_webfilehelper.jpg)
+
+## **exceljs(XLSX解析器)**
+    https://github.com/exceljs/exceljs
 
 ## **LICENSE**
     MOZILLA PUBLIC LICENSE

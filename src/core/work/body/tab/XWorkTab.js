@@ -1,10 +1,6 @@
 import { Widget } from '../../../../lib/Widget';
 import { XEvent } from '../../../../lib/XEvent';
 import { Constant, cssPrefix } from '../../../../const/Constant';
-import { SheetUtils } from '../../../../utils/SheetUtils';
-
-let number = 0;
-let include = [];
 
 class XWorkTab extends Widget {
 
@@ -13,10 +9,9 @@ class XWorkTab extends Widget {
     rClickHandle = () => {},
   } = {}) {
     super(`${cssPrefix}-sheet-tab`);
-    this.name = '';
+    this.name = name;
     this.lClickHandle = lClickHandle;
     this.rClickHandle = rClickHandle;
-    this.setName(this.getCheckName(name));
     this.bind();
   }
 
@@ -35,9 +30,19 @@ class XWorkTab extends Widget {
     });
   }
 
+  onAttach() {
+    super.onAttach();
+    const root = this.getRootWidget();
+    this.setName(root.tabNameGen.genName(this.name));
+  }
+
   setName(name) {
     this.name = name;
     this.text(this.name);
+  }
+
+  getName() {
+    return this.name;
   }
 
   setRClick(handle) {
@@ -46,22 +51,6 @@ class XWorkTab extends Widget {
 
   setLClick(handle) {
     this.lClickHandle = handle;
-  }
-
-  getName() {
-    number += 1;
-    return `Sheet${number}`;
-  }
-
-  getCheckName(name) {
-    if (SheetUtils.isUnDef(name)) {
-      name = this.getName();
-    }
-    while (include.indexOf(name) > -1) {
-      name = this.getName();
-    }
-    include.push(name);
-    return name;
   }
 
   destroy() {

@@ -87,7 +87,10 @@ class XTableFrozenFullRect {
 class XTableFixedBar {
 
   constructor(table, {
-    width, height, background, buttonColor,
+    width,
+    height,
+    background,
+    buttonColor,
   }) {
     this.table = table;
     this.height = height;
@@ -2648,8 +2651,12 @@ class XTableDrawStyle extends Widget {
    * @param scroll
    */
   constructor({
-    xTableScrollView, settings, snapshot,
-    scroll, xFixedView, xIteratorBuilder,
+    xTableScrollView,
+    settings,
+    snapshot,
+    scroll,
+    xFixedView,
+    xIteratorBuilder,
   }) {
     super(`${cssPrefix}-table-canvas`, 'canvas');
     // 渲染模式
@@ -2735,25 +2742,25 @@ class XTableDrawStyle extends Widget {
     const lBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new LBorderRequire({ cells: this.cells }),
+        new LBorderRequire(this),
       ],
     });
     const rBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new RBorderRequire({ cells: this.cells }),
+        new RBorderRequire(this),
       ],
     });
     const tBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new TBorderRequire({ cells: this.cells }),
+        new TBorderRequire(this),
       ],
     });
     const bBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new BBorderRequire({ cells: this.cells }),
+        new BBorderRequire(this),
       ],
     });
     // 绘制资源

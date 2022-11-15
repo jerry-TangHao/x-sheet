@@ -123,7 +123,7 @@ class TableEdit extends TextEdit {
         if (align === BaseFont.ALIGN.center) {
           this.local();
         }
-        table.trigger(Constant.TABLE_EVENT_TYPE.EDIT_INPUT, {
+        this.trigger(Constant.TABLE_EVENT_TYPE.EDIT_INPUT, {
           native: event, table, edit: this,
         });
       }

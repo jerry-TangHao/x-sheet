@@ -5,6 +5,7 @@ import { XEvent } from '../../../../lib/XEvent';
 import { TabContextMenu } from './contextmenu/TabContextMenu';
 import { ElPopUp } from '../../../../module/elpopup/ElPopUp';
 import { SlideTabBar } from '../../../../lib/slidebar/SlideTabBar';
+import { Alert } from '../../../../module/alert/Alert';
 
 const settings = {
   showMenu: true,
@@ -22,9 +23,21 @@ class XWorkTabView extends Widget {
       this.slideTabBar.destroy();
     }
     this.slideTabBar = new SlideTabBar({
+      onSlideEnd: () => {
+        const items = this.slideTabBar.getSlideTabItems().map((item) => item.primeval());
+        const activeTab = this.tabList[this.activeIndex];
+        this.tabList.sort((a, b) => {
+          let ai = items.indexOf(a.el);
+          let bi = items.indexOf(b.el);
+          return ai > bi ? 1 : -1;
+        });
+        this.activeIndex = this.tabList.indexOf(activeTab);
+        console.log(this.activeIndex);
+        this.options.onSort();
+      },
+      slideTabActiveClassName: 'active',
       slideTabBarClassName: `${cssPrefix}-sheet-tab-tabs`,
       slideTabItemClassName: `${cssPrefix}-sheet-tab`,
-      slideTabActiveClassName: 'active',
     });
   }
 
@@ -38,6 +51,7 @@ class XWorkTabView extends Widget {
       onSwitch: () => {},
       onAdded: () => {},
       onRemove: () => {},
+      onSort: () => {},
     }, settings, options);
   }
 
@@ -63,19 +77,37 @@ class XWorkTabView extends Widget {
         const { tab } = this.contextMenu;
         switch (type) {
           case 1: {
-            this.options.onRemove(tab);
+            if (this.getTabSize() > 1) {
+              this.options.onRemove(tab);
+            } else {
+              new Alert({
+                message: '需要保留一个Sheet',
+              }).parentWidget(this).open();
+            }
             break;
           }
           case 2: {
+            new Alert({
+              message: '开发人员正在努力施工中....',
+            }).parentWidget(this).open();
             break;
           }
           case 3: {
+            new Alert({
+              message: '开发人员正在努力施工中....',
+            }).parentWidget(this).open();
             break;
           }
           case 4: {
+            new Alert({
+              message: '开发人员正在努力施工中....',
+            }).parentWidget(this).open();
             break;
           }
           case 5: {
+            new Alert({
+              message: '开发人员正在努力施工中....',
+            }).parentWidget(this).open();
             break;
           }
         }
@@ -134,7 +166,7 @@ class XWorkTabView extends Widget {
       this.options.onSwitch(tab, event);
     });
     this._reloadSlideTabBar();
-    tab.onAttach();
+    this.slideTabBar.getScrollbar().scrollXMax();
   }
 
   /**
@@ -182,11 +214,26 @@ class XWorkTabView extends Widget {
   }
 
   /**
+   * 获取tab数量
+   */
+  getTabSize() {
+    return this.tabList.length;
+  }
+
+  /**
    * 获取当前激活的tab
    * @returns {*}
    */
   getActiveTab() {
     return this.tabList[this.activeIndex];
+  }
+
+  /**
+   * 获取所有tab
+   * @returns {XWorkTab[]|[]}
+   */
+  getTabs() {
+    return SheetUtils.newArray(this.tabList);
   }
 
   /**
@@ -223,6 +270,7 @@ class XWorkTabView extends Widget {
     }
     const active = this.getActiveTab();
     this.setActive(active);
+    this._reloadSlideTabBar();
   }
 }
 

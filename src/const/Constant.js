@@ -21,6 +21,7 @@ Constant.SYSTEM_EVENT_TYPE = {
   MOUSE_ENTER: 'mouseenter',
   CLICK: 'click',
   FOCUS: 'focus',
+  BLUR: 'blur',
   DRAG_START: 'dragstart',
   CHANGE: 'change',
   VISIBILITY_CHANGE: 'visibilitychange',

@@ -21,6 +21,13 @@ import { WidgetFocusMange } from './lib/WidgetFocusMange';
 import './style/base.less';
 import './style/index.less';
 
+import { TabNameGen } from './lib/TabNameGen';
+import { XlsxImportTask } from './worker/XlsxImportTask';
+import { XlsxExportTask } from './worker/XlsxExportTask';
+import { Confirm } from './module/confirm/Confirm';
+import { XWorkTab } from './core/work/body/tab/XWorkTab';
+import { XWorkSheet } from './core/work/body/sheet/XWorkSheet';
+
 const settings = {
   workConfig: {
     name: 'x-sheet',
@@ -36,6 +43,7 @@ const settings = {
       tabConfig: {
         showMenu: true,
       },
+      banner: true,
       sheetConfig: {
         showMenu: true,
       },
@@ -61,16 +69,130 @@ class XSheet extends Widget {
    */
   constructor(el, options) {
     super(`${cssPrefix}`, 'div', true);
+    this.tabNameGen = new TabNameGen();
     if (SheetUtils.isString(el)) {
       el = document.querySelector(el);
     }
     h(el).childrenNodes(this);
+    this.xlsxImportTask = new XlsxImportTask();
+    this.xlsxExportTask = new XlsxExportTask();
     this.options = SheetUtils.copy({}, settings, options);
     this.focusManage = new WidgetFocusMange({
       root: this,
     });
     this.xWork = new XWork(this.options.workConfig);
     this.attach(this.xWork);
+  }
+
+  getWork() {
+    return this.xWork;
+  }
+
+  /**
+   * 导入xlsx文件
+   * @param xlsx 文件
+   * @param confirm 展示确认提示框
+   * @returns {Promise<void>}
+   */
+  async importXlsx(xlsx, confirm = false) {
+    const { body } = this.xWork;
+    const result = await this.xlsxToXSheet(xlsx, null);
+    if (confirm) {
+      new Confirm({
+        message: '文件解析完成是否导入?',
+        ok: () => {
+          const config = result.data;
+          const { sheets } = config.body;
+          sheets.forEach((item) => {
+            const tab = new XWorkTab(item.name);
+            const sheet = new XWorkSheet(tab, item);
+            body.addTabSheet(tab, sheet);
+          });
+        },
+      }).parentWidget(this).open();
+    } else {
+      const config = result.data;
+      const { sheets } = config.body;
+      sheets.forEach((item) => {
+        const tab = new XWorkTab(item.name);
+        const sheet = new XWorkSheet(tab, item);
+        body.addTabSheet(tab, sheet);
+      });
+    }
+  }
+
+  /**
+   * xlsx文件转换到 XSheetJson
+   * @param xlsx {File}
+   * @param callback {Function | null}
+   * @returns {Promise<never>}
+   */
+  async xlsxToXSheet(xlsx, callback) {
+    const { body } = this.xWork;
+    const { sheetView } = body;
+    const { table } = sheetView.getActiveSheet();
+    const { wideUnit, heightUnit } = table.getXTableStyle();
+    const dpr = XDraw.dpr();
+    const unit = wideUnit.getUnit();
+    const dpi = heightUnit.getDpi();
+    const result = await this.xlsxImportTask.execute(xlsx, dpr, unit, dpi);
+    if (callback) {
+      callback(result);
+    }
+    return result;
+  }
+
+  /**
+   * 下载xlsx文件
+   * @returns {Promise<void>}
+   */
+  async exportXlsx() {
+    const { options } = this.xWork;
+    const result = await this.xSheetToXlsx(null);
+    const file = result.data;
+    Download(file, `${options.name}.xlsx`);
+  }
+
+  /**
+   * XSheet 转换到 xlsx文件
+   * @param callback
+   * @returns {Promise<never>}
+   */
+  async xSheetToXlsx(callback) {
+    const { body, options } = this.xWork;
+    const { sheetView } = body;
+    const { sheetList } = sheetView;
+    const { table } = sheetView.getActiveSheet();
+    const { wideUnit, heightUnit } = table.getXTableStyle();
+    const sheetItems = [];
+    sheetList.forEach((sheet) => {
+      const { table, tab } = sheet;
+      const { rows, cols, settings } = table;
+      const merges = table.getTableMerges();
+      const cells = table.getTableCells();
+      const item = {
+        name: tab.name,
+        tableConfig: {
+          table: {
+            showGrid: settings.table.showGrid,
+            background: settings.table.background,
+          },
+          merge: merges.getData(),
+          rows: rows.getData(),
+          cols: cols.getData(),
+          data: cells.getData(),
+        },
+      };
+      sheetItems.push(item);
+    });
+    const dpr = XDraw.dpr();
+    const unit = wideUnit.getUnit();
+    const dpi = heightUnit.getDpi();
+    const result = await this.xlsxExportTask.execute(options, sheetItems, dpr, unit, dpi);
+    if (callback) {
+      callback(result);
+    }
+    return result;
   }
 }
 

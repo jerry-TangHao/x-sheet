@@ -68,12 +68,15 @@ class XTableKeyboard {
   bind() {
     const table = this.table;
     const root = table.getRootWidget();
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, (e) => {
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, (e) => {
       if (root.contains(table.focusManage.element)) {
         this.doHandle(e);
       }
     });
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_UP, (e) => {
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.BLUR, () => {
+      this.keyCodes = [];
+    });
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.KEY_UP, (e) => {
       if (root.contains(table.focusManage.element)) {
         this.upHandle(e);
       }
@@ -119,7 +122,10 @@ class XTableKeyboard {
    * @param el
    * @param event
    */
-  forward({ target, event }) {
+  forward({
+    target,
+    event,
+  }) {
     const find = this.find(target);
     if (find) {
       const { response } = find;

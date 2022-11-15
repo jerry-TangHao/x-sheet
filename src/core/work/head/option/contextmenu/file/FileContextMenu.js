@@ -13,11 +13,11 @@ class FileContextMenu extends ELContextMenu {
       onUpdate: () => {},
     }, options));
     this.items = [
-      new FileContextMenuItem('导入cvs', 3),
-      new FileContextMenuItem('导出cvs', 6),
-      new ELContextMenuDivider(),
       new FileContextMenuItem('导入xlsx', 1),
       new FileContextMenuItem('导出xlsx', 2),
+      new ELContextMenuDivider(),
+      new FileContextMenuItem('导入csv', 3),
+      new FileContextMenuItem('导出csv', 6),
       new ELContextMenuDivider(),
       new FileContextMenuItem('重命名', 8),
       new FileContextMenuItem('打印表格', 4),

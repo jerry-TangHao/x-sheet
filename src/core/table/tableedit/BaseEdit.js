@@ -106,7 +106,9 @@ class BaseEdit extends Widget {
     this.mode = BaseEdit.MODE.SHOW;
     this.show();
     this.local();
-    table.trigger(Constant.TABLE_EVENT_TYPE.EDIT_START, event);
+    this.trigger(Constant.TABLE_EVENT_TYPE.EDIT_START, {
+      native: event, table, edit: this,
+    });
     return this;
   }
 
@@ -118,7 +120,9 @@ class BaseEdit extends Widget {
     const { table } = this;
     this.mode = BaseEdit.MODE.HIDE;
     this.hide();
-    table.trigger(Constant.TABLE_EVENT_TYPE.EDIT_FINISH, event);
+    this.trigger(Constant.TABLE_EVENT_TYPE.EDIT_FINISH, {
+      native: event, table, edit: this,
+    });
     return this;
   }
 

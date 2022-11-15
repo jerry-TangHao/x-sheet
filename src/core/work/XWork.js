@@ -69,6 +69,10 @@ class XWork extends Widget {
     this.bottom.bottomMenu.setNumber(0);
   }
 
+  getBody() {
+    return this.body;
+  }
+
 }
 
 export { XWork };

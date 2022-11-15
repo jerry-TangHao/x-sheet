@@ -216,12 +216,17 @@ export class SlideTabBar {
         this._activeTabItem = null;
       }
     };
-    this._upAction = () => {
+    this._upAction = (event) => {
       if (this._activeTabItem) {
         this._closeAutoScroll();
         this._activeTabItem.disableFixed();
         this._sortedItems();
         this._updateItems();
+
+        if (this._config.onSlideEnd && this._activeTabItemIndex !== this._compareIndex) {
+          this._config.onSlideEnd(event);
+        }
+
         this._scrollIncremental = 0;
         this._activeTabItemIndex = 0;
         this._downActionX = 0;
@@ -229,12 +234,12 @@ export class SlideTabBar {
         this._compareIndex = 0;
 
         // fix bug
-        let event = new MouseEvent('click', {
+        let clickEvent = new MouseEvent('click', {
           view: window,
           bubbles: true,
           cancelable: true,
         });
-        this._activeTabItem.primeval().dispatchEvent(event);
+        this._activeTabItem.primeval().dispatchEvent(clickEvent);
 
         this._activeTabItem = null;
       }
@@ -263,6 +268,10 @@ export class SlideTabBar {
 
   getBoundingRect() {
     return this._slideTabBar.getBoundingClientRect();
+  }
+
+  getSlideTabItems() {
+    return this._slideTabItems;
   }
 
   destroy() {
