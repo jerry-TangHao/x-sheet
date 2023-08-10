@@ -2651,12 +2651,7 @@ class XTableDrawStyle extends Widget {
    * @param scroll
    */
   constructor({
-    xTableScrollView,
-    settings,
-    snapshot,
-    scroll,
-    xFixedView,
-    xIteratorBuilder,
+    xTableScrollView, settings, snapshot, scroll, xFixedView, xIteratorBuilder,
   }) {
     super(`${cssPrefix}-table-canvas`, 'canvas');
     // 渲染模式

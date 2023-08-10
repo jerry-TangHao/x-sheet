@@ -10,8 +10,9 @@ class TBorderPriority {
     row, col,
   }) {
     const { table } = this;
-    const main = table.getMasterMergeCellOrCell(row, col);
-    const last = table.getMasterMergeCellOrCell(row - 1, col);
+    const { cells } = table;
+    const main = cells.getCell(row, col);
+    const last = cells.getCell(row - 1, col);
     if (main) {
       if (last) {
         const { top } = main.borderAttr;

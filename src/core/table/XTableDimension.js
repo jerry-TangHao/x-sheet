@@ -683,7 +683,7 @@ class XTableDimension extends Widget {
     this.snapshot.listen.registerListen('change', (event) => {
       this.cols.syncColsLen(this.xTableStyle.cols);
       this.rows.syncRowsLen(this.xTableStyle.rows);
-      if (event) {
+      if (SheetUtils.isDef(event)) {
         const { type } = event;
         switch (type) {
           case Constant.TABLE_EVENT_TYPE.REMOVE_ROW:
@@ -894,6 +894,24 @@ class XTableDimension extends Widget {
   }
 
   /**
+   * 索引栏高度
+   * @returns {*}
+   */
+  getIndexHeight() {
+    const { index } = this;
+    return index.getHeight();
+  }
+
+  /**
+   * 索引栏宽度
+   * @returns {*}
+   */
+  getIndexWidth() {
+    const { index } = this;
+    return index.getWidth();
+  }
+
+  /**
    * 获取表格单元格
    * @returns {Cells}
    */
@@ -938,24 +956,6 @@ class XTableDimension extends Widget {
   }
 
   /**
-   * 索引栏高度
-   * @returns {*}
-   */
-  getIndexHeight() {
-    const { index } = this;
-    return index.getHeight();
-  }
-
-  /**
-   * 索引栏宽度
-   * @returns {*}
-   */
-  getIndexWidth() {
-    const { index } = this;
-    return index.getWidth();
-  }
-
-  /**
    * 获取内容区域高度
    */
   getContentHeight() {
@@ -964,19 +964,19 @@ class XTableDimension extends Widget {
   }
 
   /**
-   * 获取内容区域宽度
-   */
-  getContentWidth() {
-    const { xContent } = this;
-    return xContent.getWidth();
-  }
-
-  /**
    * 固定区域宽度
    */
   getFixedWidth() {
     const { xLeft } = this;
     return xLeft.getWidth();
+  }
+
+  /**
+   * 获取内容区域宽度
+   */
+  getContentWidth() {
+    const { xContent } = this;
+    return xContent.getWidth();
   }
 
   /**
@@ -1222,16 +1222,13 @@ class XTableDimension extends Widget {
    * 表格事件
    */
   bindTableEvent() {
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.DATA_CHANGE, () => {
+      this.render();
+    });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW, () => {
       this.resize();
     });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.ADD_NEW_COL, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.REMOVE_COL, () => {
-      this.resize();
-    });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.REMOVE_ROW, () => {
       this.resize();
     });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE, () => {
@@ -1240,14 +1237,17 @@ class XTableDimension extends Widget {
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.FIXED_COL_CHANGE, () => {
       this.resize();
     });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.REMOVE_COL, () => {
+      this.resize();
+    });
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.REMOVE_ROW, () => {
       this.resize();
     });
     XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, () => {
       this.resize();
     });
-    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.SNAPSHOT_CHANGE, () => {
-      this.render();
+    XEvent.bind(this, Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, () => {
+      this.resize();
     });
   }
 
@@ -1258,6 +1258,41 @@ class XTableDimension extends Widget {
   getScrollView() {
     const { xTableAreaView } = this;
     return xTableAreaView.getScrollView();
+  }
+
+  /**
+   * 添加合并单元格
+   * @param range
+   * @param needRender
+   */
+  merge(range, needRender = false) {
+    const { snapshot, xTableStyle } = this;
+    const merges = this.getTableMerges();
+    const intersects = merges.getIntersects(range);
+    snapshot.open();
+    merges.batchDelete(intersects);
+    merges.add(range);
+    snapshot.close();
+    if (needRender) {
+      xTableStyle.render();
+    }
+  }
+
+  /**
+   * 删除合并单元格
+   * @param range
+   * @param needRender
+   */
+  unmerge(range, needRender = false) {
+    const { snapshot } = this;
+    const merges = this.getTableMerges();
+    const intersects = merges.getIntersects(range);
+    snapshot.open();
+    merges.batchDelete(intersects);
+    snapshot.close();
+    if (needRender) {
+      this.render();
+    }
   }
 
   /**
@@ -1702,7 +1737,6 @@ class XTableDimension extends Widget {
     this.colFixed.destroy();
     this.keyboard.destroy();
   }
-
 }
 
 export {

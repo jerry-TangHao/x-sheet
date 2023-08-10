@@ -10,7 +10,8 @@ class LBorderRequire {
     row, col,
   }) {
     const { table } = this;
-    const cell = table.getMasterMergeCellOrCell(row, col);
+    const { cells } = table;
+    const cell = cells.getCell(row, col);
     if (cell) {
       const { left } = cell.borderAttr;
       return left.display

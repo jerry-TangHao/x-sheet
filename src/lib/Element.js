@@ -349,7 +349,7 @@ class Element {
     if (this.isTextNode()) {
       return false;
     }
-    return this.el.contains(ele.el);
+    return ele && this.el.contains(ele.el);
   }
 
   /**

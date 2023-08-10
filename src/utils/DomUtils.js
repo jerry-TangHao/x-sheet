@@ -49,6 +49,16 @@ class DomUtils {
   }
 
   /**
+   * 像素值转数字值
+   * @param value
+   * @returns {*|number|number}
+   */
+  static pxToFloat(value) {
+    value = value.replace('px', '');
+    return SheetUtils.parseFloat(value);
+  }
+
+  /**
    * 获取所有兄弟节点
    * @param element
    * @returns {*[]}

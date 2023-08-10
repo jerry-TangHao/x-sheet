@@ -21,7 +21,7 @@ class TextEdit extends ExprEdit {
       let { align, size, color } = fontAttr;
       let { bold, italic, name } = fontAttr;
       let { underline, strikethrough } = fontAttr;
-      let fontSize = XDraw.cssPx(scale.goto(size));
+      let fontSize = scale.goto(size);
       let textAlign = 'left';
       switch (align) {
         case BaseFont.ALIGN.left:
@@ -73,6 +73,7 @@ class TextEdit extends ExprEdit {
     let { selectRange } = this;
     let { table } = this;
     let { activeCell } = this;
+    let { scale } = table;
     if (activeCell) {
       let format = activeCell.getFormatText();
       let handle = (element, style) => {
@@ -87,7 +88,7 @@ class TextEdit extends ExprEdit {
             style.bold = true;
           }
           if (!SheetUtils.isBlank(fontSize)) {
-            style.size = DomUtils.pxToNumber(fontSize);
+            style.size = scale.back(DomUtils.pxToFloat(fontSize));
           }
           if (!SheetUtils.isBlank(fontFamily)) {
             style.name = fontFamily;
@@ -136,7 +137,6 @@ class TextEdit extends ExprEdit {
         snapshot.close({
           type: Constant.TABLE_EVENT_TYPE.DATA_CHANGE,
         });
-        table.render();
       }
     }
   }

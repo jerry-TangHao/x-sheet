@@ -10,7 +10,8 @@ class TBorderRequire {
     row, col,
   }) {
     const { table } = this;
-    const cell = table.getMasterMergeCellOrCell(row, col);
+    const { cells } = table;
+    const cell = cells.getCell(row, col);
     if (cell) {
       const { top } = cell.borderAttr;
       return top.display

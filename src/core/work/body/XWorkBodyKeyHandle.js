@@ -206,6 +206,7 @@ function home({ table, response }) {
 function tab({ table, body, response }) {
   const { xTableScrollView } = table;
   const { cols, rows, xScreen, edit } = table;
+  const { colFixed, rowFixed } = table;
   const xSelect = xScreen.findType(XSelectItem);
   const merges = table.getTableMerges();
   response.push({
@@ -271,16 +272,22 @@ function tab({ table, body, response }) {
       if (sci < minCi) {
         let diff = minCi - sci;
         let last = scrollView.sci - diff;
-        table.scrollCi(last);
-        body.refreshScrollBarSize();
-        body.refreshScrollBarLocal();
+        let min = colFixed.fxEci + 1;
+        if (last >= min) {
+          table.scrollCi(Math.max(last, colFixed.fxEci + 1));
+          body.refreshScrollBarSize();
+          body.refreshScrollBarLocal();
+        }
       }
       if (sri < minRi) {
         let diff = minRi - sri;
         let last = scrollView.sri - diff;
-        table.scrollRi(last);
-        body.refreshScrollBarSize();
-        body.refreshScrollBarLocal();
+        let min = rowFixed.fxEri + 1;
+        if (last >= min) {
+          table.scrollRi(last);
+          body.refreshScrollBarSize();
+          body.refreshScrollBarLocal();
+        }
       }
       edit.open(event);
       event.preventDefault();

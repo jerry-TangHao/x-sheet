@@ -452,9 +452,9 @@ class XWorkHeadMenu extends Widget {
     this.attach(this.fontAngle);
     this.attach(new Divider());
     this.attach(this.fixed);
-    this.attach(this.filter);
-    this.attach(this.functions);
-    this.attach(this.recycleMenu);
+    // this.attach(this.filter);
+    // this.attach(this.functions);
+    // this.attach(this.recycleMenu);
     this.bind();
   }
 
