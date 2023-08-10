@@ -1,6 +1,5 @@
 import { Widget } from '../../../lib/Widget';
 import { Constant, cssPrefix } from '../../../const/Constant';
-import { Download } from '../../../lib/donwload/Download';
 import { h } from '../../../lib/Element';
 import { File } from './option/File';
 import { Format } from './option/Format';
@@ -11,12 +10,6 @@ import { XEvent } from '../../../lib/XEvent';
 import { ElPopUp } from '../../../module/elpopup/ElPopUp';
 import { Alert } from '../../../module/alert/Alert';
 import { SelectFile } from '../../../lib/SelectFile';
-import { XlsxImportTask } from '../../../worker/XlsxImportTask';
-import { XlsxExportTask } from '../../../worker/XlsxExportTask';
-import { XDraw } from '../../../draw/XDraw';
-import { Confirm } from '../../../module/confirm/Confirm';
-import { XWorkTab } from '../body/tab/XWorkTab';
-import { XWorkSheet } from '../body/sheet/XWorkSheet';
 
 class XWorkHeadOption extends Widget {
 
@@ -31,8 +24,6 @@ class XWorkHeadOption extends Widget {
     this.rightEle = h('div', `${cssPrefix}-option-right`);
     this.leftEle.childrenNodes(this.logoEle);
     this.rightEle.childrenNodes(this.titleEle, this.optionsEle);
-    this.xlsxImportTask = new XlsxImportTask();
-    this.xlsxExportTask = new XlsxExportTask();
     this.childrenNodes(this.leftEle);
     this.childrenNodes(this.rightEle);
     this.setTitle(this.title);
@@ -49,71 +40,22 @@ class XWorkHeadOption extends Widget {
         autoClose: false,
         onUpdate: async (item, menu) => {
           const { type } = item;
-          const { work } = workTop;
-          const { body } = work;
-          const { sheetView } = body;
-          const sheet = sheetView.getActiveSheet();
-          const { table } = sheet;
-          const style = table.getXTableStyle();
-          const { wideUnit, heightUnit } = style;
+          const root = this.getRootWidget();
           switch (type) {
             case 1: {
               const file = await this.xlsxSelect.choose();
               menu.close();
               if (file) {
-                const dpr = XDraw.dpr();
-                const unit = wideUnit.getUnit();
-                const dpi = heightUnit.getDpi();
-                const result = await this.xlsxImportTask.execute(file, dpr, unit, dpi);
-                new Confirm({
-                  message: '文件解析完成是否导入?',
-                  ok: () => {
-                    const config = result.data;
-                    const { sheets } = config.body;
-                    sheets.forEach((item) => {
-                      const tab = new XWorkTab(item.name);
-                      const sheet = new XWorkSheet(tab, item);
-                      body.addTabSheet(tab, sheet);
-                    });
-                  },
-                }).parentWidget(this).open();
+                await root.importXlsx(file, true);
               }
               break;
             }
             case 2: {
               menu.close();
-              const { sheetList } = sheetView;
-              const sheetItems = [];
-              sheetList.forEach((sheet) => {
-                const { table, tab } = sheet;
-                const { rows, cols, settings } = table;
-                const merges = table.getTableMerges();
-                const cells = table.getTableCells();
-                const item = {
-                  name: tab.name,
-                  tableConfig: {
-                    table: {
-                      showGrid: settings.table.showGrid,
-                      background: settings.table.background,
-                    },
-                    merge: merges.getData(),
-                    rows: rows.getData(),
-                    cols: cols.getData(),
-                    data: cells.getData(),
-                  },
-                };
-                sheetItems.push(item);
-              });
-              const options = work.options;
-              const dpr = XDraw.dpr();
-              const unit = wideUnit.getUnit();
-              const dpi = heightUnit.getDpi();
-              const result = await this.xlsxExportTask.execute(options, sheetItems, dpr, unit, dpi);
-              const file = result.data;
-              Download(file, `${options.name}.xlsx`);
+              await root.exportXlsx();
               break;
             }
-            case 3: {
+            default: {
               menu.close();
               new Alert({
                 message: '开发人员正在努力施工中....',
@@ -124,10 +66,46 @@ class XWorkHeadOption extends Widget {
         },
       },
     }).parentWidget(this);
-    this.format = new Format().parentWidget(this);
-    this.insert = new Insert().parentWidget(this);
-    this.look = new Look().parentWidget(this);
-    this.update = new Update().parentWidget(this);
+    this.format = new Format({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Format', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
+    this.insert = new Insert({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Insert', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
+    this.look = new Look({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Look', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
+    this.update = new Update({
+      contextMenu: {
+        onUpdate: (code) => {
+          console.log('Update', code);
+          new Alert({
+            message: '开发人员正在努力施工中....',
+          }).parentWidget(this).open();
+        },
+      },
+    }).parentWidget(this);
     this.optionsEle.childrenNodes(this.file);
     this.optionsEle.childrenNodes(this.update);
     this.optionsEle.childrenNodes(this.insert);
@@ -207,11 +185,22 @@ class XWorkHeadOption extends Widget {
     });
   }
 
-  unbind() {}
+  unbind() {
+    XEvent.unbind(this.file);
+    XEvent.unbind(this.format);
+    XEvent.unbind(this.insert);
+    XEvent.unbind(this.look);
+    XEvent.unbind(this.update);
+  }
 
   setTitle(title) {
     this.title = title;
     this.titleEle.text(title);
+  }
+
+  destroy() {
+    super.destroy();
+    this.unbind();
   }
 
 }

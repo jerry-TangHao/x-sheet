@@ -175,7 +175,7 @@ class SheetUtils {
         } else if (typeof v !== 'function' && !Array.isArray(v) && SheetUtils.isPlainObject(v)) {
           object[key] = object[key] || {};
           SheetUtils.copy(object[key], v);
-        } else {
+        } else if (v) {
           object[key] = v;
         }
       });
@@ -438,6 +438,13 @@ class SheetUtils {
       return value.replace(/\s*/g, SheetUtils.EMPTY);
     }
     return value;
+  }
+
+  static newArray(array) {
+    if (array) {
+      return [].concat(array);
+    }
+    return [];
   }
 
   static safeValue(value, defaultValue = '') {

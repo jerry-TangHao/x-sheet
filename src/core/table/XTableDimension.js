@@ -468,47 +468,6 @@ class XTableTopIndex extends Dimensions {
 // ================================= XTable ================================
 
 const settings = {
-  index: {
-    height: 30,
-    width: 50,
-    gridColor: 'rgb(193,193,193)',
-    size: 12,
-    color: 'rgb(0,0,0)',
-  },
-  table: {
-    showGrid: true,
-    background: 'rgb(255,255,255)',
-    borderColor: 'rgb(0,0,0)',
-    gridColor: 'rgb(225,225,225)',
-  },
-  rows: {
-    len: 1000,
-    height: 30,
-    data: [],
-  },
-  cols: {
-    len: 36,
-    width: 110,
-    data: [],
-  },
-  xFixedView: {
-    fixedView: new RectRange(0, 0, -1, -1),
-    fxLeft: -1,
-    fxTop: -1,
-  },
-  xFixedBar: {
-    height: RowFixed.HEIGHT,
-    width: ColFixed.WIDTH,
-    background: 'rgb(234,234,234)',
-    buttonColor: 'rgb(193,193,193)',
-  },
-  data: [],
-  protection: {
-    protections: [],
-  },
-  merge: {
-    merges: [],
-  },
   sheetProtection: false,
 };
 
@@ -523,7 +482,51 @@ class XTableDimension extends Widget {
    */
   constructor(options) {
     super(`${cssPrefix}-table`);
-    this.settings = SheetUtils.copy({}, settings, options);
+    this.settings = SheetUtils.copy({}, settings, {
+      index: {
+        gridColor: 'rgb(193,193,193)',
+        height: 30,
+        width: 50,
+        size: 12,
+        color: 'rgb(0,0,0)',
+        displayTopIndex: true,
+        displayLeftIndex: true,
+      },
+      table: {
+        showGrid: true,
+        background: 'rgb(255,255,255)',
+        borderColor: 'rgb(0,0,0)',
+        gridColor: 'rgb(225,225,225)',
+      },
+      rows: {
+        len: 1000,
+        height: 30,
+        data: [],
+      },
+      cols: {
+        len: 36,
+        width: 110,
+        data: [],
+      },
+      xFixedView: {
+        fixedView: new RectRange(0, 0, -1, -1),
+        fxLeft: -1,
+        fxTop: -1,
+      },
+      xFixedBar: {
+        height: RowFixed.HEIGHT,
+        width: ColFixed.WIDTH,
+        background: 'rgb(234,234,234)',
+        buttonColor: 'rgb(193,193,193)',
+      },
+      data: [],
+      protection: {
+        protections: [],
+      },
+      merge: {
+        merges: [],
+      },
+    }, options);
   }
 
   /**
@@ -566,7 +569,7 @@ class XTableDimension extends Widget {
     // 保护区域
     this.protection = new Protection({
       snapshot: this.snapshot,
-      ...settings.protection,
+      ...this.settings.protection,
     });
     // 冻结视图坐标
     this.xFixedView = new XFixedView(this.settings.xFixedView);
@@ -631,8 +634,42 @@ class XTableDimension extends Widget {
     this.dropRowFixed = new DropRowFixed(this);
     // 粘贴板
     this.clipboard = new Clipboard({
-      filter: () => {},
-      paste: () => {},
+      filter: () => true,
+      paste: (e) => {
+        const data = e.clipboardData.getData('text/plain');
+
+        // 解析数据为二维数组
+        const dataArray = data.split(/[\r\n]+/).map((row) => row.split('\t'));
+
+        const operateCellsHelper = this.getOperateCellsHelper();
+        const xSelect = this.xScreen.findType(XSelectItem);
+        const { selectRange } = xSelect;
+        const cells = this.dataCellsHelper.getCells();
+
+        // 扩大选区
+        selectRange.eri = selectRange.sri + dataArray.length - 1;
+        selectRange.eci = selectRange.sci + dataArray[0].length - 1;
+
+        this.snapshot.open();
+
+        // 将粘贴过来的数据更新到单元格中
+        operateCellsHelper.getCellOrNewCellByViewRange({
+          rectRange: selectRange,
+          callback: (ri, ci, cell) => {
+            const newCell = cell.clone();
+            newCell.setText(dataArray[ri - selectRange.sri][ci - selectRange.sci]);
+            cells.setCell(ri, ci, newCell);
+          },
+        });
+        // 设定新的选区
+        xSelect.setRange(selectRange);
+
+        this.snapshot.close({
+          type: Constant.TABLE_EVENT_TYPE.DATA_CHANGE,
+        });
+        // 刷新表格
+        this.xContent.table.render();
+      },
     });
     // 单元格辅助类
     this.cellMergeCopyHelper = new CellMergeCopyHelper(this);
@@ -650,33 +687,57 @@ class XTableDimension extends Widget {
         const { type } = event;
         switch (type) {
           case Constant.TABLE_EVENT_TYPE.REMOVE_ROW:
-            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
-            this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_ROW);
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE, {
+              table: this,
+            });
+            this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_ROW, {
+              table: this,
+            });
             break;
           case Constant.TABLE_EVENT_TYPE.REMOVE_COL:
-            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
-            this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_COL);
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE, {
+              table: this,
+            });
+            this.trigger(Constant.TABLE_EVENT_TYPE.REMOVE_COL, {
+              table: this,
+            });
             break;
           case Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW:
-            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
-            this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW);
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE, {
+              table: this,
+            });
+            this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_ROW, {
+              table: this,
+            });
             break;
           case Constant.TABLE_EVENT_TYPE.ADD_NEW_COL:
-            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
-            this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_COL);
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE, {
+              table: this,
+            });
+            this.trigger(Constant.TABLE_EVENT_TYPE.ADD_NEW_COL, {
+              table: this,
+            });
             break;
           case Constant.TABLE_EVENT_TYPE.DATA_CHANGE:
-            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE);
+            this.trigger(Constant.TABLE_EVENT_TYPE.DATA_CHANGE, {
+              table: this,
+            });
             break;
           case Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH:
-            this.trigger(Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH);
+            this.trigger(Constant.TABLE_EVENT_TYPE.CHANGE_COL_WIDTH, {
+              table: this,
+            });
             break;
           case Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT:
-            this.trigger(Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT);
+            this.trigger(Constant.TABLE_EVENT_TYPE.CHANGE_ROW_HEIGHT, {
+              table: this,
+            });
             break;
         }
       }
-      this.trigger(Constant.TABLE_EVENT_TYPE.SNAPSHOT_CHANGE);
+      this.trigger(Constant.TABLE_EVENT_TYPE.SNAPSHOT_CHANGE, {
+        table: this,
+      });
     });
     // 表格事件绑定
     this.bindTableEvent();
@@ -1342,8 +1403,12 @@ class XTableDimension extends Widget {
     rowFixed.fxSri = fixedView.sri;
     rowFixed.fxEri = fixedView.eri;
     // 发送更新通知
-    this.trigger(Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE);
-    this.trigger(Constant.TABLE_EVENT_TYPE.FIXED_CHANGE);
+    this.trigger(Constant.TABLE_EVENT_TYPE.FIXED_ROW_CHANGE, {
+      table: this,
+    });
+    this.trigger(Constant.TABLE_EVENT_TYPE.FIXED_CHANGE, {
+      table: this,
+    });
   }
 
   /**
@@ -1429,7 +1494,9 @@ class XTableDimension extends Widget {
   render() {
     const { xTableStyle } = this;
     xTableStyle.render();
-    this.trigger(Constant.TABLE_EVENT_TYPE.RENDER);
+    this.trigger(Constant.TABLE_EVENT_TYPE.RENDER, {
+      table: this,
+    });
   }
 
   /**
@@ -1465,7 +1532,9 @@ class XTableDimension extends Widget {
     colFixed.setSize();
     xHeightLight.offsetHandle();
     yHeightLight.offsetHandle();
-    this.trigger(Constant.TABLE_EVENT_TYPE.SCALE_CHANGE);
+    this.trigger(Constant.TABLE_EVENT_TYPE.SCALE_CHANGE, {
+      table: this,
+    });
   }
 
   /**
@@ -1625,6 +1694,7 @@ class XTableDimension extends Widget {
     this.xScreen.destroy();
     this.xReSizer.destroy();
     this.yReSizer.destroy();
+    this.keyboard.destroy();
     this.xHeightLight.destroy();
     this.yHeightLight.destroy();
     this.edit.destroy();

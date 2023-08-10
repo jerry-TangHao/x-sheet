@@ -7,13 +7,17 @@ class XWorkFoot extends Widget {
   constructor(work) {
     super(`${cssPrefix}-work-bottom`);
     this.work = work;
+    this.bottomMenu = new XWorkFootMenu(this);
   }
 
   onAttach() {
-    this.bottomMenu = new XWorkFootMenu(this);
     this.attach(this.bottomMenu);
   }
 
+  destroy() {
+    super.destroy();
+    this.bottomMenu.destroy();
+  }
 }
 
 export { XWorkFoot };

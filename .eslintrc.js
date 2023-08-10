@@ -10,6 +10,7 @@ module.exports = {
   rules: {
     'no-empty': 'off',
     'no-unused-vars': 'off',
+    'linebreak-style': 'off',
     'no-mixed-operators': 'off',
     'max-classes-per-file': 'off',
     'no-async-promise-executor': 'off',
@@ -24,6 +25,7 @@ module.exports = {
     'default-case': 'off',
     'no-empty-pattern': 'off',
     'no-shadow': 'off',
+    'no-return-assign': 'off',
     'no-continue': 'off',
     camelcase: 'off',
     'no-cond-assign': 'off',

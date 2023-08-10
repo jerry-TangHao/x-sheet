@@ -1,123 +1,94 @@
-// eslint-disable-next-line max-len
-/* global requestAnimationFrame webkitRequestAnimationFrame cancelAnimationFrame webkitCancelAnimationFrame */
-
-import { SheetUtils } from '../../utils/SheetUtils';
-
-const REQUEST = requestAnimationFrame || webkitRequestAnimationFrame;
-const CANCEL = cancelAnimationFrame || webkitCancelAnimationFrame;
-const TWEEN = {
+let tween = {
   easeOutStrong(t, b, c, d) {
-    // eslint-disable-next-line no-return-assign,no-param-reassign
     return -c * ((t = t / d - 1) * t * t * t - 1) + b;
   },
   backOut(t, b, c, d, s) {
     if (typeof s === 'undefined') {
-      // eslint-disable-next-line no-param-reassign
       s = 0.7;
     }
-    // eslint-disable-next-line no-param-reassign,no-return-assign
     return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
   },
 };
 
-class Animate {
-  constructor(option) {
-    this.option = SheetUtils.copy({
-      loop: false,
+export class Animate {
+  _fakeHandle() {
+    let times = Date.now() - this._start;
+    times = times >= this._opt.duration
+      ? this._opt.duration : times;
+
+    let val = tween[this._opt.type](times, this._opt.begin, this._opt.end - this._opt.begin, this._opt.duration, 0.7);
+    let fix = val.toFixed(2);
+
+    this._opt.receive(fix);
+
+    if (this._status === 'cancel') {
+      this._opt.cancel(fix);
+      this._opt.complete(fix);
+      return;
+    }
+
+    if (times === this._opt.duration) {
+      this._opt.success(fix);
+      this._opt.complete(fix);
+      return;
+    }
+
+    this._handle = requestAnimationFrame(this._fakeHandle.bind(this));
+  }
+
+  constructor(opt) {
+    this._opt = { loop: false,
       begin: 0,
       end: 0,
       duration: 300,
       delay: 0,
       type: 'easeOutStrong',
-      receive: () => {},
-      success: () => {},
-      cancel: () => {},
-      complete: () => {},
-    }, option);
-    this.option.begin = parseFloat(this.option.begin);
-    this.option.end = parseFloat(this.option.end);
-    this.option.duration = parseFloat(this.option.duration);
-    this.option.delay = parseFloat(this.option.delay);
-    this.delayHandle = null;
-    if (this.option.loop) {
-      this.option.complete = () => {};
-      this.option.success = () => {
+      receive(v) { /* noop */ },
+      success(v) { /* noop */ },
+      cancel(v) { /* noop */ },
+      complete(v) { /* noop */ },
+      ...opt,
+    };
+
+    this._opt.begin = parseFloat(this._opt.begin);
+    this._opt.end = parseFloat(this._opt.end);
+    this._opt.duration = parseFloat(this._opt.duration);
+    this._opt.delay = parseFloat(this._opt.delay);
+
+    this._delayHandle = null;
+
+    if (this._opt.loop) {
+      this._opt.complete = () => {
+        /* noop */
+      };
+      this._opt.success = () => {
         this.request();
       };
     }
   }
 
-  request() {
-    if (this.option.delay === 0) {
-      this.status = 'request';
-      this.start = Date.now();
-      this.fakeHandle();
-    } else {
-      // eslint-disable-next-line no-unused-expressions
-      this.delayHandle && clearTimeout(this.delayHandle);
-      this.delayHandle = setTimeout(() => {
-        this.status = 'request';
-        this.start = Date.now();
-        this.fakeHandle();
-      }, this.option.delay);
-    }
-  }
-
   cancel() {
-    this.status = 'cancel';
-    // eslint-disable-next-line no-unused-expressions
-    this.delayHandle && clearTimeout(this.delayHandle);
-    CANCEL(this.handle);
+    this._status = 'cancel';
+    if (this._delayHandle) {
+      clearTimeout(this._delayHandle);
+    }
+    cancelAnimationFrame(this._handle);
   }
 
-  fakeHandle() {
-    let times = Date.now() - this.start;
-    times = times >= this.option.duration ? this.option.duration : times;
-    const val = TWEEN[this.option.type](
-      times,
-      this.option.begin,
-      this.option.end - this.option.begin,
-      this.option.duration,
-      0.7,
-    );
-    this.option.receive(val.toFixed(2));
-    if (this.status === 'cancel') {
-      this.option.cancel();
-      this.option.complete();
-      return;
-    }
-    if (times === this.option.duration) {
-      this.option.success();
-      this.option.complete();
-      return;
-    }
-    this.handle = REQUEST(() => {
-      this.fakeHandle();
-    });
-  }
-
-  static success() {
-    // eslint-disable-next-line prefer-rest-params
-    const animates = arguments;
-    let successNumber = 0;
-    return new Promise(((resolve) => {
-      for (let i = 0; i < animates.length; i += 1) {
-        const animate = animates[i];
-        if (animate.option.loop) continue;
-        // eslint-disable-next-line no-loop-func,func-names
-        (function (animate) {
-          const { success } = animate.option;
-          animate.option.success = () => {
-            successNumber += 1;
-            success.apply(animate);
-            if (successNumber === animates.length) {
-              resolve();
-            }
-          };
-        }(animate));
+  request() {
+    if (this._opt.delay === 0) {
+      this._status = 'request';
+      this._start = Date.now();
+      this._fakeHandle();
+    } else {
+      if (this._delayHandle) {
+        clearTimeout(this._delayHandle);
       }
-    }));
+      this._delayHandle = setTimeout(() => {
+        this._status = 'request';
+        this._start = Date.now();
+        this._fakeHandle();
+      }, this._opt.delay);
+    }
   }
 }
-
-export { Animate };

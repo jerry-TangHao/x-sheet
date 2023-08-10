@@ -1,0 +1,71 @@
+class XSheet {
+
+    constructor(el, options)
+
+    getWork(): XWork
+
+    importXlsx(xlsx, confirm)
+
+    xlsxToXSheet(xlsx, callback)
+
+    exportXlsx()
+
+    xSheetToXlsx(callback)
+
+    destroy()
+
+}
+
+class XWork {
+    getBody(): XWorkBody
+
+    destroy()
+}
+
+class XWorkBody {
+    setActiveByIndex()
+
+    getActiveSheet()
+
+    getSheetByIndex()
+
+    getActiveTab()
+
+    getActiveTable(): XTableDimension
+
+    removeByIndex()
+
+    refreshActiveTable()
+
+    getSheets()
+
+    destroy()
+}
+
+class XTableDimension {
+    showEditor()
+
+    scrollX(x)
+
+    scrollY(y)
+
+    scrollRi(ri)
+
+    scrollCi(ci)
+
+    removeRow()
+
+    removeCol()
+
+    insertRowAfter()
+
+    insertRowBefore()
+
+    insertColAfter()
+
+    insertColBefore()
+
+    getTableCells(): cells[][]
+
+    destroy()
+}

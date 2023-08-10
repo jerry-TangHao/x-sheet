@@ -278,6 +278,13 @@ class Cell {
   }
 
   /**
+   * 清空边框样式
+   */
+  clearBorderStyle() {
+    this.borderAttr = CellBorder.getInstance();
+  }
+
+  /**
    * 字体属性
    * @param attr
    */
@@ -619,7 +626,6 @@ class Cell {
     this.setContentHeight(0);
     return this;
   }
-
 }
 
 /**

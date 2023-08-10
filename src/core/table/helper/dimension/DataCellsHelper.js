@@ -939,7 +939,7 @@ class DataCellsHelper extends BaseCellsHelper {
           } else {
             snapshot.open();
             merges.batchDelete(intersects);
-            cells.clear(merge, {
+            cells.clearByMerge(merge, {
               ignoreCorner: true,
             });
             merges.add(merge);
@@ -950,7 +950,7 @@ class DataCellsHelper extends BaseCellsHelper {
           }
         } else {
           snapshot.open();
-          cells.clear(merge, {
+          cells.clearByMerge(merge, {
             ignoreCorner: true,
           });
           merges.add(merge);

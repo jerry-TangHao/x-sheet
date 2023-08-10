@@ -8,6 +8,9 @@ const settings = {
   option: {
     show: true,
   },
+  menu: {
+    shrinkMode: 'scroll',
+  },
 };
 
 class XWorkHead extends Widget {
@@ -29,6 +32,11 @@ class XWorkHead extends Widget {
     }
   }
 
+  destroy() {
+    super.destroy();
+    this.option.destroy();
+    this.toolsMenu.destroy();
+  }
 }
 
 export { XWorkHead };

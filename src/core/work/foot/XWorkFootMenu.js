@@ -46,9 +46,7 @@ class XWorkFootMenu extends Widget {
     const xSelect = xScreen.findType(XSelectItem);
     const { selectRange } = xSelect;
     if (selectRange) {
-      const { sri, sci, eri, eci } = selectRange;
-      const items = cells.slice(sri, sci, eri, eci);
-      const { total, avg, number } = await totalTask.execute(selectRange, items);
+      const { total, avg, number } = await totalTask.execute(selectRange, cells.getData());
       this.setSum(SheetUtils.toFixed(total, 2));
       this.setAvg(SheetUtils.toFixed(avg, 2));
       this.setNumber(SheetUtils.toFixed(number, 2));

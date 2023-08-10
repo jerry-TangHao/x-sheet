@@ -7,6 +7,7 @@ import { LINE_TYPE } from '../../draw/Line';
 import { SheetUtils } from '../../utils/SheetUtils';
 import { ColorArray } from '../../module/colorpicker/colorarray/ColorArray';
 import { HexRgb, Theme, ThemeXml } from './XlsxTheme';
+import { XlsxIndexedColor } from './XlsxIndexedColor';
 import { WideUnit } from '../../core/table/tableunit/WideUnit';
 import { Cell } from '../../core/table/tablecell/Cell';
 import { HeightUnit } from '../../core/table/tableunit/HeightUnit';
@@ -64,7 +65,11 @@ class XlsxImport {
       const xRows = { data: [], len: 100 };
       const xMerge = { merges };
       const xCols = { data: [], len: 25 };
-      const xTable = { showGrid: views[0].showGridLines, background: '#ffffff' };
+      const xTable = { showGrid: views && views.length && views[0].showGridLines, background: '#ffffff' };
+      const xFixedView = {
+        fxTop: -1,
+        fxLeft: -1,
+      };
       // 主题颜色
       const themeXlsx = new Theme();
       const themeXml = themes[`theme${idx + 1}`];
@@ -92,6 +97,7 @@ class XlsxImport {
           }
         }
       });
+      let maxCol = 0;
       // 读取行高
       rows.forEach((row) => {
         const { cells, height, number } = row;
@@ -103,7 +109,7 @@ class XlsxImport {
         }
         // 读取数据
         const item = [];
-        cells.forEach((cell) => {
+        cells.forEach((cell, col) => {
           // 单元格基本属性
           const { value = '', address = '', style = {} } = cell;
           const { richText } = value;
@@ -124,47 +130,56 @@ class XlsxImport {
             },
           };
           // 字体属性
-          if (font) {
-            const { name, bold, size, italic, underline, strike, color } = font;
+          if (SheetUtils.isDef(font)) {
+            const { name, bold, size, italic, strike, color } = font;
             xCell.fontAttr.italic = italic;
             xCell.fontAttr.name = name;
             xCell.fontAttr.size = this.fontSize(size || 13);
             xCell.fontAttr.bold = bold;
-            xCell.fontAttr.underline = underline;
+            xCell.fontAttr.underline = this.fontUnderline(font);
             xCell.fontAttr.strikethrough = strike;
-            if (color) {
-              const { theme, tint, argb } = color;
+            if (SheetUtils.isDef(color)) {
+              const { theme, tint, argb, indexed } = color;
               if (SheetUtils.isDef(argb)) {
                 const rgb = HexRgb(argb);
                 xCell.fontAttr.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
               } else if (SheetUtils.isDef(theme)) {
                 xCell.fontAttr.color = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
+              } else if (SheetUtils.isDef(indexed)) {
+                const color = XlsxIndexedColor[indexed];
+                if (SheetUtils.isDef(color)) {
+                  xCell.fontAttr.color = ColorPicker.parseHexToRgb(color);
+                }
               }
             }
           }
           // 富文本
-          if (richText) {
+          if (SheetUtils.isDef(richText)) {
             const rich = [];
             for (let i = 0, len = richText.length; i < len; i++) {
               const item = richText[i];
               const { font, text } = item;
               const richFont = { text };
-              if (font) {
-                const { size, name, italic, bold } = font;
-                const { underline, strike, color } = font;
+              if (SheetUtils.isDef(font)) {
+                const { size, name, italic, bold, strike, color } = font;
                 richFont.size = this.fontSize(size || 13);
                 richFont.bold = bold;
                 richFont.name = name;
                 richFont.italic = italic;
-                richFont.underline = underline;
+                richFont.underline = this.fontUnderline(font);
                 richFont.strikethrough = strike;
-                if (color) {
-                  const { theme, tint, argb } = color;
+                if (SheetUtils.isDef(color)) {
+                  const { theme, tint, argb, indexed } = color;
                   if (SheetUtils.isDef(argb)) {
                     const rgb = HexRgb(argb);
                     richFont.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
                   } else if (SheetUtils.isDef(theme)) {
                     richFont.color = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
+                  } else if (SheetUtils.isDef(indexed)) {
+                    const color = XlsxIndexedColor[indexed];
+                    if (SheetUtils.isDef(color)) {
+                      richFont.color = ColorPicker.parseHexToRgb(color);
+                    }
                   }
                 }
                 rich.push(richFont);
@@ -190,21 +205,26 @@ class XlsxImport {
             }
           }
           // 单元格边框
-          if (border) {
+          if (SheetUtils.isDef(border)) {
             if (border.right) {
               const { style, color } = border.right;
               const { widthType, type } = this.borderType(style);
               xCell.borderAttr.right.widthType = widthType;
               xCell.borderAttr.right.type = type;
               xCell.borderAttr.right.display = true;
-              if (color) {
-                const { theme, tint, argb } = color;
+              if (SheetUtils.isDef(color)) {
+                const { theme, tint, argb, indexed } = color;
                 if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.right.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
                 } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.right.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
+                } else if (SheetUtils.isDef(indexed)) {
+                  const color = XlsxIndexedColor[indexed];
+                  if (SheetUtils.isDef(color)) {
+                    xCell.borderAttr.right.color = ColorPicker.parseHexToRgb(color);
+                  }
                 }
               }
             }
@@ -214,14 +234,19 @@ class XlsxImport {
               xCell.borderAttr.top.display = true;
               xCell.borderAttr.top.type = type;
               xCell.borderAttr.top.widthType = widthType;
-              if (color) {
-                const { theme, tint, argb } = color;
+              if (SheetUtils.isDef(color)) {
+                const { theme, tint, argb, indexed } = color;
                 if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.top.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
                 } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.top.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
+                } else if (SheetUtils.isDef(indexed)) {
+                  const color = XlsxIndexedColor[indexed];
+                  if (SheetUtils.isDef(color)) {
+                    xCell.borderAttr.top.color = ColorPicker.parseHexToRgb(color);
+                  }
                 }
               }
             }
@@ -231,14 +256,19 @@ class XlsxImport {
               xCell.borderAttr.left.display = true;
               xCell.borderAttr.left.type = type;
               xCell.borderAttr.left.widthType = widthType;
-              if (color) {
-                const { theme, tint, argb } = color;
+              if (SheetUtils.isDef(color)) {
+                const { theme, tint, argb, indexed } = color;
                 if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.left.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
                 } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.left.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
+                } else if (SheetUtils.isDef(indexed)) {
+                  const color = XlsxIndexedColor[indexed];
+                  if (SheetUtils.isDef(color)) {
+                    xCell.borderAttr.left.color = ColorPicker.parseHexToRgb(color);
+                  }
                 }
               }
             }
@@ -248,36 +278,75 @@ class XlsxImport {
               xCell.borderAttr.bottom.display = true;
               xCell.borderAttr.bottom.type = type;
               xCell.borderAttr.bottom.widthType = widthType;
-              if (color) {
-                const { theme, tint, argb } = color;
+              if (SheetUtils.isDef(color)) {
+                const { theme, tint, argb, indexed } = color;
                 if (SheetUtils.isDef(argb)) {
                   const rgb = HexRgb(argb);
                   xCell.borderAttr.bottom.color = ColorPicker.parseHexToRgb(rgb, ColorArray.BLACK);
                 } else if (SheetUtils.isDef(theme)) {
                   xCell.borderAttr.bottom.color = themeXlsx.setTheme(theme).setTint(tint)
                     .getThemeRgb();
+                } else if (SheetUtils.isDef(indexed)) {
+                  const color = XlsxIndexedColor[indexed];
+                  if (SheetUtils.isDef(color)) {
+                    xCell.borderAttr.bottom.color = ColorPicker.parseHexToRgb(color);
+                  }
                 }
               }
             }
           }
           // 背景颜色
-          if (fill) {
+          if (SheetUtils.isDef(fill)) {
             const { fgColor } = fill;
             if (SheetUtils.isDef(fgColor)) {
-              const { theme, tint, argb } = fgColor;
+              const { theme, tint, argb, indexed } = fgColor;
               if (SheetUtils.isDef(argb)) {
                 const rgb = HexRgb(argb);
                 xCell.background = ColorPicker.parseHexToRgb(rgb);
               } else if (SheetUtils.isDef(theme)) {
                 xCell.background = themeXlsx.setTheme(theme).setTint(tint).getThemeRgb();
+              } else if (SheetUtils.isDef(indexed)) {
+                const color = XlsxIndexedColor[indexed];
+                if (SheetUtils.isDef(color)) {
+                  xCell.background = ColorPicker.parseHexToRgb(color);
+                }
               }
             }
           }
           // 对齐方式
-          if (alignment) {
+          if (SheetUtils.isDef(alignment)) {
             const { textRotation, wrapText } = alignment;
             const { vertical, horizontal } = alignment;
-            xCell.fontAttr.align = horizontal;
+            switch (horizontal) {
+              case 'left': {
+                xCell.fontAttr.align = 'left';
+                break;
+              }
+              case 'center': {
+                xCell.fontAttr.align = 'center';
+                break;
+              }
+              case 'right': {
+                xCell.fontAttr.align = 'right';
+                break;
+              }
+              case 'fill': {
+                xCell.fontAttr.align = 'center';
+                break;
+              }
+              case 'justify': {
+                xCell.fontAttr.align = 'left';
+                break;
+              }
+              case 'centerContinuous': {
+                xCell.fontAttr.align = 'center';
+                break;
+              }
+              case 'distributed': {
+                xCell.fontAttr.align = 'left';
+                break;
+              }
+            }
             xCell.fontAttr.verticalAlign = vertical;
             xCell.fontAttr.direction = BaseFont.TEXT_DIRECTION.HORIZONTAL;
             // 自动换行
@@ -296,6 +365,8 @@ class XlsxImport {
           }
           // 添加单元格
           item[colIndex] = xCell;
+          // 标记最大列数
+          maxCol = Math.max(col, maxCol);
         });
         // 添加新行
         xData[rowIndex] = item;
@@ -307,12 +378,24 @@ class XlsxImport {
       if (xRows.data.length > xRows.len) {
         xRows.len = xRows.data.length;
       }
+      if (maxCol > xCols.len) {
+        xCols.len = maxCol + 1;
+      }
       if (xData.length > xRows.len) {
         xRows.len = xData.length;
+      }
+      if (views.length > 0) {
+        if (views[0].ySplit) {
+          xFixedView.fxTop = views[0].ySplit - 1;
+        }
+        if (views[0].xSplit) {
+          xFixedView.fxLeft = views[0].xSplit - 1;
+        }
       }
       sheets.push({
         name,
         tableConfig: {
+          xFixedView,
           table: xTable,
           cols: xCols,
           rows: xRows,
@@ -365,6 +448,25 @@ class XlsxImport {
   rowHeight(value) {
     const pixel = this.heightUnit.getPixel(value);
     return XDraw.srcPx(pixel);
+  }
+
+  /**
+   * 字体下划线
+   * @param font
+   * @returns {boolean}
+   */
+  fontUnderline(font) {
+    // true, false, 'none', 'single', 'double', 'singleAccounting', 'doubleAccounting'
+    switch (font.underline) {
+      case true:
+      case 'single':
+      case 'double':
+      case 'singleAccounting':
+      case 'doubleAccounting': {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

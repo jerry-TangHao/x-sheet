@@ -23,10 +23,46 @@ import { XWorkBodyKeyHandle } from './XWorkBodyKeyHandle';
 import { Confirm } from '../../../module/confirm/Confirm';
 
 const settings = {
-  sheets: [],
-  tabConfig: {},
-  sheetConfig: {},
+  banner: true,
+  hideTabs: false,
 };
+
+/**
+ * XScrollBarDrag
+ */
+class XScrollBarDrag extends Widget {
+  constructor(body) {
+    super(`${cssPrefix}-x-scroll-bar-drag`);
+    this.body = body;
+  }
+
+  onAttach() {
+    super.onAttach();
+    this.bind();
+  }
+
+  bind() {
+    XEvent.bind(this, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (event) => {
+      const downX = event.clientX;
+      const width = this.body.scrollBarXHorizontalLayer.box().width;
+      XEvent.mouseMoveUp(document, (event) => {
+        const moveX = event.clientX;
+        const diffX = downX - moveX;
+        this.body.scrollBarXHorizontalLayer.css('min-width', `${(Math.max(width + diffX, 200))}px`);
+        this.body.refreshScrollBar();
+      });
+    });
+  }
+
+  unbind() {
+    XEvent.unbind(this);
+  }
+
+  destroy() {
+    super.destroy();
+    this.unbind();
+  }
+}
 
 /**
  * XWorkBody
@@ -40,13 +76,21 @@ class XWorkBody extends Widget {
    */
   constructor(work, options) {
     super(`${cssPrefix}-work-body`);
-    this.options = SheetUtils.copy({}, settings, options);
+    this.options = SheetUtils.copy({}, settings, {
+      tabConfig: {
+        showAdd: true,
+      },
+      sheets: [],
+      sheetConfig: {},
+    }, options);
     this.work = work;
     this.sheets = this.options.sheets;
     // 版本标识
     this.version = h('div', `${cssPrefix}-version-tips`);
     this.version.html(`<a target="_blank" href="https://gitee.com/eigi/x-sheet">${XSheetVersion}</a>`);
-    this.childrenNodes(this.version);
+    if (this.options.banner) {
+      this.childrenNodes(this.version);
+    }
     // 组件
     this.sheetView = new XWorkSheetView({
       ...this.options.sheetConfig,
@@ -59,7 +103,11 @@ class XWorkBody extends Widget {
       },
       onAdded: () => {
         const tab = new XWorkTab();
-        const sheet = new XWorkSheet(tab);
+        const sheet = new XWorkSheet(tab, {
+          tableConfig: {
+            data: [],
+          },
+        });
         this.addTabSheet(tab, sheet);
       },
       onRemove: (tab) => {
@@ -70,6 +118,9 @@ class XWorkBody extends Widget {
             this.removeByIndex(index);
           },
         }).parentWidget(this).open();
+      },
+      onSort: () => {
+        this.sheetView.sortByTabs(this.tabView.getTabs());
       },
     });
     this.scrollBarY = new ScrollBarY({
@@ -141,13 +192,14 @@ class XWorkBody extends Widget {
       },
     });
     // 水平滚动条
-    this.scrollBarXLayer = new VerticalCenterElement();
-    this.scrollBarXVerticalCenter = new VerticalCenter();
     this.scrollBarXHorizontalLayer = new HorizontalLayerElement({
       style: {
-        flexGrow: 2,
+        flexGrow: '0',
+        minWidth: '600px',
       },
     });
+    this.scrollBarXVerticalCenter = new VerticalCenter();
+    this.scrollBarXLayer = new VerticalCenterElement();
     this.scrollBarXVerticalCenter.attach(this.scrollBarXLayer);
     this.scrollBarXHorizontalLayer.attach(this.scrollBarXVerticalCenter);
     // 选项卡
@@ -156,12 +208,16 @@ class XWorkBody extends Widget {
         flexGrow: 3,
       },
     });
-    // 水平布局
+    // 水平滚动条拖拽
+    this.xScrollBarDrag = new XScrollBarDrag(this);
+    // 水平布局(sheet视图&垂直滚动条)
     this.horizontalLayer1 = new HorizontalLayer();
-    this.horizontalLayer2 = new HorizontalLayer();
     this.horizontalLayer1.attach(this.sheetViewLayer);
     this.horizontalLayer1.attach(this.scrollBarYLayer);
+    // 水平布局(tab视图&水平滚动条)
+    this.horizontalLayer2 = new HorizontalLayer();
     this.horizontalLayer2.attach(this.sheetSwitchTabLayer);
+    this.horizontalLayer2.attach(this.xScrollBarDrag);
     this.horizontalLayer2.attach(this.scrollBarXHorizontalLayer);
     // 根布局
     this.horizontalLayer1Layer = new VerticalLayerElement({
@@ -176,6 +232,12 @@ class XWorkBody extends Widget {
     this.layerVerticalLayer.attach(this.horizontalLayer1Layer);
     this.layerVerticalLayer.attach(this.horizontalLayer2Layer);
     this.attach(this.layerVerticalLayer);
+    // 隐藏tab栏
+    if (this.options.hideTabs) {
+      this.sheetSwitchTabLayer.hide();
+      this.xScrollBarDrag.hide();
+      this.scrollBarXHorizontalLayer.css('flexGrow', '1');
+    }
   }
 
   /**
@@ -338,6 +400,14 @@ class XWorkBody extends Widget {
   }
 
   /**
+   * 获取当前激活的tab
+   * @returns {*}
+   */
+  getActiveTab() {
+    return this.tabView.getActiveTab();
+  }
+
+  /**
    * 获取当前激活的sheet
    * @returns {*}
    */
@@ -346,11 +416,21 @@ class XWorkBody extends Widget {
   }
 
   /**
-   * 获取当前激活的tab
-   * @returns {*}
+   * 获取指定索引的sheet
+   * @param index
+   * @returns {XWorkSheet}
    */
-  getActiveTab() {
-    return this.tabView.getActiveSheet();
+  getSheetByIndex(index = 0) {
+    return this.sheetView.getSheetByIndex(index);
+  }
+
+  /**
+   * 获取指定索引的tab
+   * @param index
+   * @returns {XWorkSheet}
+   */
+  getTabByIndex(index) {
+    return this.sheetView.getSheetByIndex(index);
   }
 
   /**
@@ -379,6 +459,16 @@ class XWorkBody extends Widget {
     XWorkBodyKeyHandle.register({
       table, body: this,
     });
+  }
+
+  /**
+   * 从数据添加一个新的 tab sheet
+   * @param sheetConfig
+   */
+  addTabSheetByConfig(sheetConfig) {
+    const tab = new XWorkTab(sheetConfig.name);
+    const sheet = new XWorkSheet(tab, sheetConfig);
+    this.addTabSheet(tab, sheet);
   }
 
   /**
@@ -459,9 +549,20 @@ class XWorkBody extends Widget {
     const table = this.getActiveTable();
     if (table) {
       table.reset();
-      this.refreshScrollBarLocal();
       this.refreshScrollBarSize();
+      this.refreshScrollBarLocal();
       table.resize();
+    }
+  }
+
+  /**
+   * 刷新滚动条位置和大小
+   */
+  refreshScrollBar() {
+    const table = this.getActiveTable();
+    if (table) {
+      this.refreshScrollBarSize();
+      this.refreshScrollBarLocal();
     }
   }
 
@@ -484,6 +585,14 @@ class XWorkBody extends Widget {
     // 调整滚动条尺寸
     scrollBarY.setSize(table.getContentHeight(), totalHeight);
     scrollBarX.setSize(table.getContentWidth(), totalWidth);
+    // 显示/隐藏水平滚动条拖拽按钮
+    if (scrollBarX.isHide) {
+      this.xScrollBarDrag.hide();
+    } else {
+      if (!this.options.hideTabs) {
+        this.xScrollBarDrag.show();
+      }
+    }
   }
 
   /**
@@ -496,11 +605,22 @@ class XWorkBody extends Widget {
   }
 
   /**
+   * 获取所有的sheet
+   * @returns {XWorkSheet[]|[]}
+   */
+  getSheets() {
+    return this.sheetView.getSheets();
+  }
+
+  /**
    * 组件销毁
    */
   destroy() {
     super.destroy();
-    this.unbind();
+    this.sheetView.destroy();
+    this.tabView.destroy();
+    this.scrollBarY.destroy();
+    this.scrollBarX.destroy();
   }
 
 }

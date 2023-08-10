@@ -47,8 +47,8 @@ class TabContextMenu extends ELContextMenu {
 
   update(name, type) {
     const { options } = this;
-    options.onUpdate(name, type);
     this.close();
+    options.onUpdate(name, type);
   }
 
   destroy() {

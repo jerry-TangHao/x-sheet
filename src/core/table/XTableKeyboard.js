@@ -19,37 +19,46 @@ class XTableKeyboard {
     this.items = [];
     this.keyCodes = [];
     this.doHandle = (event) => {
-      const { keyCode } = event;
-      const { activate } = focusManage;
-      // 修复输入中文时产生的bug
-      if (keyCode === 229) {
-        return;
-      }
-      if (!this.keyCodes.includes(keyCode)) {
-        this.keyCodes.push(keyCode);
-      }
-      if (activate) {
-        const { target } = activate;
-        const find = this.find(target);
-        if (find) {
-          const { response } = find;
-          const flagCode = this.getKeyCode();
-          response.forEach((item) => {
-            if (item.keyCode(flagCode, event)) {
-              item.handle(event);
-            }
-          });
+      const root = table.getRootWidget();
+      if (root.contains(table.focusManage.element)) {
+        const { keyCode } = event;
+        const { activate } = focusManage;
+        // 修复输入中文时产生的bug
+        if (keyCode === 229) {
+          return;
         }
+        if (!this.keyCodes.includes(keyCode)) {
+          this.keyCodes.push(keyCode);
+        }
+        if (activate) {
+          const { target } = activate;
+          const find = this.find(target);
+          if (find) {
+            const { response } = find;
+            const flagCode = this.getKeyCode();
+            response.forEach((item) => {
+              if (item.keyCode(flagCode, event)) {
+                item.handle(event);
+              }
+            });
+          }
+        }
+        this.count += 1;
       }
-      this.count += 1;
     };
     this.upHandle = (event) => {
-      const { keyCode } = event;
-      const index = this.keyCodes.indexOf(keyCode);
-      if (index > -1) {
-        this.keyCodes.splice(index, 1);
+      const root = table.getRootWidget();
+      if (root.contains(table.focusManage.element)) {
+        const { keyCode } = event;
+        const index = this.keyCodes.indexOf(keyCode);
+        if (index > -1) {
+          this.keyCodes.splice(index, 1);
+        }
+        this.count = Math.max(0, this.count - 1);
       }
-      this.count = Math.max(0, this.count - 1);
+    };
+    this.blurHandle = () => {
+      this.keyCodes = [];
     };
     this.bind();
   }
@@ -58,26 +67,18 @@ class XTableKeyboard {
    * 解绑事件
    */
   unbind() {
-    XEvent.unbind(document, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, this.doHandle);
-    XEvent.unbind(document, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, this.upHandle);
+    XEvent.unbind(window, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, this.doHandle);
+    XEvent.unbind(window, Constant.SYSTEM_EVENT_TYPE.BLUR, this.blurHandle);
+    XEvent.unbind(window, Constant.SYSTEM_EVENT_TYPE.KEY_UP, this.upHandle);
   }
 
   /**
    * 绑定事件
    */
   bind() {
-    const table = this.table;
-    const root = table.getRootWidget();
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, (e) => {
-      if (root.contains(table.focusManage.element)) {
-        this.doHandle(e);
-      }
-    });
-    XEvent.bind(document, Constant.SYSTEM_EVENT_TYPE.KEY_UP, (e) => {
-      if (root.contains(table.focusManage.element)) {
-        this.upHandle(e);
-      }
-    });
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.KEY_DOWN, this.doHandle);
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.BLUR, this.blurHandle);
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.KEY_UP, this.upHandle);
   }
 
   /**
@@ -119,7 +120,10 @@ class XTableKeyboard {
    * @param el
    * @param event
    */
-  forward({ target, event }) {
+  forward({
+    target,
+    event,
+  }) {
     const find = this.find(target);
     if (find) {
       const { response } = find;

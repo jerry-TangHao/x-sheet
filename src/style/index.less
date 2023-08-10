@@ -332,12 +332,19 @@
 
 
 // sheet 选项卡
-.@{css-prefix}-sheet-switch-tab {
+.@{css-prefix}-slide-tab-container {
   height: 25px;
   width: 100%;
   background: #e8e8e8;
 }
-.@{css-prefix}-switch-tab-last-btn {
+.@{css-prefix}-slide-tab-content {
+  height: 100%;
+  width: auto;
+  max-width: calc(100% - 85px);
+  float: left;
+  overflow: hidden;
+}
+.@{css-prefix}-slide-tab-last-btn {
   height: 100%;
   width: 30px;
   float: left;
@@ -345,7 +352,7 @@
   background-size: 50% 50%;
   cursor: pointer;
 }
-.@{css-prefix}-switch-tab-next-btn {
+.@{css-prefix}-slide-tab-next-btn {
   height: 100%;
   width: 30px;
   float: left;
@@ -353,18 +360,7 @@
   background-size: 50% 50%;
   cursor: pointer;
 }
-.@{css-prefix}-sheet-tab-content {
-  height: 100%;
-  width: auto;
-  max-width: calc(100% - 85px);
-  float: left;
-  overflow: hidden;
-}
-.@{css-prefix}-sheet-tab-tabs {
-  width: max-content;
-  height: 100%;
-}
-.@{css-prefix}-sheet-tab-plus{
+.@{css-prefix}-slide-tab-add-btn {
   height: 100%;
   width: 25px;
   background: url("../../assets/svg/plus.svg") center center no-repeat;
@@ -372,27 +368,42 @@
   float: left;
   cursor: pointer;
 }
-.@{css-prefix}-sheet-tab {
+.@{css-prefix}-sheet-tab-tabs {
+  max-width: 100%;
+  width: 100%;
   height: 100%;
-  padding: 0 20px 0 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.@{css-prefix}-sheet-tab-tabs::-webkit-scrollbar {
+  display: none;
+}
+.@{css-prefix}-sheet-tab {
+  user-select: none;
+  height: 100%;
   box-sizing: border-box;
-  background: #d0d0d0;
-  float: left;
-  text-align: center;
-  line-height: 25px;
-  font-size: 12px;
-  font-weight: bold;
-  border-left: 1px solid #ccc;
   color: #787878;
   cursor: pointer;
-}
-.@{css-prefix}-sheet-tab:first-child {
-  border-left: none;
+  padding: 0 10px 0 10px;
+  flex-shrink:0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 25px;
+  font-weight: bold;
+  background: #d0d0d0;
+  font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 }
 .@{css-prefix}-sheet-tab.active {
   background: #ffffff;
   color: #42a642;
   border-bottom: 2px solid #42a642;
+}
+.@{css-prefix}-sheet-tab-editor {
+  padding: 2px 10px 2px 10px;
 }
 
 
@@ -662,6 +673,9 @@
 .@{css-prefix}-icon-img.font-angle6 {
   background-position: -0 * @icon-size -4 * @icon-size;
 }
+.@{css-prefix}-icon-img.recycle-menu {
+  background-position: -12 * @icon-size -1 * @icon-size;
+}
 
 
 // 工具菜单激活 状态/关闭状态
@@ -709,8 +723,12 @@
 .@{css-prefix}-tools-menu {
   height: 45px;
   background: #f6f7fa;
+}
+.@{css-prefix}-tools-menu-content {
+  width: max-content;
   display: flex;
   align-items: center;
+  height: 100%;
 }
 .@{css-prefix}-tools-divider {
   display: inline-block;
@@ -1646,4 +1664,13 @@
   margin-right: 20px;
   font-size: 15px;
   width: 100%;
+}
+
+// 拖动水平滚动条的长度
+.@{css-prefix}-x-scroll-bar-drag {
+  background: #b7b7b7;
+  width: 10px;
+  height: 17px;
+  cursor: col-resize;
+  align-self: center;
 }

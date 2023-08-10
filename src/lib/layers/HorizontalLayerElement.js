@@ -1,6 +1,6 @@
 import { cssPrefix } from '../../const/Constant';
-import { SheetUtils } from '../../utils/SheetUtils';
 import { Layer } from '../Layer';
+import { SheetUtils } from '../../utils/SheetUtils';
 
 class HorizontalLayerElement extends Layer {
 

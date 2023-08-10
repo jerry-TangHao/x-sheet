@@ -555,9 +555,9 @@ class Element {
    * 设置元素属性
    * @param name
    * @param value
-   * @returns {Element|*}
+   * @returns {string|null|Element}
    */
-  css(name, value) {
+  css(name, value = undefined) {
     if (!this.isTextNode()) {
       if (this.el.style) {
         if (value === undefined && typeof name !== 'string') {

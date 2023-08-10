@@ -69,9 +69,11 @@ class XlsxExport {
     workbook.lastModifiedBy = workOptions.lastModifiedBy;
     // 添加工作表
     sheetList.forEach((sheet) => {
+      console.log(sheet);
       const { name, tableConfig } = sheet;
       const { table, merge } = tableConfig;
       const { rows, cols, data } = tableConfig;
+      const { fxLeft, fxTop } = tableConfig;
       // 初始化配置数据
       const xMerges = new Merges({
         ...merge,
@@ -87,9 +89,19 @@ class XlsxExport {
       worksheet.defaultRowHeight = this.rowHeight(xRows.getOriginDefaultHeight());
       worksheet.defaultColWidth = this.colWidth(xCols.getOriginDefaultWidth());
       // 是否显示网格
-      worksheet.views = [{
+      const view = {
         showGridLines: table.showGrid,
-      }];
+      };
+      if (fxLeft > -1 || fxTop > -1) {
+        view.state = 'frozen';
+        if (fxLeft > -1) {
+          view.xSplit = fxLeft + 1;
+        }
+        if (fxTop > -1) {
+          view.ySplit = fxTop + 1;
+        }
+      }
+      worksheet.views = [view];
       // 处理列宽
       const sheetColumns = [];
       xCols.eachWidth(0, last(xCols.len), (col) => {
@@ -114,19 +126,42 @@ class XlsxExport {
             const config = items.shift();
             if (config) {
               const cell = Cells.wrapCell(config);
-              const { contentType, background } = cell;
+              const { contentType, background, richText } = cell;
               const { text, fontAttr, borderAttr } = cell;
               const { top, right, left, bottom } = borderAttr;
               const workCell = workRow.getCell(next(col));
               // 单元格文本
-              if (text) {
-                switch (contentType) {
-                  case Cell.TYPE.NUMBER:
-                    workCell.value = SheetUtils.parseFloat(text);
-                    break;
-                  case Cell.TYPE.STRING:
-                    workCell.value = text;
-                    break;
+              switch (contentType) {
+                case Cell.TYPE.NUMBER:
+                  workCell.value = SheetUtils.parseFloat(text);
+                  break;
+                case Cell.TYPE.STRING:
+                  workCell.value = text;
+                  break;
+                case Cell.TYPE.RICH_TEXT: {
+                  const { rich } = richText;
+                  const result = [];
+                  for (let i = 0, len = rich.length; i < len; i++) {
+                    const item = rich[i];
+                    result.push({
+                      text: item.text,
+                      font: {
+                        size: this.fontSize(item.size),
+                        name: item.name,
+                        italic: item.italic,
+                        bold: item.bold,
+                        underline: item.underline,
+                        strike: item.strikethrough,
+                        color: {
+                          argb: ColorPicker.parseRgbToHex(item.color),
+                        },
+                      },
+                    });
+                  }
+                  workCell.value = {
+                    richText: result,
+                  };
+                  break;
                 }
               }
               // 字体样式
@@ -138,7 +173,7 @@ class XlsxExport {
                 size: this.fontSize(fontAttr.size),
                 italic: fontAttr.italic,
                 bold: fontAttr.bold,
-                underline: fontAttr.underline,
+                underline: fontAttr.underline ? 'single' : 'none',
                 strike: fontAttr.strikethrough,
               };
               // 对齐方式
@@ -205,7 +240,7 @@ class XlsxExport {
       // 处理合并
       xMerges.getAll().forEach((xMergeRange) => {
         const { sri, sci, eri, eci } = xMergeRange;
-        worksheet.mergeCells(next(sri), next(sci), next(eri), next(eci));
+        worksheet.mergeCellsWithoutStyle(next(sri), next(sci), next(eri), next(eci));
       });
     });
     // 返回文件信息
@@ -272,7 +307,6 @@ class XlsxExport {
     }
     return 'thick';
   }
-
 }
 
 export {

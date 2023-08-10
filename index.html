@@ -8,61 +8,84 @@
             padding: 0;
             margin: 0;
         }
+
         html, body {
             height: 100%;
             display: block;
         }
+
+        #demo {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
-<body id="demo1">
+<body>
+<div id="demo"></div>
 </body>
 <script>
-  new XSheet('#demo1', {
+  console.time('生成数据消耗');
+  const bigdata = [];
+  for (let row = 0; row < 50000; row++) {
+    const items = [];
+    for (let col = 0; col < 25; col++) {
+      items.push(`row-${row}-col-${col}`);
+    }
+    bigdata.push(items);
+  }
+  console.timeEnd('生成数据消耗');
+
+  console.time('表格渲染消耗');
+  const table = {
+    name: '5w数据测试',
+    tableConfig: {
+      rows: {
+        len: bigdata.length
+      },
+      cols: {
+        len: 5
+      },
+      data: bigdata,
+      protection: {
+        // protections: ["A1:F5"],
+      },
+    },
+  };
+  const dome = document.getElementById('demo');
+  const xsheet = new XSheet(dome, {
     workConfig: {
-      name: 'x-sheet',
       top: {
         option: {
           show: true,
         },
-        menu: {
-          show: true,
-        },
       },
       body: {
-        sheetConfig: {
-          showMenu: true,
-        },
-        sheets: [{
-          tableConfig: {
-            rows: {
-              data: [{height: 90}]
-            },
-            data: [
-              [{
-                contentType: 2,
-                fontAttr: {
-                  textWrap: 2,
-                  direction: 'vertical'
-                },
-                richText: {
-                  rich: [{text: '哈哈aaFDF', color: 'rgb(255,0,2)'}, {text: 'FDFDFDF'}]
-                }
-              }]
-            ],
-            xFixedBar: {
-              height: 2,
-              width: 2,
-            },
-          },
-        }],
         tabConfig: {
-          showMenu: true,
+          showAdd: true,
         },
+        banner: false,
+        sheets: [table],
       },
-      bottom: {
-        show: true,
-      },
-    },
+    }
+  });
+  console.timeEnd('表格渲染消耗');
+
+  // 获取所有的sheet
+  const sheets = xsheet.getWork()
+    .getBody()
+    .getSheets();
+
+  // 获取指定的sheet
+  const sheet = xsheet.getWork()
+    .getBody()
+    .getSheetByIndex(0);
+  const cells = sheet.getTable()
+    .getTableCells();
+  const cell = cells.getCell(0, 0);
+
+  // 监听输入
+  XSheet.XEvent.bind(window, XSheet.Constant.TABLE_EVENT_TYPE.EDIT_INPUT, (e) => {
+
   });
 </script>
 </html>

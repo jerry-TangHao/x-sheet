@@ -103,15 +103,21 @@ class XSelectItem extends XScreenCssBorderItem {
           mousePointer.set(XTableMousePoint.KEYS.sResize, XSelectItem);
           break;
       }
-      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_DOWN);
-      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE);
+      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_DOWN, {
+        select: this, table,
+      });
+      table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE, {
+        select: this, table,
+      });
       XEvent.mouseMoveUp(document, (e2) => {
         const { x, y } = table.eventXy(e2);
         this.moveHandle(x, y);
         this.offsetHandle();
         this.borderHandle();
         this.cornerHandle();
-        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE);
+        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_CHANGE, {
+          select: this, table,
+        });
       }, () => {
         this.closeAnimate();
         switch (selectLocal) {
@@ -120,7 +126,9 @@ class XSelectItem extends XScreenCssBorderItem {
             mousePointer.free(XSelectItem);
             break;
         }
-        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_OVER);
+        table.trigger(Constant.TABLE_EVENT_TYPE.SELECT_OVER, {
+          select: this, table,
+        });
       });
     };
     this.tableChangeHeight = () => {

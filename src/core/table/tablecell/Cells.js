@@ -71,11 +71,15 @@ class Items {
                 if (firstRi && firstCi) {
                   continue;
                 }
-                oldRowItem[ci] = rowItem[ci];
-                rowItem[ci] = undefined;
+                if (rowItem[ci]) {
+                  oldRowItem[ci] = rowItem[ci];
+                  rowItem[ci] = rowItem[ci].cloneStyle();
+                }
               } else {
-                oldRowItem[ci] = rowItem[ci];
-                rowItem[ci] = undefined;
+                if (rowItem[ci]) {
+                  oldRowItem[ci] = rowItem[ci];
+                  rowItem[ci] = rowItem[ci].cloneStyle();
+                }
               }
             }
             oldItems[ri] = oldRowItem;
@@ -85,6 +89,84 @@ class Items {
     };
     snapshot.addAction(action);
     action.redo();
+  }
+
+  clearByMerge(rectRange, { ignoreCorner = false } = {}) {
+    let { sri, eri } = rectRange;
+    let { sci, eci } = rectRange;
+    let { data } = this;
+    let { snapshot } = this;
+    let { length } = data;
+    let oldItems = [];
+    let effRiLength = eri - sri + 1;
+    let effCiLength = eci - sci + 1;
+    let action = {
+      undo: () => {
+        for (let ri = sri; ri <= eri; ri++) {
+          if (ri >= length) {
+            break;
+          }
+          let oldRowItem = oldItems[ri];
+          let rowItem = data[ri];
+          if (rowItem) {
+            for (let ci = sci; ci <= eci; ci++) {
+              if (ci >= length) {
+                break;
+              }
+              if (ignoreCorner) {
+                rowItem[ci] = oldRowItem[ci];
+              } else {
+                rowItem[ci] = oldRowItem[ci];
+              }
+            }
+          }
+        }
+      },
+      redo: () => {
+        oldItems = new Array(effRiLength);
+        for (let ri = sri; ri <= eri; ri++) {
+          if (ri >= length) {
+            break;
+          }
+          let rowItem = data[ri];
+          if (rowItem) {
+            let oldRowItem = new Array(effCiLength);
+            let { length } = rowItem;
+            for (let ci = sci; ci <= eci; ci++) {
+              if (ci >= length) {
+                break;
+              }
+              if (ignoreCorner) {
+                let firstRi = ri === sri;
+                let firstCi = ci === sci;
+                if (firstRi && firstCi) {
+                  oldRowItem[ci] = rowItem[ci];
+                  rowItem[ci] = rowItem[ci].clone();
+                  rowItem[ci].clearBorderStyle();
+                  continue;
+                }
+                if (rowItem[ci]) {
+                  oldRowItem[ci] = rowItem[ci];
+                  rowItem[ci] = rowItem[ci].cloneStyle();
+                }
+              } else {
+                if (rowItem[ci]) {
+                  oldRowItem[ci] = rowItem[ci];
+                  rowItem[ci] = rowItem[ci].cloneStyle();
+                }
+              }
+            }
+            oldItems[ri] = oldRowItem;
+          }
+        }
+      },
+    };
+    snapshot.addAction(action);
+    action.redo();
+  }
+
+  clearAll() {
+    this.data.length = 0;
   }
 
   shift() {

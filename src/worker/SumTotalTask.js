@@ -13,7 +13,7 @@ class SumTotalTask extends BaseTask {
     this.workers = [];
     this.finish = 0;
     this.result = [];
-    this.group = 10000;
+    this.group = 1000;
     this.notice = null;
   }
 
@@ -42,6 +42,7 @@ class SumTotalTask extends BaseTask {
     workers.push(worker);
     worker.postMessage(data);
     worker.addEventListener('message', (event) => {
+      worker.terminate();
       this.finish++;
       this.workerFinish(event.data);
     });
@@ -77,13 +78,15 @@ class SumTotalTask extends BaseTask {
    */
   async execute(range, items) {
     return new Promise(async (resolve) => {
+      let splitGroup =  this.splitGroup(range);
       this.resetTask();
       this.notice = resolve;
-      let data = await this.splitData(range, items);
-      const { length } = data;
-      if (length) {
-        for (let i = 0; i < length; i++) {
-          this.createWorker(data[i]);
+      if (splitGroup.length > 0) {
+        for (let i = 0; i < splitGroup.length; i++) {
+          let group = splitGroup[i];
+          let data = items.slice(group.sri, group.eri + 1)
+              .map(items => items.slice(group.sci, group.eci + 1));
+          this.createWorker(data);
         }
       } else {
         this.workerFinish({
@@ -95,24 +98,42 @@ class SumTotalTask extends BaseTask {
   }
 
   /**
-   * 拆分数据
+   * 拆分数据组
    * @param range
-   * @param items
-   * @returns {Promise<void>}
+   * @returns {Array<{sri: number, eri: number, sci: number, eci: number}>}
    */
-  async splitData(range, items) {
-    return new Promise((resolve) => {
-      const { workers, group } = this;
-      const worker = new Worker(new URL('./task/splitdata.worker.js', import.meta.url));
-      workers.push(worker);
-      worker.postMessage({
-        range, items, group,
+  splitGroup(range) {
+    let group = this.group;
+    let record = [];
+    let checkPoint = range.sri;
+    for (let index = range.sri, split = 0; index <= range.eri; index ++, split ++) {
+      if (split > 0 && split % group === 0) {
+        record.push({
+          sri: checkPoint,
+          eri: index - 1,
+          sci: range.sci,
+          eci: range.eci,
+        });
+        checkPoint = index;
+        split = 0;
+      }
+    }
+    if (checkPoint === range.sri) {
+      record.push({
+        sri: range.sri,
+        eri: range.eri,
+        sci: range.sci,
+        eci: range.eci,
+      })
+    } else if (checkPoint < range.eri) {
+      record.push({
+        sri: checkPoint,
+        eri: range.eri,
+        sci: range.sci,
+        eci: range.eci,
       });
-      worker.addEventListener('message', (event) => {
-        this.finish++;
-        resolve(event.data);
-      });
-    });
+    }
+    return record;
   }
 
   /**

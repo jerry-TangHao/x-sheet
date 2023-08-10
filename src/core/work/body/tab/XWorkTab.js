@@ -3,20 +3,25 @@ import { XEvent } from '../../../../lib/XEvent';
 import { Constant, cssPrefix } from '../../../../const/Constant';
 import { SheetUtils } from '../../../../utils/SheetUtils';
 
-let number = 0;
-let include = [];
-
 class XWorkTab extends Widget {
+
+  _setName(name) {
+    const root = this.getRootWidget();
+    root.tabNameGen.removeName(this.name);
+    this.name = root.tabNameGen.genName(name);
+    this.editor.text(this.name);
+  }
 
   constructor(name, {
     lClickHandle = () => {},
     rClickHandle = () => {},
   } = {}) {
     super(`${cssPrefix}-sheet-tab`);
-    this.name = '';
+    this.name = name;
+    this.editor = new Widget(`${cssPrefix}-sheet-tab-editor`, 'span');
     this.lClickHandle = lClickHandle;
     this.rClickHandle = rClickHandle;
-    this.setName(this.getCheckName(name));
+    this.attach(this.editor);
     this.bind();
   }
 
@@ -35,9 +40,20 @@ class XWorkTab extends Widget {
     });
   }
 
+  onAttach() {
+    super.onAttach();
+    this._setName(this.name);
+  }
+
   setName(name) {
-    this.name = name;
-    this.text(this.name);
+    if (SheetUtils.isBlank(name)) {
+      name = this.name;
+    }
+    this._setName(name);
+  }
+
+  getName() {
+    return this.name;
   }
 
   setRClick(handle) {
@@ -48,24 +64,10 @@ class XWorkTab extends Widget {
     this.lClickHandle = handle;
   }
 
-  getName() {
-    number += 1;
-    return `Sheet${number}`;
-  }
-
-  getCheckName(name) {
-    if (SheetUtils.isUnDef(name)) {
-      name = this.getName();
-    }
-    while (include.indexOf(name) > -1) {
-      name = this.getName();
-    }
-    include.push(name);
-    return name;
-  }
-
   destroy() {
+    const root = this.getRootWidget();
     super.destroy();
+    root.tabNameGen.removeName(this.name);
     this.unbind();
   }
 

@@ -8,7 +8,7 @@ class Format {
   }
 
   text(value) {
-    return value ? `${value}` : '';
+    return value != null ? `${value}` : '';
   }
 
   // =============================数字==============================

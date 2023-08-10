@@ -9,15 +9,15 @@ import { Font } from './tool/Font';
 import { FontSize } from './tool/FontSize';
 import { FontBold } from './tool/FontBold';
 import { FontItalic } from './tool/FontItalic';
+import { Border } from './tool/Border';
+import { Merge } from './tool/Merge';
 import { UnderLine } from './tool/UnderLine';
+import { VerticalAlign } from './tool/VerticalAlign';
+import { TextWrapping } from './tool/TextWrapping';
 import { FontStrike } from './tool/FontStrike';
 import { FontColor } from './tool/FontColor';
 import { FillColor } from './tool/FillColor';
-import { Border } from './tool/Border';
-import { Merge } from './tool/Merge';
 import { HorizontalAlign } from './tool/HorizontalAlign';
-import { VerticalAlign } from './tool/VerticalAlign';
-import { TextWrapping } from './tool/TextWrapping';
 import { Fixed } from './tool/Fixed';
 import { Filter } from './tool/Filter';
 import { Functions } from './tool/Functions';
@@ -34,38 +34,91 @@ import { XCopyStyle } from '../../table/screenitems/xcopystyle/XCopyStyle';
 import { FontAngle } from './tool/FontAngle';
 import { Divider } from './tool/base/Divider';
 import { BaseEdit } from '../../table/tableedit/BaseEdit';
+import { RecycleMenu } from './tool/RecycleMenu';
+
+class XWorkHeadMenuScroll {
+  constructor(headMenu) {
+    this.headMenu = headMenu;
+    this.value = 0;
+    this.reset = () => {
+      let minValue = this.headMenu.box().width - this.headMenu.content.box().width;
+      if (minValue >= 0) {
+        this.headMenu.content.css('transform', `translateX(${this.value = 0}px)`);
+      }
+    };
+    this.bind();
+  }
+
+  bind() {
+    XEvent.bind(this.headMenu, Constant.SYSTEM_EVENT_TYPE.MOUSE_WHEEL, (event) => {
+      let maxValue = 0;
+      let minValue = this.headMenu.box().width - this.headMenu.content.box().width;
+      if (minValue < 0) {
+        this.value += (event.wheelDelta > 0 ? 20 : -20);
+        if (this.value < minValue) {
+          this.value = minValue;
+        } else if (this.value > maxValue) {
+          this.value = maxValue;
+        }
+        this.headMenu.content.css('transform', `translateX(${this.value}px)`);
+      }
+    });
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.RESIZE, this.reset);
+  }
+
+  unbind() {
+    XEvent.unbind(this.headMenu, Constant.SYSTEM_EVENT_TYPE.SCROLL);
+    XEvent.unbind(window, Constant.SYSTEM_EVENT_TYPE.RESIZE, this.reset);
+  }
+}
 
 class XWorkHeadMenu extends Widget {
 
-  constructor(workTop) {
+  constructor(workTop, options = {
+    shrinkMode: 'scroll',
+  }) {
     super(`${cssPrefix}-tools-menu`);
+    this.content = new Widget(`${cssPrefix}-tools-menu-content`, 'div');
     this.workTop = workTop;
+    this.options = options;
+    this.resize = () => {
+      ElPopUp.closeAll();
+    };
+    console.log(this.options.shrinkMode);
+    if (this.options.shrinkMode === 'scroll') {
+      this.scroll = new XWorkHeadMenuScroll(this);
+    }
   }
 
   unbind() {
     const { body } = this.workTop.work;
-    XEvent.bind(body);
-    XEvent.bind(this.scale);
-    XEvent.bind(this.undo);
-    XEvent.bind(this.redo);
-    XEvent.bind(this.paintFormat);
-    XEvent.bind(this.clearFormat);
-    XEvent.bind(this.format);
-    XEvent.bind(this.font);
-    XEvent.bind(this.dprFontSize);
-    XEvent.bind(this.fontBold);
-    XEvent.bind(this.fontItalic);
-    XEvent.bind(this.underLine);
-    XEvent.bind(this.fontStrike);
-    XEvent.bind(this.fontColor);
-    XEvent.bind(this.fillColor);
-    XEvent.bind(this.border);
-    XEvent.bind(this.merge);
-    XEvent.bind(this.horizontalAlign);
-    XEvent.bind(this.verticalAlign);
-    XEvent.bind(this.textWrapping);
-    XEvent.bind(this.fixed);
-    XEvent.bind(this.filter);
+    XEvent.unbind(body);
+    XEvent.unbind(this.scale);
+    XEvent.unbind(this.undo);
+    XEvent.unbind(this.redo);
+    XEvent.unbind(this.paintFormat);
+    XEvent.unbind(this.clearFormat);
+    XEvent.unbind(this.format);
+    XEvent.unbind(this.font);
+    XEvent.unbind(this.dprFontSize);
+    XEvent.unbind(this.fontBold);
+    XEvent.unbind(this.fontItalic);
+    XEvent.unbind(this.underLine);
+    XEvent.unbind(this.fontStrike);
+    XEvent.unbind(this.fontColor);
+    XEvent.unbind(this.fillColor);
+    XEvent.unbind(this.border);
+    XEvent.unbind(this.merge);
+    XEvent.unbind(this.horizontalAlign);
+    XEvent.unbind(this.verticalAlign);
+    XEvent.unbind(this.textWrapping);
+    XEvent.unbind(this.fixed);
+    XEvent.unbind(this.filter);
+    XEvent.unbind(this.recycleMenu);
+    XEvent.unbind(window, Constant.WORK_BODY_EVENT_TYPE.RESIZE, this.resize);
+    if (this.scroll) {
+      this.scroll.unbind();
+    }
   }
 
   onAttach() {
@@ -366,8 +419,12 @@ class XWorkHeadMenu extends Widget {
         },
       },
     });
+    this.recycleMenu = new RecycleMenu(this, {
+      enable: this.options.shrinkMode === 'recycle',
+    });
 
     // 追加到菜单中
+    super.attach(this.content);
     this.attach(this.undo);
     this.attach(this.redo);
     this.attach(new Divider());
@@ -397,6 +454,7 @@ class XWorkHeadMenu extends Widget {
     this.attach(this.fixed);
     this.attach(this.filter);
     this.attach(this.functions);
+    this.attach(this.recycleMenu);
     this.bind();
   }
 
@@ -621,10 +679,13 @@ class XWorkHeadMenu extends Widget {
 
     // 上下文菜单工具栏
     XEvent.bind(this.dprFontSize, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
-      const { dprFontSize } = this;
+      const { dprFontSize, recycleMenu } = this;
       const { fontSizeContextMenu } = dprFontSize;
-      const { elPopUp } = fontSizeContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      const { recycleContextMenu } = recycleMenu;
+      ElPopUp.closeAll([
+        fontSizeContextMenu.elPopUp,
+        recycleContextMenu.elPopUp,
+      ]);
       if (fontSizeContextMenu.isClose()) {
         fontSizeContextMenu.open();
       } else {
@@ -634,10 +695,13 @@ class XWorkHeadMenu extends Widget {
       e.preventDefault();
     });
     XEvent.bind(this.font, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
-      const { font } = this;
+      const { font, recycleMenu } = this;
       const { fontContextMenu } = font;
-      const { elPopUp } = fontContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      const { recycleContextMenu } = recycleMenu;
+      ElPopUp.closeAll([
+        fontContextMenu.elPopUp,
+        recycleContextMenu.elPopUp,
+      ]);
       if (fontContextMenu.isClose()) {
         fontContextMenu.open();
       } else {
@@ -647,10 +711,13 @@ class XWorkHeadMenu extends Widget {
       e.preventDefault();
     });
     XEvent.bind(this.fontColor, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
-      const { fontColor } = this;
+      const { fontColor, recycleMenu } = this;
       const { fontColorContextMenu } = fontColor;
-      const { elPopUp } = fontColorContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      const { recycleContextMenu } = recycleMenu;
+      ElPopUp.closeAll([
+        fontColorContextMenu.elPopUp,
+        recycleContextMenu.elPopUp,
+      ]);
       if (fontColorContextMenu.isClose()) {
         fontColorContextMenu.open();
       } else {
@@ -663,10 +730,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { fillColor } = this;
+      const { fillColor, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { fillColorContextMenu } = fillColor;
-      const { elPopUp } = fillColorContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        fillColorContextMenu.elPopUp,
+        recycleContextMenu.elPopUp,
+      ]);
       if (fillColorContextMenu.isClose()) {
         fillColorContextMenu.open();
       } else {
@@ -679,10 +749,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { scale } = this;
+      const { scale, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { scaleContextMenu } = scale;
-      const { elPopUp } = scaleContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        scaleContextMenu.elPopUp,
+        recycleContextMenu.elPopUp,
+      ]);
       if (scaleContextMenu.isClose()) {
         scaleContextMenu.open();
       } else {
@@ -695,10 +768,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { format } = this;
+      const { format, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { formatContextMenu } = format;
-      const { elPopUp } = formatContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        formatContextMenu.elPopUp,
+        recycleContextMenu.elPopUp,
+      ]);
       if (formatContextMenu.isClose()) {
         formatContextMenu.open();
       } else {
@@ -711,10 +787,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { border } = this;
+      const { border, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { borderTypeContextMenu } = border;
-      const { elPopUp } = borderTypeContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        recycleContextMenu.elPopUp,
+        borderTypeContextMenu.elPopUp,
+      ]);
       if (borderTypeContextMenu.isClose()) {
         borderTypeContextMenu.open();
       } else {
@@ -727,10 +806,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { textWrapping } = this;
+      const { textWrapping, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { textWrappingContextMenu } = textWrapping;
-      const { elPopUp } = textWrappingContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        recycleContextMenu.elPopUp,
+        textWrappingContextMenu.elPopUp,
+      ]);
       if (textWrappingContextMenu.isClose()) {
         textWrappingContextMenu.open();
       } else {
@@ -743,10 +825,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { horizontalAlign } = this;
+      const { horizontalAlign, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { horizontalContextMenu } = horizontalAlign;
-      const { elPopUp } = horizontalContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        recycleContextMenu.elPopUp,
+        horizontalContextMenu.elPopUp,
+      ]);
       if (horizontalContextMenu.isClose()) {
         horizontalContextMenu.open();
       } else {
@@ -759,10 +844,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { verticalAlign } = this;
+      const { verticalAlign, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { verticalContextMenu } = verticalAlign;
-      const { elPopUp } = verticalContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        recycleContextMenu.elPopUp,
+        verticalContextMenu.elPopUp,
+      ]);
       if (verticalContextMenu.isClose()) {
         verticalContextMenu.open();
       } else {
@@ -775,10 +863,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { fixed } = this;
+      const { fixed, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { fixedContextMenu } = fixed;
-      const { elPopUp } = fixedContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        recycleContextMenu.elPopUp,
+        fixedContextMenu.elPopUp,
+      ]);
       if (fixedContextMenu.isClose()) {
         fixedContextMenu.open();
       } else {
@@ -791,10 +882,13 @@ class XWorkHeadMenu extends Widget {
       const sheet = sheetView.getActiveSheet();
       const { table } = sheet;
       table.hideEditor();
-      const { fontAngle } = this;
+      const { fontAngle, recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
       const { fontAngleContextMenu } = fontAngle;
-      const { elPopUp } = fontAngleContextMenu;
-      ElPopUp.closeAll([elPopUp]);
+      ElPopUp.closeAll([
+        recycleContextMenu.elPopUp,
+        fontAngleContextMenu.elPopUp,
+      ]);
       if (fontAngleContextMenu.isClose()) {
         fontAngleContextMenu.open();
       } else {
@@ -803,6 +897,26 @@ class XWorkHeadMenu extends Widget {
       e.stopPropagation();
       e.preventDefault();
     });
+    XEvent.bind(this.recycleMenu, Constant.SYSTEM_EVENT_TYPE.MOUSE_DOWN, (e) => {
+      const { recycleMenu } = this;
+      const { recycleContextMenu } = recycleMenu;
+      const { elPopUp } = recycleContextMenu;
+      ElPopUp.closeAll([elPopUp]);
+      if (recycleContextMenu.isClose()) {
+        recycleContextMenu.open();
+      } else {
+        recycleContextMenu.close();
+      }
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    // resize
+    XEvent.bind(window, Constant.SYSTEM_EVENT_TYPE.RESIZE, this.resize);
+  }
+
+  attach(widget) {
+    this.content.attach(widget);
   }
 
   setAllStatus() {
@@ -833,113 +947,6 @@ class XWorkHeadMenu extends Widget {
     let { sheetView } = body;
     let sheet = sheetView.getActiveSheet();
     this.paintFormat.active(this.paintFormat.includeSheet(sheet));
-  }
-
-  setFontStatus() {
-    let { body } = this.workTop.work;
-    let { sheetView } = body;
-    let sheet = sheetView.getActiveSheet();
-    let { table } = sheet;
-    let { xScreen } = table;
-    let helper = table.getDataCellsHelper();
-    let xSelect = xScreen.findType(XSelectItem);
-    let { selectRange } = xSelect;
-    let name = helper.getStyleFontName({ selectRange });
-    this.font.setTitle(name);
-    this.font.fontContextMenu.setActiveByType(name);
-  }
-
-  setFixedStatus() {
-    let { body } = this.workTop.work;
-    let { fixed } = this;
-    let { sheetView } = body;
-    let sheet = sheetView.getActiveSheet();
-    let { table } = sheet;
-    fixed.setFixedRowStatus(table.xFixedView.hasFixedTop());
-    fixed.setFixedColStatus(table.xFixedView.hasFixedLeft());
-  }
-
-  setUndoStatus() {
-    let { body } = this.workTop.work;
-    let { sheetView } = body;
-    let sheet = sheetView.getActiveSheet();
-    let { table } = sheet;
-    let { snapshot } = table;
-    this.undo.active(snapshot.canUndo());
-  }
-
-  setRedoStatus() {
-    let { body } = this.workTop.work;
-    let { sheetView } = body;
-    let sheet = sheetView.getActiveSheet();
-    let { table } = sheet;
-    let { snapshot } = table;
-    this.redo.active(snapshot.canRedo());
-  }
-
-  setScaleStatus() {
-    let { body } = this.workTop.work;
-    let { sheetView } = body;
-    let sheet = sheetView.getActiveSheet();
-    let { table } = sheet;
-    let { scale } = table;
-    let value = scale.goto(100);
-    this.scale.setTitle(`${value}%`);
-  }
-
-  setFormatStatus() {
-    let { body } = this.workTop.work;
-    let { sheetView } = body;
-    let sheet = sheetView.getActiveSheet();
-    let { table } = sheet;
-    let { xScreen } = table;
-    let helper = table.getDataCellsHelper();
-    let xSelect = xScreen.findType(XSelectItem);
-    let { selectRange } = xSelect;
-    let format = helper.getCellFormat({ selectRange });
-    let text = '常规';
-    switch (format) {
-      case 'default':
-        text = '常规';
-        break;
-      case 'text':
-        text = '文本';
-        break;
-      case 'number':
-        text = '数字';
-        break;
-      case 'percentage':
-        text = '百分比';
-        break;
-      case 'fraction':
-        text = '分数';
-        break;
-      case 'ENotation':
-        text = '科学计数';
-        break;
-      case 'rmb':
-        text = '人民币';
-        break;
-      case 'hk':
-        text = '港币';
-        break;
-      case 'dollar':
-        text = '美元';
-        break;
-      case 'date1':
-      case 'date2':
-      case 'date3':
-      case 'date4':
-      case 'date5':
-        text = '日期';
-        break;
-      case 'time':
-        text = '时间';
-        break;
-      default: break;
-    }
-    this.format.setTitle(text);
-    this.format.formatContextMenu.setActiveByType(format);
   }
 
   setFilterStatus() {
@@ -1002,6 +1009,113 @@ class XWorkHeadMenu extends Widget {
     let { selectRange } = xSelect;
     let strikethrough = helper.hasStyleStrikeLine({ selectRange });
     this.fontStrike.active(strikethrough);
+  }
+
+  setFontStatus() {
+    let { body } = this.workTop.work;
+    let { sheetView } = body;
+    let sheet = sheetView.getActiveSheet();
+    let { table } = sheet;
+    let { xScreen } = table;
+    let helper = table.getDataCellsHelper();
+    let xSelect = xScreen.findType(XSelectItem);
+    let { selectRange } = xSelect;
+    let name = helper.getStyleFontName({ selectRange });
+    this.font.setTitle(name);
+    this.font.fontContextMenu.setActiveByType(name);
+  }
+
+  setScaleStatus() {
+    let { body } = this.workTop.work;
+    let { sheetView } = body;
+    let sheet = sheetView.getActiveSheet();
+    let { table } = sheet;
+    let { scale } = table;
+    let value = scale.goto(100);
+    this.scale.setTitle(`${value}%`);
+  }
+
+  setFixedStatus() {
+    let { body } = this.workTop.work;
+    let { fixed } = this;
+    let { sheetView } = body;
+    let sheet = sheetView.getActiveSheet();
+    let { table } = sheet;
+    fixed.setFixedRowStatus(table.xFixedView.hasFixedTop());
+    fixed.setFixedColStatus(table.xFixedView.hasFixedLeft());
+  }
+
+  setUndoStatus() {
+    let { body } = this.workTop.work;
+    let { sheetView } = body;
+    let sheet = sheetView.getActiveSheet();
+    let { table } = sheet;
+    let { snapshot } = table;
+    this.undo.active(snapshot.canUndo());
+  }
+
+  setRedoStatus() {
+    let { body } = this.workTop.work;
+    let { sheetView } = body;
+    let sheet = sheetView.getActiveSheet();
+    let { table } = sheet;
+    let { snapshot } = table;
+    this.redo.active(snapshot.canRedo());
+  }
+
+  setFormatStatus() {
+    let { body } = this.workTop.work;
+    let { sheetView } = body;
+    let sheet = sheetView.getActiveSheet();
+    let { table } = sheet;
+    let { xScreen } = table;
+    let helper = table.getDataCellsHelper();
+    let xSelect = xScreen.findType(XSelectItem);
+    let { selectRange } = xSelect;
+    let format = helper.getCellFormat({ selectRange });
+    let text = '常规';
+    switch (format) {
+      case 'default':
+        text = '常规';
+        break;
+      case 'text':
+        text = '文本';
+        break;
+      case 'number':
+        text = '数字';
+        break;
+      case 'percentage':
+        text = '百分比';
+        break;
+      case 'fraction':
+        text = '分数';
+        break;
+      case 'ENotation':
+        text = '科学计数';
+        break;
+      case 'rmb':
+        text = '人民币';
+        break;
+      case 'hk':
+        text = '港币';
+        break;
+      case 'dollar':
+        text = '美元';
+        break;
+      case 'date1':
+      case 'date2':
+      case 'date3':
+      case 'date4':
+      case 'date5':
+        text = '日期';
+        break;
+      case 'time':
+        text = '时间';
+        break;
+      default: break;
+    }
+    this.format.setTitle(text);
+    this.format.formatContextMenu.setActiveByType(format);
   }
 
   setFontItalicStatus() {
@@ -1165,7 +1279,6 @@ class XWorkHeadMenu extends Widget {
     super.destroy();
     this.unbind();
   }
-
 }
 
 export { XWorkHeadMenu };

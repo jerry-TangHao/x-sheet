@@ -67,7 +67,7 @@ const pool = new BindPool();
 
 class XEvent {
 
-  static unbind(target, name, fn, option = false) {
+  static unbind(target, name = null, fn = null, option = false) {
     if (Array.isArray(target)) {
       pool.multipleUnbind(target, name, fn, option);
     } else {

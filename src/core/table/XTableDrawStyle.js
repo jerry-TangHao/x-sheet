@@ -87,7 +87,10 @@ class XTableFrozenFullRect {
 class XTableFixedBar {
 
   constructor(table, {
-    width, height, background, buttonColor,
+    width,
+    height,
+    background,
+    buttonColor,
   }) {
     this.table = table;
     this.height = height;
@@ -1550,22 +1553,27 @@ class XTableLeftIndexUI extends XTableIndexUI {
     const borderX = this.getLineX();
     const borderY = this.getLineY();
     const { table } = this;
-    const { draw, indexGrid } = table;
-    const { iResult } = LineGenerator.run({
-      scrollView: borderView,
-      foldOnOff: false,
-      model: LineGenerator.MODEL.INDEX,
-      table,
-      getWidth: () => table.index.getWidth(),
-    });
-    draw.offset(borderX, borderY);
-    iResult.bLine.forEach((item) => {
-      indexGrid.horizonLine(item.sx, item.sy, item.ex, item.ey);
-    });
-    iResult.rLine.forEach((item) => {
-      indexGrid.verticalLine(item.sx, item.sy, item.ex, item.ey);
-    });
-    draw.offset(0, 0);
+    const { index } = table;
+    const { draw } = table;
+    const { indexGrid } = table;
+    const displayLeftIndex = index.isDisplayLeftIndex();
+    if (displayLeftIndex) {
+      const { iResult } = LineGenerator.run({
+        scrollView: borderView,
+        foldOnOff: false,
+        model: LineGenerator.MODEL.INDEX,
+        table,
+        getWidth: () => table.index.getWidth(),
+      });
+      draw.offset(borderX, borderY);
+      iResult.bLine.forEach((item) => {
+        indexGrid.horizonLine(item.sx, item.sy, item.ex, item.ey);
+      });
+      iResult.rLine.forEach((item) => {
+        indexGrid.verticalLine(item.sx, item.sy, item.ex, item.ey);
+      });
+      draw.offset(0, 0);
+    }
   }
 
   drawColor() {
@@ -1575,47 +1583,54 @@ class XTableLeftIndexUI extends XTableIndexUI {
     const height = scrollView.h;
     const width = this.getWidth();
     const { table } = this;
-    const {
-      draw, index,
-    } = table;
-    draw.offset(dx, dy);
-    draw.attr({
-      fillStyle: index.getBackground(),
-    });
-    draw.fillRect(0, 0, width, height);
-    draw.offset(0, 0);
+    const { draw } = table;
+    const { index } = table;
+    const displayLeftIndex = index.isDisplayLeftIndex();
+    if (displayLeftIndex) {
+      draw.offset(dx, dy);
+      draw.attr({
+        fillStyle: index.getBackground(),
+      });
+      draw.fillRect(0, 0, width, height);
+      draw.offset(0, 0);
+    }
   }
 
   drawFont() {
     const dx = this.getDrawX();
     const dy = this.getDrawY();
-    const scrollView = this.getScrollView();
     const width = this.getWidth();
     const { table } = this;
-    const { draw, rows, index } = table;
-    const { sri, eri } = scrollView;
-    const minHeight = rows.getMinHeight();
-    draw.offset(dx, dy);
-    draw.attr({
-      font: `${index.getSize()}px Arial`,
-      fillStyle: index.getColor(),
-    });
-    rows.eachHeight(sri, eri, (i, ch, y) => {
-      if (ch > minHeight) {
-        const index = `${i + 1}`;
-        const metrics = draw.measureText(index);
-        const ascent = metrics.actualBoundingBoxAscent;
-        const descent = metrics.actualBoundingBoxDescent;
-        const fontWidth = metrics.width;
-        const fontHeight = ascent + descent;
-        if (ch > fontHeight) {
-          const fx = (width / 2) - (fontWidth / 2);
-          const fy = y + ((ch / 2) - (fontHeight / 2)) + ascent;
-          draw.fillText(index, fx, fy);
+    const { draw } = table;
+    const { rows } = table;
+    const { index } = table;
+    const displayLeftIndex = index.isDisplayLeftIndex();
+    if (displayLeftIndex) {
+      const scrollView = this.getScrollView();
+      const minHeight = rows.getMinHeight();
+      const { sri, eri } = scrollView;
+      draw.offset(dx, dy);
+      draw.attr({
+        font: `${index.getSize()}px Arial`,
+        fillStyle: index.getColor(),
+      });
+      rows.eachHeight(sri, eri, (i, ch, y) => {
+        if (ch > minHeight) {
+          const index = `${i + 1}`;
+          const metrics = draw.measureText(index);
+          const ascent = metrics.actualBoundingBoxAscent;
+          const descent = metrics.actualBoundingBoxDescent;
+          const fontWidth = metrics.width;
+          const fontHeight = ascent + descent;
+          if (ch > fontHeight) {
+            const fx = (width / 2) - (fontWidth / 2);
+            const fy = y + ((ch / 2) - (fontHeight / 2)) + ascent;
+            draw.fillText(index, fx, fy);
+          }
         }
-      }
-    });
-    draw.offset(0, 0);
+      });
+      draw.offset(0, 0);
+    }
   }
 
   drawFilter() {
@@ -1651,77 +1666,90 @@ class XTableTopIndexUI extends XTableIndexUI {
     const borderX = this.getLineX();
     const borderY = this.getLineY();
     const { table } = this;
-    const { draw, indexGrid } = table;
-    // 边缘线条
-    const lineWidth = XDraw.getLineWidthTypePx(XDraw.LINE_WIDTH_TYPE.low);
+    const { index } = table;
+    const { draw } = table;
+    const { indexGrid } = table;
+    const displayTopIndex = index.isDisplayTopIndex();
     const width = table.visualWidth();
+    const lineWidth = XDraw.getLineWidthTypePx(XDraw.LINE_WIDTH_TYPE.low);
+    // 边缘线条
     indexGrid.horizonLine(0, lineWidth, width, lineWidth);
-    // 索引边框
-    const { iResult } = LineGenerator.run({
-      scrollView: borderView,
-      foldOnOff: false,
-      model: LineGenerator.MODEL.INDEX,
-      table,
-      getHeight: () => table.index.getHeight(),
-    });
-    draw.offset(borderX, borderY);
-    iResult.bLine.forEach((item) => {
-      indexGrid.horizonLine(item.sx, item.sy, item.ex, item.ey);
-    });
-    iResult.rLine.forEach((item) => {
-      indexGrid.verticalLine(item.sx, item.sy, item.ex, item.ey);
-    });
-    draw.offset(0, 0);
+    if (displayTopIndex) {
+      // 索引边框
+      const indexHeight = index.getHeight();
+      const { iResult } = LineGenerator.run({
+        scrollView: borderView,
+        foldOnOff: false,
+        model: LineGenerator.MODEL.INDEX,
+        table,
+        getHeight: () => indexHeight,
+      });
+      draw.offset(borderX, borderY);
+      iResult.bLine.forEach((item) => {
+        indexGrid.horizonLine(item.sx, item.sy, item.ex, item.ey);
+      });
+      iResult.rLine.forEach((item) => {
+        indexGrid.verticalLine(item.sx, item.sy, item.ex, item.ey);
+      });
+      draw.offset(0, 0);
+    }
   }
 
   drawColor() {
     const { table } = this;
-    const {
-      draw, index,
-    } = table;
-    const scrollView = this.getScrollView();
-    const dx = this.getDrawX();
-    const dy = this.getDrawY();
-    const height = this.getHeight();
-    const width = scrollView.w;
-    draw.offset(dx, dy);
-    draw.attr({
-      fillStyle: index.getBackground(),
-    });
-    draw.fillRect(0, 0, width, height);
-    draw.offset(0, 0);
+    const { index } = table;
+    const { draw } = table;
+    const displayTopIndex = index.isDisplayTopIndex();
+    if (displayTopIndex) {
+      const height = this.getHeight();
+      const dx = this.getDrawX();
+      const dy = this.getDrawY();
+      const scrollView = this.getScrollView();
+      const width = scrollView.w;
+      draw.offset(dx, dy);
+      draw.attr({
+        fillStyle: index.getBackground(),
+      });
+      draw.fillRect(0, 0, width, height);
+      draw.offset(0, 0);
+    }
   }
 
   drawFont() {
-    const dx = this.getDrawX();
-    const dy = this.getDrawY();
-    const scrollView = this.getScrollView();
-    const height = this.getHeight();
     const { table } = this;
-    const { draw, cols, index } = table;
-    const { sci, eci } = scrollView;
-    const minWidth = cols.getMinWidth();
-    draw.offset(dx, dy);
-    draw.attr({
-      font: `${index.getSize()}px Arial`,
-      fillStyle: index.getColor(),
-    });
-    cols.eachWidth(sci, eci, (i, cw, x) => {
-      if (cw > minWidth) {
-        const index = SheetUtils.stringAt(i);
-        const metrics = draw.measureText(index);
-        const ascent = metrics.actualBoundingBoxAscent;
-        const descent = metrics.actualBoundingBoxDescent;
-        const fontWidth = metrics.width;
-        const fontHeight = ascent + descent;
-        if (cw > fontWidth) {
-          const fx = x + ((cw / 2) - fontWidth / 2);
-          const fy = ((height / 2) - fontHeight / 2) + ascent;
-          draw.fillText(index, fx, fy);
+    const { draw } = table;
+    const { cols } = table;
+    const { index } = table;
+    const displayTopIndex = index.isDisplayTopIndex();
+    if (displayTopIndex) {
+      const dx = this.getDrawX();
+      const dy = this.getDrawY();
+      const scrollView = this.getScrollView();
+      const height = this.getHeight();
+      const { sci, eci } = scrollView;
+      const minWidth = cols.getMinWidth();
+      draw.offset(dx, dy);
+      draw.attr({
+        font: `${index.getSize()}px Arial`,
+        fillStyle: index.getColor(),
+      });
+      cols.eachWidth(sci, eci, (i, cw, x) => {
+        if (cw > minWidth) {
+          const index = SheetUtils.stringAt(i);
+          const metrics = draw.measureText(index);
+          const ascent = metrics.actualBoundingBoxAscent;
+          const descent = metrics.actualBoundingBoxDescent;
+          const fontWidth = metrics.width;
+          const fontHeight = ascent + descent;
+          if (cw > fontWidth) {
+            const fx = x + ((cw / 2) - fontWidth / 2);
+            const fy = ((height / 2) - fontHeight / 2) + ascent;
+            draw.fillText(index, fx, fy);
+          }
         }
-      }
-    });
-    draw.offset(0, 0);
+      });
+      draw.offset(0, 0);
+    }
   }
 
   drawFilter() {
@@ -1747,7 +1775,6 @@ class XTableTopIndexUI extends XTableIndexUI {
     }
     return false;
   }
-
 }
 
 // ============================ 表格冻结区域内容绘制 =============================
@@ -2624,8 +2651,12 @@ class XTableDrawStyle extends Widget {
    * @param scroll
    */
   constructor({
-    xTableScrollView, settings, snapshot,
-    scroll, xFixedView, xIteratorBuilder,
+    xTableScrollView,
+    settings,
+    snapshot,
+    scroll,
+    xFixedView,
+    xIteratorBuilder,
   }) {
     super(`${cssPrefix}-table-canvas`, 'canvas');
     // 渲染模式
@@ -2711,25 +2742,25 @@ class XTableDrawStyle extends Widget {
     const lBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new LBorderRequire({ cells: this.cells }),
+        new LBorderRequire(this),
       ],
     });
     const rBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new RBorderRequire({ cells: this.cells }),
+        new RBorderRequire(this),
       ],
     });
     const tBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new TBorderRequire({ cells: this.cells }),
+        new TBorderRequire(this),
       ],
     });
     const bBorderFilter = new LineIteratorFilter({
       logic: LineIteratorFilter.FILTER_LOGIC.AND,
       stack: [
-        new BBorderRequire({ cells: this.cells }),
+        new BBorderRequire(this),
       ],
     });
     // 绘制资源
@@ -2864,6 +2895,23 @@ class XTableDrawStyle extends Widget {
       }
     }
     return boundOutWidth;
+  }
+
+  /**
+   * 获取合并单元格左上角单元格，
+   * 如果不存在，返回指定坐标的单元格
+   * @param ri
+   * @param ci
+   */
+  getMasterMergeCellOrCell(ri, ci) {
+    const { cells, merges } = this;
+    const merge = merges.getFirstInclude(ri, ci);
+    if (merge) {
+      const mri = merge.sri;
+      const mci = merge.sci;
+      return cells.getCell(mri, mci);
+    }
+    return cells.getCell(ri, ci);
   }
 
   /**
