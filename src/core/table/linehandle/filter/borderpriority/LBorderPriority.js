@@ -10,9 +10,8 @@ class LBorderPriority {
     row, col,
   }) {
     const { table } = this;
-    const { cells } = table;
-    const main = cells.getCell(row, col);
-    const last = cells.getCell(row, col - 1);
+    const main = table.getMasterMergeCellOrCell(row, col);
+    const last = table.getMasterMergeCellOrCell(row, col - 1);
     if (main) {
       if (last) {
         const { left } = main.borderAttr;
